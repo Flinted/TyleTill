@@ -55,31 +55,39 @@ const Tyle = React.createClass({
   },
 
   onItemClick(event, markerID){
-        console.log(event.target.value)
-        console.log("marker", markerID)
         let currentOrder = this.state.primaryOrderItems
         if(markerID === 2){
-            console.log("hitting secondary for items")
         currentOrder = this.state.secondaryOrderItems
         }
-
         const item = this.state.displayItems[event.target.value]
         const ordermanager = new OrderManager
         let newOrderArray = ordermanager.addItem(currentOrder, item)
-        console.log("tyle state", newOrderArray)
         const cashmanager = new CashManager
-        const total = cashmanager.total(newOrderArray).toLocaleString('en-GB', {style:'currency', currency:'GBP'})
-        if(markerID == 2){
-            console.log("hitting secondary")
+        const total = cashmanager.total(newOrderArray)
+        if(markerID === 2){
         this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total})
         }else{
-            console.log("hitting primary")
         this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total})
         }
   },
 
-  onOrderRowClick(event){
-        console.log('clicked')
+  onOrderRowClick(key, markerID){
+      let currentOrder = null
+      let items = null;
+      if(markerID === 2){
+        currentOrder = this.state.secondaryOrderItems
+      }else{
+        currentOrder = this.state.primaryOrderItems
+      }
+      const ordermanager = new OrderManager
+      let newOrderArray = ordermanager.removeItem(currentOrder, key)
+      const cashmanager = new CashManager
+      const total = cashmanager.total(newOrderArray)
+      if(markerID === 2){
+      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total})
+      }else{
+      this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total})
+    }
   },
 
   onLongClick(event){
@@ -102,7 +110,7 @@ const Tyle = React.createClass({
                 <div className="primary">
                       <div id='sidebar'>
                             <Infowindow total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
-                            <Orderwindow items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
+                            <Orderwindow markerID={1} items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
                             <Cashwindow />
                       </div>
                       <ButtonColumn splitClick= {this.onSplitClick}/>
@@ -112,7 +120,7 @@ const Tyle = React.createClass({
                 <div className="secondary">
                     <div id='sidebar'>
                         <Infowindow total={this.state.secondaryOrderTotal} user={this.state.secondaryUser}/>
-                        <Orderwindow items={this.state.secondaryOrderItems} onClick={this.onOrderRowClick}/>
+                        <Orderwindow markerID={2} items={this.state.secondaryOrderItems} onClick={this.onOrderRowClick}/>
                         <Cashwindow />
                     </div>
                     <ButtonColumn splitClick= {this.onSplitClick}/>
@@ -126,11 +134,11 @@ const Tyle = React.createClass({
       <div className='tyle-container'>
             <div id='sidebar'>
             <Infowindow total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
-            <Orderwindow items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
+            <Orderwindow markerID={1} items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
             <Cashwindow />
             </div>
             <ButtonColumn splitClick= {this.onSplitClick}/>
-            <Itemwindow class= 'item-window' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>
+            <Itemwindow markerID={1} class= 'item-window' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>
       </div>
       )
 

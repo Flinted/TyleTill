@@ -29,7 +29,6 @@ const Item = React.createClass({
   },
 
   onClick(event){
-    console.log("itemmarker", event)
     this.props.onClick(event, this.props.markerID)
   },
 

@@ -9,7 +9,7 @@ const Orderwindow= React.createClass({
   render(){
     let orderNodes = []
     for(let key in this.props.items[0]){
-      let row  =  <OrderRow name={this.props.items[0][key].name} qty={this.props.items[0][key].qty} total={this.props.items[0][key].total} key={this.props.items[0][key].id} onClick={this.props.onClick}/>
+      let row  =  <OrderRow name={this.props.items[0][key].name} markerID={this.props.markerID}qty={this.props.items[0][key].qty} total={this.props.items[0][key].total} key={this.props.items[0][key].id} onClick={this.props.onClick}/>
       orderNodes.push(row)
     }
     

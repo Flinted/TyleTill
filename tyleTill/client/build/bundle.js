@@ -19823,30 +19823,38 @@
 	    return parsedItems;
 	  },
 	  onItemClick: function onItemClick(event, markerID) {
-	    console.log(event.target.value);
-	    console.log("marker", markerID);
 	    var currentOrder = this.state.primaryOrderItems;
 	    if (markerID === 2) {
-	      console.log("hitting secondary for items");
 	      currentOrder = this.state.secondaryOrderItems;
 	    }
-	
 	    var item = this.state.displayItems[event.target.value];
 	    var ordermanager = new OrderManager();
 	    var newOrderArray = ordermanager.addItem(currentOrder, item);
-	    console.log("tyle state", newOrderArray);
 	    var cashmanager = new CashManager();
-	    var total = cashmanager.total(newOrderArray).toLocaleString('en-GB', { style: 'currency', currency: 'GBP' });
-	    if (markerID == 2) {
-	      console.log("hitting secondary");
+	    var total = cashmanager.total(newOrderArray);
+	    if (markerID === 2) {
 	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total });
 	    } else {
-	      console.log("hitting primary");
 	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total });
 	    }
 	  },
-	  onOrderRowClick: function onOrderRowClick(event) {
-	    console.log('clicked');
+	  onOrderRowClick: function onOrderRowClick(key, markerID) {
+	    var currentOrder = null;
+	    var items = null;
+	    if (markerID === 2) {
+	      currentOrder = this.state.secondaryOrderItems;
+	    } else {
+	      currentOrder = this.state.primaryOrderItems;
+	    }
+	    var ordermanager = new OrderManager();
+	    var newOrderArray = ordermanager.removeItem(currentOrder, key);
+	    var cashmanager = new CashManager();
+	    var total = cashmanager.total(newOrderArray);
+	    if (markerID === 2) {
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total });
+	    } else {
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total });
+	    }
 	  },
 	  onLongClick: function onLongClick(event) {},
 	  onSplitClick: function onSplitClick() {
@@ -19869,7 +19877,7 @@
 	            'div',
 	            { id: 'sidebar' },
 	            React.createElement(Infowindow, { total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
-	            React.createElement(Orderwindow, { items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
+	            React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
 	            React.createElement(Cashwindow, null)
 	          ),
 	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
@@ -19883,7 +19891,7 @@
 	            'div',
 	            { id: 'sidebar' },
 	            React.createElement(Infowindow, { total: this.state.secondaryOrderTotal, user: this.state.secondaryUser }),
-	            React.createElement(Orderwindow, { items: this.state.secondaryOrderItems, onClick: this.onOrderRowClick }),
+	            React.createElement(Orderwindow, { markerID: 2, items: this.state.secondaryOrderItems, onClick: this.onOrderRowClick }),
 	            React.createElement(Cashwindow, null)
 	          ),
 	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
@@ -19899,11 +19907,11 @@
 	          'div',
 	          { id: 'sidebar' },
 	          React.createElement(Infowindow, { total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
-	          React.createElement(Orderwindow, { items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
+	          React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
 	          React.createElement(Cashwindow, null)
 	        ),
 	        React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
-	        React.createElement(Itemwindow, { 'class': 'item-window', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
+	        React.createElement(Itemwindow, { markerID: 1, 'class': 'item-window', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
 	      );
 	    }
 	  }
@@ -19926,7 +19934,7 @@
 	  render: function render() {
 	    var orderNodes = [];
 	    for (var key in this.props.items[0]) {
-	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
+	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
 	      orderNodes.push(row);
 	    }
 	
@@ -19952,26 +19960,32 @@
 	
 	var React = __webpack_require__(1);
 	
-	var OrderRow = function OrderRow(props) {
-	    return React.createElement(
-	        'li',
-	        { value: props.index, onClick: props.onClick },
-	        React.createElement(
-	            'p',
-	            null,
-	            props.qty,
-	            ' * ',
-	            props.name,
-	            ':'
-	        ),
-	        React.createElement(
-	            'div',
-	            { className: 'order-price' },
-	            props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	        ),
-	        ' '
-	    );
-	};
+	var OrderRow = React.createClass({
+	    displayName: 'OrderRow',
+	    onClick: function onClick() {
+	        this.props.onClick(this.props.name, this.props.markerID);
+	    },
+	    render: function render() {
+	        return React.createElement(
+	            'li',
+	            { value: this.props.name, onClick: this.onClick },
+	            React.createElement(
+	                'p',
+	                null,
+	                this.props.qty,
+	                ' * ',
+	                this.props.name,
+	                ':'
+	            ),
+	            React.createElement(
+	                'div',
+	                { className: 'order-price' },
+	                this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	            ),
+	            ' '
+	        );
+	    }
+	});
 	
 	module.exports = OrderRow;
 
@@ -36794,7 +36808,6 @@
 	    }
 	  },
 	  onClick: function onClick(event) {
-	    console.log("itemmarker", event);
 	    this.props.onClick(event, this.props.markerID);
 	  },
 	  render: function render() {
@@ -36843,7 +36856,7 @@
 	            'h3',
 	            { id: 'order-total' },
 	            'Total: ',
-	            props.total
+	            props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
 	        )
 	    );
 	};
@@ -36940,11 +36953,9 @@
 	CashManager.prototype = {
 	    total: function total(order, index) {
 	        var total = 0.00;
-	        console.log(order);
 	        for (var key in order[0]) {
 	            total += order[0][key].total;
 	        }
-	        console.log(total);
 	        return total;
 	    }
 	};
@@ -36972,6 +36983,21 @@
 	        }
 	        var total = price * qty;
 	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
+	    },
+	    removeItem: function removeItem(orderItems, key) {
+	        var itemsObject = orderItems[0];
+	        var price = itemsObject[key].price;
+	        var qty = itemsObject[key].qty - 1;
+	        var id = itemsObject[key].id;
+	        if (qty < 1) {
+	            delete itemsObject[key];
+	            var _returnArray = [itemsObject];
+	            return _returnArray;
+	        }
+	        var total = price * qty;
+	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
 	        var returnArray = [itemsObject];
 	        return returnArray;
 	    }
