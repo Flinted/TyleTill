@@ -1,4 +1,5 @@
 const React = require('react')
+const ExpandedItem = require('./ExpandedItem')
 
 const Item = React.createClass({
   getInitialState(){
@@ -41,11 +42,7 @@ const Item = React.createClass({
         )
     }else{
       return(
-        <div className = 'item-button-expanded' onMouseUp={this.stopTimer}>
-        <li className = 'item-button' value={this.props.index}  onMouseDown={this.dblClick} >
-            <p>{this.props.name}</p>
-        </li>
-        </div>
+        <ExpandedItem value={this.props.index} name={this.props.name} markerID={this.props.markerID} onMouseUp={this.stopTimer}/>
         )
 
     }

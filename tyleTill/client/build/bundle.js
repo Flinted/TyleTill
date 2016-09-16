@@ -19760,9 +19760,11 @@
 	    return {
 	      items: [],
 	      displayItems: [],
-	      primaryOrderItems: [{ test: { id: 1, name: "test", qty: 1, total: 10.00 } }],
+	      primaryUser: "Chris",
+	      secondaryUser: "Renwick",
+	      primaryOrderItems: [{}],
 	      primaryOrderTotal: 0.00,
-	      secondaryOrderItems: [{ test2: { id: 1, name: "test2", qty: 1, total: 15.00 } }],
+	      secondaryOrderItems: [{}],
 	      secondaryOrderTotal: 0.00,
 	      split: false
 	    };
@@ -19866,7 +19868,7 @@
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
-	            React.createElement(Infowindow, { total: this.state.primaryOrderTotal }),
+	            React.createElement(Infowindow, { total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
 	            React.createElement(Orderwindow, { items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
 	            React.createElement(Cashwindow, null)
 	          ),
@@ -19880,7 +19882,7 @@
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
-	            React.createElement(Infowindow, { total: this.state.secondaryOrderTotal }),
+	            React.createElement(Infowindow, { total: this.state.secondaryOrderTotal, user: this.state.secondaryUser }),
 	            React.createElement(Orderwindow, { items: this.state.secondaryOrderItems, onClick: this.onOrderRowClick }),
 	            React.createElement(Cashwindow, null)
 	          ),
@@ -19896,7 +19898,7 @@
 	        React.createElement(
 	          'div',
 	          { id: 'sidebar' },
-	          React.createElement(Infowindow, { total: this.state.primaryOrderTotal }),
+	          React.createElement(Infowindow, { total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
 	          React.createElement(Orderwindow, { items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
 	          React.createElement(Cashwindow, null)
 	        ),
@@ -36762,12 +36764,13 @@
 /* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	var React = __webpack_require__(1);
+	var ExpandedItem = __webpack_require__(171);
 	
 	var Item = React.createClass({
-	  displayName: "Item",
+	  displayName: 'Item',
 	  getInitialState: function getInitialState() {
 	    return { expanded: false, timer: null };
 	  },
@@ -36797,28 +36800,16 @@
 	  render: function render() {
 	    if (!this.state.expanded) {
 	      return React.createElement(
-	        "li",
-	        { className: "item-button", value: this.props.index, onMouseDown: this.startTimer, onMouseUp: this.stopTimer },
+	        'li',
+	        { className: 'item-button', value: this.props.index, onMouseDown: this.startTimer, onMouseUp: this.stopTimer },
 	        React.createElement(
-	          "p",
+	          'p',
 	          null,
 	          this.props.name
 	        )
 	      );
 	    } else {
-	      return React.createElement(
-	        "div",
-	        { className: "item-button-expanded", onMouseUp: this.stopTimer },
-	        React.createElement(
-	          "li",
-	          { className: "item-button", value: this.props.index, onMouseDown: this.dblClick },
-	          React.createElement(
-	            "p",
-	            null,
-	            this.props.name
-	          )
-	        )
-	      );
+	      return React.createElement(ExpandedItem, { value: this.props.index, name: this.props.name, markerID: this.props.markerID, onMouseUp: this.stopTimer });
 	    }
 	  }
 	});
@@ -36837,6 +36828,12 @@
 	    return React.createElement(
 	        'div',
 	        { className: 'info-window' },
+	        React.createElement(
+	            'h3',
+	            null,
+	            'User: ',
+	            props.user
+	        ),
 	        React.createElement(
 	            'h5',
 	            null,
@@ -37032,6 +37029,82 @@
 	
 	module.exports = __webpack_require__(3);
 
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var React = __webpack_require__(1);
+	var Item = __webpack_require__(164);
+	
+	var ExpandedItem = function ExpandedItem(props) {
+	
+	  if (props.items) {
+	    var nodes = props.items.map(function (item, index) {
+	      return React.createElement(Item, _extends({}, item, { key: index, markerID: props.markerID, index: index, onClick: props.onClick, onLongClick: props.onLongClick }));
+	    });
+	  }
+	
+	  return React.createElement(
+	    'li',
+	    { className: 'item-button-expanded', onMouseUp: props.onMouseUp },
+	    React.createElement(
+	      'div',
+	      { className: 'subItem-container' },
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'ITEM'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'subItem' },
+	        'test'
+	      )
+	    )
+	  );
+	};
+	
+	module.exports = ExpandedItem;
 
 /***/ }
 /******/ ]);

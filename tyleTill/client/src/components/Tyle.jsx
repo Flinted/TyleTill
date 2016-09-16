@@ -13,9 +13,11 @@ const Tyle = React.createClass({
     return {
       items: [], 
       displayItems:[],
-      primaryOrderItems:[{test:{id: 1, name: "test", qty:1, total:10.00}}],
+      primaryUser: "Chris",
+      secondaryUser: "Renwick",
+      primaryOrderItems:[{}],
       primaryOrderTotal:0.00,
-      secondaryOrderItems:[{test2:{id: 1, name: "test2", qty:1, total:15.00}}],
+      secondaryOrderItems:[{}],
       secondaryOrderTotal:0.00,
       split: false
     }
@@ -99,7 +101,7 @@ const Tyle = React.createClass({
           <div className='tyle-container'>
                 <div className="primary">
                       <div id='sidebar'>
-                            <Infowindow total={this.state.primaryOrderTotal}/>
+                            <Infowindow total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
                             <Orderwindow items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
                             <Cashwindow />
                       </div>
@@ -109,7 +111,7 @@ const Tyle = React.createClass({
                 <div id="divider"/>
                 <div className="secondary">
                     <div id='sidebar'>
-                        <Infowindow total={this.state.secondaryOrderTotal}/>
+                        <Infowindow total={this.state.secondaryOrderTotal} user={this.state.secondaryUser}/>
                         <Orderwindow items={this.state.secondaryOrderItems} onClick={this.onOrderRowClick}/>
                         <Cashwindow />
                     </div>
@@ -123,7 +125,7 @@ const Tyle = React.createClass({
     return(
       <div className='tyle-container'>
             <div id='sidebar'>
-            <Infowindow total={this.state.primaryOrderTotal}/>
+            <Infowindow total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
             <Orderwindow items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
             <Cashwindow />
             </div>
