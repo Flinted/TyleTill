@@ -19,7 +19,8 @@ const Tyle = React.createClass({
       primaryOrderTotal:0.00,
       secondaryOrderItems:[{}],
       secondaryOrderTotal:0.00,
-      split: false
+      split: false,
+      input:''
     }
   },
 
@@ -61,15 +62,17 @@ const Tyle = React.createClass({
         }
         const item = this.state.displayItems[event.target.value]
         const ordermanager = new OrderManager
-        let newOrderArray = ordermanager.addItem(currentOrder, item)
+        let newOrderArray = ordermanager.addItem(currentOrder, item, this.state.input)
         const cashmanager = new CashManager
         const total = cashmanager.total(newOrderArray)
         if(markerID === 2){
-        this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total})
+        this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, input:''})
         }else{
-        this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total})
+        this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, input:''})
         }
   },
+
+
 
   onOrderRowClick(key, markerID){
       let currentOrder = null
@@ -80,18 +83,28 @@ const Tyle = React.createClass({
         currentOrder = this.state.primaryOrderItems
       }
       const ordermanager = new OrderManager
-      let newOrderArray = ordermanager.removeItem(currentOrder, key)
+      let newOrderArray = ordermanager.removeItem(currentOrder, key, this.state.input)
       const cashmanager = new CashManager
       const total = cashmanager.total(newOrderArray)
       if(markerID === 2){
-      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total})
+      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, input: ''})
       }else{
-      this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total})
+      this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, input:''})
     }
   },
 
-  onLongClick(event){
+  cashButtonClick(event){
+      const input = event.target.value
+      if(input === "del"){
 
+        // ADD DELETE ONE DIGIT HERE 
+      }else if(input === "C"){
+        this.setState({input:''})
+      }else{
+        let newInput = this.state.input
+        newInput += input
+        this.setState({input:newInput})
+      }
   },
 
   onSplitClick(){
@@ -109,7 +122,7 @@ const Tyle = React.createClass({
           <div className='tyle-container'>
                 <div className="primary">
                       <div id='sidebar'>
-                            <Infowindow total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
+                            <Infowindow input={this.state.input} total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
                             <Orderwindow markerID={1} items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
                             <Cashwindow />
                       </div>
@@ -119,9 +132,9 @@ const Tyle = React.createClass({
                 <div id="divider"/>
                 <div className="secondary">
                     <div id='sidebar'>
-                        <Infowindow total={this.state.secondaryOrderTotal} user={this.state.secondaryUser}/>
+                        <Infowindow input={this.state.input} total={this.state.secondaryOrderTotal} user={this.state.secondaryUser}/>
                         <Orderwindow markerID={2} items={this.state.secondaryOrderItems} onClick={this.onOrderRowClick}/>
-                        <Cashwindow />
+                        <Cashwindow onClick={this.cashButtonClick}/>
                     </div>
                     <ButtonColumn splitClick= {this.onSplitClick}/>
                     <Itemwindow markerID={2} class='item-window-split' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>
@@ -133,9 +146,9 @@ const Tyle = React.createClass({
     return(
       <div className='tyle-container'>
             <div id='sidebar'>
-            <Infowindow total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
+            <Infowindow input={this.state.input} total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
             <Orderwindow markerID={1} items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
-            <Cashwindow />
+            <Cashwindow onClick={this.cashButtonClick}/>
             </div>
             <ButtonColumn splitClick= {this.onSplitClick}/>
             <Itemwindow markerID={1} class= 'item-window' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>

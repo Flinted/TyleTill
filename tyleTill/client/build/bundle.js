@@ -19766,7 +19766,8 @@
 	      primaryOrderTotal: 0.00,
 	      secondaryOrderItems: [{}],
 	      secondaryOrderTotal: 0.00,
-	      split: false
+	      split: false,
+	      input: ''
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
@@ -19829,13 +19830,13 @@
 	    }
 	    var item = this.state.displayItems[event.target.value];
 	    var ordermanager = new OrderManager();
-	    var newOrderArray = ordermanager.addItem(currentOrder, item);
+	    var newOrderArray = ordermanager.addItem(currentOrder, item, this.state.input);
 	    var cashmanager = new CashManager();
 	    var total = cashmanager.total(newOrderArray);
 	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total });
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, input: '' });
 	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total });
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, input: '' });
 	    }
 	  },
 	  onOrderRowClick: function onOrderRowClick(key, markerID) {
@@ -19847,16 +19848,28 @@
 	      currentOrder = this.state.primaryOrderItems;
 	    }
 	    var ordermanager = new OrderManager();
-	    var newOrderArray = ordermanager.removeItem(currentOrder, key);
+	    var newOrderArray = ordermanager.removeItem(currentOrder, key, this.state.input);
 	    var cashmanager = new CashManager();
 	    var total = cashmanager.total(newOrderArray);
 	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total });
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, input: '' });
 	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total });
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, input: '' });
 	    }
 	  },
-	  onLongClick: function onLongClick(event) {},
+	  cashButtonClick: function cashButtonClick(event) {
+	    var input = event.target.value;
+	    if (input === "del") {
+	
+	      // ADD DELETE ONE DIGIT HERE 
+	    } else if (input === "C") {
+	      this.setState({ input: '' });
+	    } else {
+	      var newInput = this.state.input;
+	      newInput += input;
+	      this.setState({ input: newInput });
+	    }
+	  },
 	  onSplitClick: function onSplitClick() {
 	    console.log("Splitting");
 	    if (!this.state.split) {
@@ -19876,7 +19889,7 @@
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
-	            React.createElement(Infowindow, { total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
+	            React.createElement(Infowindow, { input: this.state.input, total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
 	            React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
 	            React.createElement(Cashwindow, null)
 	          ),
@@ -19890,9 +19903,9 @@
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
-	            React.createElement(Infowindow, { total: this.state.secondaryOrderTotal, user: this.state.secondaryUser }),
+	            React.createElement(Infowindow, { input: this.state.input, total: this.state.secondaryOrderTotal, user: this.state.secondaryUser }),
 	            React.createElement(Orderwindow, { markerID: 2, items: this.state.secondaryOrderItems, onClick: this.onOrderRowClick }),
-	            React.createElement(Cashwindow, null)
+	            React.createElement(Cashwindow, { onClick: this.cashButtonClick })
 	          ),
 	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
 	          React.createElement(Itemwindow, { markerID: 2, 'class': 'item-window-split', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
@@ -19906,9 +19919,9 @@
 	        React.createElement(
 	          'div',
 	          { id: 'sidebar' },
-	          React.createElement(Infowindow, { total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
+	          React.createElement(Infowindow, { input: this.state.input, total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
 	          React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
-	          React.createElement(Cashwindow, null)
+	          React.createElement(Cashwindow, { onClick: this.cashButtonClick })
 	        ),
 	        React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
 	        React.createElement(Itemwindow, { markerID: 1, 'class': 'item-window', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
@@ -36842,7 +36855,7 @@
 	        'div',
 	        { className: 'info-window' },
 	        React.createElement(
-	            'h3',
+	            'h5',
 	            null,
 	            'User: ',
 	            props.user
@@ -36851,6 +36864,12 @@
 	            'h5',
 	            null,
 	            'Last Order Change: £3.00'
+	        ),
+	        React.createElement(
+	            'h5',
+	            null,
+	            'Input: ',
+	            props.input
 	        ),
 	        React.createElement(
 	            'h3',
@@ -36877,62 +36896,62 @@
 	        { className: 'cash-window' },
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '1' },
 	            '1'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '2' },
 	            '2'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '3' },
 	            '3'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '4' },
 	            '4'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '5' },
 	            '5'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '6' },
 	            '6'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '7' },
 	            '7'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '8' },
 	            '8'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '9' },
 	            '9'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: 'del' },
 	            'del'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: '0' },
 	            '0'
 	        ),
 	        React.createElement(
 	            'button',
-	            { className: 'cash-button' },
+	            { onClick: props.onClick, className: 'cash-button', value: 'C' },
 	            'C'
 	        )
 	    );
@@ -36973,13 +36992,13 @@
 	var OrderManager = function OrderManager() {};
 	
 	OrderManager.prototype = {
-	    addItem: function addItem(orderItems, newItem) {
+	    addItem: function addItem(orderItems, newItem, input) {
 	        var itemsObject = orderItems[0];
 	        var ref = newItem.name + "(" + newItem.sizes[0] + ")";
 	        var price = newItem.prices[0];
-	        var qty = 1;
+	        var qty = parseInt(input) || 1;
 	        if (itemsObject[ref]) {
-	            qty = itemsObject[ref].qty + 1;
+	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
 	        }
 	        var total = price * qty;
 	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };

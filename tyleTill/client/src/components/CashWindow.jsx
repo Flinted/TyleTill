@@ -3,18 +3,18 @@ const React = require('react')
 const Cashwindow= (props) =>(
 
     <div className='cash-window'>
-        <button className="cash-button">1</button>
-        <button className="cash-button">2</button>
-        <button className="cash-button">3</button>
-        <button className="cash-button">4</button>
-        <button className="cash-button">5</button>
-        <button className="cash-button">6</button>
-        <button className="cash-button">7</button>
-        <button className="cash-button">8</button>
-        <button className="cash-button">9</button>
-        <button className="cash-button">del</button>
-        <button className="cash-button">0</button>
-        <button className="cash-button">C</button>
+        <button onClick={props.onClick}className="cash-button" value="1">1</button>
+        <button onClick={props.onClick}className="cash-button" value="2">2</button>
+        <button onClick={props.onClick}className="cash-button" value="3">3</button>
+        <button onClick={props.onClick}className="cash-button" value="4">4</button>
+        <button onClick={props.onClick}className="cash-button" value="5">5</button>
+        <button onClick={props.onClick}className="cash-button" value="6">6</button>
+        <button onClick={props.onClick}className="cash-button" value="7">7</button>
+        <button onClick={props.onClick}className="cash-button" value="8">8</button>
+        <button onClick={props.onClick}className="cash-button" value="9">9</button>
+        <button onClick={props.onClick}className="cash-button" value="del">del</button>
+        <button onClick={props.onClick}className="cash-button" value="0">0</button>
+        <button onClick={props.onClick}className="cash-button" value="C">C</button>
 
     </div>
 )
