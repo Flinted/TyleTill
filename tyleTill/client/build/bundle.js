@@ -19746,10 +19746,10 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Orderwindow = __webpack_require__(159);
+	var Orderwindow = __webpack_require__(174);
 	var Itemwindow = __webpack_require__(163);
-	var Infowindow = __webpack_require__(165);
-	var Cashwindow = __webpack_require__(166);
+	var Infowindow = __webpack_require__(173);
+	var Cashwindow = __webpack_require__(172);
 	var CashManager = __webpack_require__(167);
 	var OrderManager = __webpack_require__(168);
 	var ButtonColumn = __webpack_require__(169);
@@ -19764,10 +19764,12 @@
 	      secondaryUser: "Renwick",
 	      primaryOrderItems: [{}],
 	      primaryOrderTotal: 0.00,
+	      primaryInput: '',
 	      secondaryOrderItems: [{}],
 	      secondaryOrderTotal: 0.00,
-	      split: false,
-	      input: ''
+	      secondaryInput: '',
+	      split: false
+	
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
@@ -19825,49 +19827,55 @@
 	  },
 	  onItemClick: function onItemClick(event, markerID) {
 	    var currentOrder = this.state.primaryOrderItems;
+	    var input = this.state.primaryInput;
 	    if (markerID === 2) {
 	      currentOrder = this.state.secondaryOrderItems;
+	      input = this.state.secondaryInput;
 	    }
 	    var item = this.state.displayItems[event.target.value];
 	    var ordermanager = new OrderManager();
-	    var newOrderArray = ordermanager.addItem(currentOrder, item, this.state.input);
+	    var newOrderArray = ordermanager.addItem(currentOrder, item, input);
 	    var cashmanager = new CashManager();
 	    var total = cashmanager.total(newOrderArray);
 	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, input: '' });
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
 	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, input: '' });
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
 	    }
 	  },
 	  onOrderRowClick: function onOrderRowClick(key, markerID) {
 	    var currentOrder = null;
 	    var items = null;
+	    var input = null;
 	    if (markerID === 2) {
 	      currentOrder = this.state.secondaryOrderItems;
+	      input = this.state.primaryInput;
 	    } else {
 	      currentOrder = this.state.primaryOrderItems;
+	      input = this.state.secondaryInput;
 	    }
 	    var ordermanager = new OrderManager();
-	    var newOrderArray = ordermanager.removeItem(currentOrder, key, this.state.input);
+	    var newOrderArray = ordermanager.removeItem(currentOrder, key, input);
 	    var cashmanager = new CashManager();
 	    var total = cashmanager.total(newOrderArray);
 	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, input: '' });
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
 	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, input: '' });
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
 	    }
 	  },
-	  cashButtonClick: function cashButtonClick(event) {
+	  cashButtonClick: function cashButtonClick(event, markerID) {
 	    var input = event.target.value;
 	    if (input === "del") {
-	
 	      // ADD DELETE ONE DIGIT HERE 
 	    } else if (input === "C") {
 	      this.setState({ input: '' });
 	    } else {
-	      var newInput = this.state.input;
-	      newInput += input;
-	      this.setState({ input: newInput });
+	      var newInput = this.state.primaryInput;
+	      if (newInput.length < 3) {
+	        newInput += input;
+	        this.setState({ primaryInput: newInput });
+	      }
 	    }
 	  },
 	  onSplitClick: function onSplitClick() {
@@ -19891,7 +19899,7 @@
 	            { id: 'sidebar' },
 	            React.createElement(Infowindow, { input: this.state.input, total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
 	            React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
-	            React.createElement(Cashwindow, null)
+	            React.createElement(Cashwindow, { markerID: 1, onClick: this.cashButtonClick })
 	          ),
 	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
 	          React.createElement(Itemwindow, { markerID: 1, 'class': 'item-window-split', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
@@ -19905,7 +19913,7 @@
 	            { id: 'sidebar' },
 	            React.createElement(Infowindow, { input: this.state.input, total: this.state.secondaryOrderTotal, user: this.state.secondaryUser }),
 	            React.createElement(Orderwindow, { markerID: 2, items: this.state.secondaryOrderItems, onClick: this.onOrderRowClick }),
-	            React.createElement(Cashwindow, { onClick: this.cashButtonClick })
+	            React.createElement(Cashwindow, { markerID: 2, onClick: this.cashButtonClick })
 	          ),
 	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
 	          React.createElement(Itemwindow, { markerID: 2, 'class': 'item-window-split', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
@@ -19921,7 +19929,7 @@
 	          { id: 'sidebar' },
 	          React.createElement(Infowindow, { input: this.state.input, total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
 	          React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
-	          React.createElement(Cashwindow, { onClick: this.cashButtonClick })
+	          React.createElement(Cashwindow, { markerID: 1, onClick: this.cashButtonClick })
 	        ),
 	        React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
 	        React.createElement(Itemwindow, { markerID: 1, 'class': 'item-window', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
@@ -19933,76 +19941,8 @@
 	module.exports = Tyle;
 
 /***/ },
-/* 159 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	var OrderRow = __webpack_require__(160);
-	_ = __webpack_require__(161);
-	
-	var Orderwindow = React.createClass({
-	  displayName: 'Orderwindow',
-	  render: function render() {
-	    var orderNodes = [];
-	    for (var key in this.props.items[0]) {
-	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
-	      orderNodes.push(row);
-	    }
-	
-	    return React.createElement(
-	      'div',
-	      { className: 'order-window' },
-	      React.createElement(
-	        'ul',
-	        { id: 'order-list' },
-	        orderNodes
-	      )
-	    );
-	  }
-	});
-	
-	module.exports = Orderwindow;
-
-/***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var OrderRow = React.createClass({
-	    displayName: 'OrderRow',
-	    onClick: function onClick() {
-	        this.props.onClick(this.props.name, this.props.markerID);
-	    },
-	    render: function render() {
-	        return React.createElement(
-	            'li',
-	            { value: this.props.name, onClick: this.onClick },
-	            React.createElement(
-	                'p',
-	                null,
-	                this.props.qty,
-	                ' * ',
-	                this.props.name,
-	                ':'
-	            ),
-	            React.createElement(
-	                'div',
-	                { className: 'order-price' },
-	                this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	            ),
-	            ' '
-	        );
-	    }
-	});
-	
-	module.exports = OrderRow;
-
-/***/ },
+/* 159 */,
+/* 160 */,
 /* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -36843,123 +36783,8 @@
 	module.exports = Item;
 
 /***/ },
-/* 165 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var Infowindow = function Infowindow(props) {
-	    return React.createElement(
-	        'div',
-	        { className: 'info-window' },
-	        React.createElement(
-	            'h5',
-	            null,
-	            'User: ',
-	            props.user
-	        ),
-	        React.createElement(
-	            'h5',
-	            null,
-	            'Last Order Change: £3.00'
-	        ),
-	        React.createElement(
-	            'h5',
-	            null,
-	            'Input: ',
-	            props.input
-	        ),
-	        React.createElement(
-	            'h3',
-	            { id: 'order-total' },
-	            'Total: ',
-	            props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	        )
-	    );
-	};
-	
-	module.exports = Infowindow;
-
-/***/ },
-/* 166 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var Cashwindow = function Cashwindow(props) {
-	    return React.createElement(
-	        'div',
-	        { className: 'cash-window' },
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '1' },
-	            '1'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '2' },
-	            '2'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '3' },
-	            '3'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '4' },
-	            '4'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '5' },
-	            '5'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '6' },
-	            '6'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '7' },
-	            '7'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '8' },
-	            '8'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '9' },
-	            '9'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: 'del' },
-	            'del'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '0' },
-	            '0'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: 'C' },
-	            'C'
-	        )
-	    );
-	};
-	
-	module.exports = Cashwindow;
-
-/***/ },
+/* 165 */,
+/* 166 */,
 /* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -37005,10 +36830,10 @@
 	        var returnArray = [itemsObject];
 	        return returnArray;
 	    },
-	    removeItem: function removeItem(orderItems, key) {
+	    removeItem: function removeItem(orderItems, key, input) {
 	        var itemsObject = orderItems[0];
 	        var price = itemsObject[key].price;
-	        var qty = itemsObject[key].qty - 1;
+	        var qty = itemsObject[key].qty - (parseInt(input) || 1);
 	        var id = itemsObject[key].id;
 	        if (qty < 1) {
 	            delete itemsObject[key];
@@ -37150,6 +36975,193 @@
 	};
 	
 	module.exports = ExpandedItem;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var Cashwindow = function Cashwindow(props) {
+	    return React.createElement(
+	        'div',
+	        { className: 'cash-window' },
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '1' },
+	            '1'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '2' },
+	            '2'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '3' },
+	            '3'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '4' },
+	            '4'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '5' },
+	            '5'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '6' },
+	            '6'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '7' },
+	            '7'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '8' },
+	            '8'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '9' },
+	            '9'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: 'del' },
+	            'del'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: '0' },
+	            '0'
+	        ),
+	        React.createElement(
+	            'button',
+	            { onClick: props.onClick, className: 'cash-button', value: 'C' },
+	            'C'
+	        )
+	    );
+	};
+	
+	module.exports = Cashwindow;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var Infowindow = function Infowindow(props) {
+	    return React.createElement(
+	        'div',
+	        { className: 'info-window' },
+	        React.createElement(
+	            'h5',
+	            null,
+	            'User: ',
+	            props.user
+	        ),
+	        React.createElement(
+	            'h5',
+	            null,
+	            'Last Order Change: £3.00'
+	        ),
+	        React.createElement(
+	            'h5',
+	            null,
+	            'Input: ',
+	            props.input
+	        ),
+	        React.createElement(
+	            'h4',
+	            { id: 'order-total' },
+	            'Total: ',
+	            props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	        )
+	    );
+	};
+	
+	module.exports = Infowindow;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var OrderRow = __webpack_require__(175);
+	_ = __webpack_require__(161);
+	
+	var Orderwindow = React.createClass({
+	  displayName: 'Orderwindow',
+	  render: function render() {
+	    var orderNodes = [];
+	    for (var key in this.props.items[0]) {
+	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
+	      orderNodes.push(row);
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { className: 'order-window' },
+	      React.createElement(
+	        'ul',
+	        { id: 'order-list' },
+	        orderNodes
+	      )
+	    );
+	  }
+	});
+	
+	module.exports = Orderwindow;
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var OrderRow = React.createClass({
+	    displayName: 'OrderRow',
+	    onClick: function onClick() {
+	        this.props.onClick(this.props.name, this.props.markerID);
+	    },
+	    render: function render() {
+	        return React.createElement(
+	            'li',
+	            { value: this.props.name, onClick: this.onClick },
+	            React.createElement(
+	                'p',
+	                null,
+	                this.props.qty,
+	                ' * ',
+	                this.props.name,
+	                ':'
+	            ),
+	            React.createElement(
+	                'div',
+	                { className: 'order-price' },
+	                this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	            ),
+	            ' '
+	        );
+	    }
+	});
+	
+	module.exports = OrderRow;
 
 /***/ }
 /******/ ]);

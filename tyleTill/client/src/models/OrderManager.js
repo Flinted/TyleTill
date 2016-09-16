@@ -9,17 +9,17 @@ OrderManager.prototype = {
       const ref = newItem.name+"("+newItem.sizes[0] +")"
       const price = newItem.prices[0] 
       let qty = parseInt(input) || 1
-      if(itemsObject[ref]){ qty = itemsObject[ref].qty + (parseInt(input) || 1)  }
+      if(itemsObject[ref]){ qty = itemsObject[ref].qty + (parseInt(input) || 1) } 
       const total = (price * qty)
       itemsObject[ref] = {id: newItem.id, name: ref, qty: qty, total: total}
       const returnArray= [itemsObject]
       return returnArray
       },
 
-    removeItem(orderItems, key){
+    removeItem(orderItems, key, input){
         let itemsObject = orderItems[0]
         const price = itemsObject[key].price
-        let qty = itemsObject[key].qty - 1
+        let qty = itemsObject[key].qty - (parseInt(input) || 1) 
         let id = itemsObject[key].id
         if(qty<1){
           delete itemsObject[key] 

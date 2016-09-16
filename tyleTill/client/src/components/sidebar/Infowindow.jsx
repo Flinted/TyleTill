@@ -6,7 +6,7 @@ const Infowindow= (props) =>(
     <h5>User: {props.user}</h5>
     <h5>Last Order Change: £3.00</h5>
     <h5>Input: {props.input}</h5>
-    <h3 id='order-total'>Total: {props.total.toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</h3>
+    <h4 id='order-total'>Total: {props.total.toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</h4>
     </div>
 )
 
