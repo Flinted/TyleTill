@@ -1,0 +1,114 @@
+u1 = User.create({name: 'Chris', pinCode: 1111})
+u2 = User.create({name:'Renwick', pinCode: 2222})
+u3 = User.create({name:'Russell', pinCode: 3333})
+u4 = User.create({name:'Sam', pinCode: 4444})
+
+d1= Division.create({name: "Food"})
+d2= Division.create({name: "Drink"})
+
+t1= Type.create({name:'Beer/Other', division_id:d2.id})
+t2= Type.create({name:'Wine', division_id:d2.id})
+t3= Type.create({name:'Soft', division_id:d2.id})
+t4= Type.create({name:'Spirits', division_id:d2.id})
+t5= Type.create({name:'Starters', division_id:d1.id})
+t6= Type.create({name:'Mains', division_id:d1.id})
+t7= Type.create({name:'Desserts', division_id:d1.id})
+t8= Type.create({name:'Sides', division_id:d1.id})
+
+sT1= SubType.create({name: 'Red Wine', type_id: t2.id}
+sT2= SubType.create({name: 'White Wine', type_id: t2.id}))
+sT3= SubType.create({name: 'Rose Wine', type_id: t2.id})
+sT4= SubType.create({name: 'Sparkling Wine', type_id: t2.id})
+sT5= SubType.create({name: 'Draught Beer', type_id: t1.id})
+sT6= SubType.create({name: 'Packaged Beer', type_id: t1.id})
+sT7= SubType.create({name: 'Packaged Other', type_id: t1.id})
+sT8= SubType.create({name: 'Draught Soft', type_id: t3.id})
+sT9= SubType.create({name: 'Packaged Soft', type_id: t3.id})
+sT10= SubType.create({name: 'Packaged Soft', type_id: t3.id})
+sT11= SubType.create({name: 'Packaged Soft', type_id: t3.id})
+sT12= SubType.create({name: 'Packaged Soft', type_id: t3.id})
+sT9= SubType.create({name: 'Packaged Soft', type_id: t3.id})
+
+
+INITIAL SEED DATA:
+u1 = User.create({name: 'Chris', pinCode: 1111})
+u2 = User.create({name:'Renwick', pinCode: 2222})
+
+d1= Division.create({name: "Food"})
+d2= Division.create({name: "Drink"})
+
+t1= Type.create({name:'Beer/Other', division_id:d2.id})
+t2= Type.create({name:'Wine', division_id:d2.id})
+t6= Type.create({name:'Mains', division_id:d1.id})
+
+sT1= SubType.create({name: 'Red Wine', type_id: t2.id}
+sT2= SubType.create({name: 'White Wine', type_id: t2.id}))
+sT5= SubType.create({name: 'Draught Beer', type_id: t1.id})
+sT6= SubType.create({name: 'Packaged Beer', type_id: t1.id})
+sT7= SubType.create({name: 'Grill', type_id: t6.id})
+sT8= SubType.create({name: 'Salads', type_id: t6.id})
+
+i1 = Item.create({
+name: 'Merlot', 
+subtype_id: sT1.id}, 
+sizes:[125ml,175ml,750ml], 
+prices[3.00,4.50,18.00],
+links: []
+)
+
+i2 = Item.create({
+name: 'Primitivo' , 
+subtype_id: sT1.id}, 
+sizes:[125ml,175ml,750ml], 
+prices[3.50,5.00,20.00],
+links: []
+)
+
+i3 = Item.create({
+name: 'Pinot Grigio' , 
+subtype_id: sT2.id}, 
+sizes:[125ml,175ml,750ml], 
+prices[3.00,4.50,18.00],
+links: []
+)
+i4 = Item.create({
+name: 'Chenin Blanc' , 
+subtype_id: sT2.id}, 
+sizes:[125ml,175ml,750ml], 
+prices[3.50,5.00,20.00],
+links: []
+)
+
+i5 = Item.create({
+name: 'Red Stripe' , 
+subtype_id: sT6.id}, 
+sizes:[half,pint], 
+prices[2.00,4.00],
+links: []
+)
+
+i6 = Item.create({
+name: 'Guinness' , 
+subtype_id: sT6.id}, 
+sizes:[half,pint], 
+prices[2.40,4.80],
+links: []
+)
+
+name: 'Btl Pacifico' , 
+subtype_id: sT7.id}, 
+sizes:[330ml], 
+prices[3.60],
+links: []
+)
+
+name: 'Btl Gladeye' , 
+subtype_id: sT7.id}, 
+sizes:[500ml], 
+prices[4.80],
+links: []
+)
+
+
+
+
