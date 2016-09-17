@@ -50,6 +50,7 @@ const Tyle = React.createClass({
 
   prepareItems(items){
     let parsedItems =[]
+    console.log(items)
     for(let item of items){
       let parseItem = item
       parseItem.sizes = JSON.parse(item.sizes)
@@ -133,10 +134,25 @@ const Tyle = React.createClass({
         console.log(url)
       const promise = runner.run("GET",url)
       promise.then(function(result){
-        console.log(result)
-
         // ASSIGN NEW OBJECTS HERE
-      })
+        let items = []
+        if(result[0].types){}
+        if(result[0].subtypes){
+              result[0].subtypes.forEach(function(subtype){
+                  items = items.concat(subtype.items)
+              })
+        }
+        if(!result[0].types && !result[0].subtypes){
+          items = result[0].items
+        }
+
+        const finalItems = this.prepareItems(items)
+        if(markerID===2){
+          this.setState({secondaryDisplayItems: finalItems})
+        }else{
+          this.setState({primaryDisplayItems: finalItems})
+        }
+      }.bind(this))
   },
 
   cashButtonClick(input, markerID){

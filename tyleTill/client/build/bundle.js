@@ -19795,6 +19795,7 @@
 	  },
 	  prepareItems: function prepareItems(items) {
 	    var parsedItems = [];
+	    console.log(items);
 	    var _iteratorNormalCompletion = true;
 	    var _didIteratorError = false;
 	    var _iteratorError = undefined;
@@ -19902,10 +19903,25 @@
 	    console.log(url);
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
-	      console.log(result);
-	
 	      // ASSIGN NEW OBJECTS HERE
-	    });
+	      var items = [];
+	      if (result[0].types) {}
+	      if (result[0].subtypes) {
+	        result[0].subtypes.forEach(function (subtype) {
+	          items = items.concat(subtype.items);
+	        });
+	      }
+	      if (!result[0].types && !result[0].subtypes) {
+	        items = result[0].items;
+	      }
+	
+	      var finalItems = this.prepareItems(items);
+	      if (markerID === 2) {
+	        this.setState({ secondaryDisplayItems: finalItems });
+	      } else {
+	        this.setState({ primaryDisplayItems: finalItems });
+	      }
+	    }.bind(this));
 	  },
 	  cashButtonClick: function cashButtonClick(input, markerID) {
 	    var newInput = this.state.primaryInput;
