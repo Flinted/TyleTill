@@ -18,6 +18,7 @@ OrderManager.prototype = {
 
     removeItem(orderItems, key, input){
         let itemsObject = orderItems[0]
+        console.log(input)
         const currentTotal = parseFloat(itemsObject[key].total)
         let origQty = itemsObject[key].qty
         const price = currentTotal/origQty

@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(170);
+	var ReactDOM = __webpack_require__(159);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19746,13 +19746,13 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Orderwindow = __webpack_require__(174);
-	var Itemwindow = __webpack_require__(163);
-	var Infowindow = __webpack_require__(173);
-	var Cashwindow = __webpack_require__(172);
-	var CashManager = __webpack_require__(167);
-	var OrderManager = __webpack_require__(168);
-	var ButtonColumn = __webpack_require__(169);
+	var Orderwindow = __webpack_require__(160);
+	var Itemwindow = __webpack_require__(164);
+	var Infowindow = __webpack_require__(167);
+	var Cashwindow = __webpack_require__(168);
+	var CashManager = __webpack_require__(169);
+	var OrderManager = __webpack_require__(170);
+	var ButtonColumn = __webpack_require__(171);
 	
 	var Tyle = React.createClass({
 	  displayName: 'Tyle',
@@ -19761,13 +19761,15 @@
 	      items: [],
 	      displayItems: [],
 	      primaryUser: "Chris",
-	      secondaryUser: "Renwick",
 	      primaryOrderItems: [{}],
 	      primaryOrderTotal: 0.00,
 	      primaryInput: '',
+	      primaryCashDisplay: true,
+	      secondaryUser: "Renwick",
 	      secondaryOrderItems: [{}],
 	      secondaryOrderTotal: 0.00,
 	      secondaryInput: '',
+	      secondaryCashDisplay: true,
 	      split: false
 	
 	    };
@@ -19850,10 +19852,10 @@
 	    var input = null;
 	    if (markerID === 2) {
 	      currentOrder = this.state.secondaryOrderItems;
-	      input = this.state.primaryInput;
+	      input = this.state.secondaryInput;
 	    } else {
 	      currentOrder = this.state.primaryOrderItems;
-	      input = this.state.secondaryInput;
+	      input = this.state.primaryInput;
 	    }
 	    var ordermanager = new OrderManager();
 	    var newOrderArray = ordermanager.removeItem(currentOrder, key, input);
@@ -19867,24 +19869,51 @@
 	  },
 	  cashButtonClick: function cashButtonClick(event, markerID) {
 	    var input = event.target.value;
-	    if (input === "del") {
-	      // ADD DELETE ONE DIGIT HERE 
-	    } else if (input === "C") {
-	      this.setState({ input: '' });
-	    } else {
-	      var newInput = this.state.primaryInput;
-	      if (newInput.length < 3) {
-	        newInput += input;
-	        this.setState({ primaryInput: newInput });
-	      }
+	
+	    switch (input) {
+	      case 'del':
+	        break;
+	      case 'C':
+	        if (markerID === 2) {
+	          this.setState({ secondaryInput: '' });
+	        } else {
+	          this.setState({ primaryInput: '' });
+	        }
+	        break;
+	      default:
+	        var newInput = this.state.primaryInput;
+	        if (markerID === 2) {
+	          newInput = this.state.secondaryInput;
+	        }
+	        if (newInput.length < 3) {
+	          newInput += input;
+	        }
+	        if (markerID === 2) {
+	          this.setState({ secondaryInput: newInput });
+	        } else {
+	          this.setState({ primaryInput: newInput });
+	        }
 	    }
 	  },
-	  onSplitClick: function onSplitClick() {
+	  onSplitClick: function onSplitClick(markerID) {
 	    console.log("Splitting");
 	    if (!this.state.split) {
 	      this.setState({ split: true });
 	    } else {
-	      this.setState({ split: false });
+	      if (markerID === 2) {
+	        this.setState({ split: false,
+	          primaryOrderItems: this.state.secondaryOrderItems,
+	          primaryOrderTotal: this.state.secondaryOrderTotal,
+	          primaryUser: this.state.secondaryUser,
+	          primaryCashDisplay: this.state.secondaryCashDisplay,
+	          secondaryOrderItems: [{}],
+	          secondaryOrderTotal: 0,
+	          secondaryUser: this.state.primaryUser,
+	          secondaryCashDisplay: false
+	        });
+	      } else {
+	        this.setState({ split: false });
+	      }
 	    }
 	  },
 	  render: function render() {
@@ -19913,12 +19942,11 @@
 	              onClick: this.cashButtonClick
 	            })
 	          ),
-	          React.createElement(ButtonColumn, {
-	            splitClick: this.onSplitClick
-	          }),
+	          React.createElement(ButtonColumn, null),
 	          React.createElement(Itemwindow, {
 	            markerID: 1,
 	            'class': 'item-window-split',
+	            cashDisplay: this.state.primaryCashDisplay,
 	            splitClick: this.onSplitClick,
 	            items: this.state.displayItems,
 	            onClick: this.onItemClick,
@@ -19947,11 +19975,10 @@
 	              onClick: this.cashButtonClick
 	            })
 	          ),
-	          React.createElement(ButtonColumn, {
-	            splitClick: this.onSplitClick
-	          }),
+	          React.createElement(ButtonColumn, null),
 	          React.createElement(Itemwindow, {
 	            markerID: 2,
+	            cashDisplay: this.state.secondaryCashDisplay,
 	            splitClick: this.onSplitClick,
 	            'class': 'item-window-split',
 	            items: this.state.displayItems,
@@ -19982,10 +20009,10 @@
 	            markerID: 1,
 	            onClick: this.cashButtonClick })
 	        ),
-	        React.createElement(ButtonColumn, {
-	          splitClick: this.onSplitClick }),
+	        React.createElement(ButtonColumn, null),
 	        React.createElement(Itemwindow, {
 	          markerID: 1,
+	          cashDisplay: this.state.primaryCashDisplay,
 	          splitClick: this.onSplitClick,
 	          'class': 'item-window',
 	          items: this.state.displayItems,
@@ -20000,9 +20027,86 @@
 	module.exports = Tyle;
 
 /***/ },
-/* 159 */,
-/* 160 */,
+/* 159 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	module.exports = __webpack_require__(3);
+
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var OrderRow = __webpack_require__(161);
+	_ = __webpack_require__(162);
+	
+	var Orderwindow = React.createClass({
+	  displayName: 'Orderwindow',
+	  render: function render() {
+	    var orderNodes = [];
+	    for (var key in this.props.items[0]) {
+	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
+	      orderNodes.push(row);
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { className: 'order-window' },
+	      React.createElement(
+	        'ul',
+	        { id: 'order-list' },
+	        orderNodes
+	      )
+	    );
+	  }
+	});
+	
+	module.exports = Orderwindow;
+
+/***/ },
 /* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var OrderRow = React.createClass({
+	    displayName: 'OrderRow',
+	    onClick: function onClick() {
+	        this.props.onClick(this.props.name, this.props.markerID);
+	    },
+	    render: function render() {
+	        return React.createElement(
+	            'li',
+	            { value: this.props.name, onClick: this.onClick },
+	            React.createElement(
+	                'p',
+	                null,
+	                this.props.qty,
+	                ' * ',
+	                this.props.name,
+	                ':'
+	            ),
+	            React.createElement(
+	                'div',
+	                { className: 'order-price' },
+	                this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	            ),
+	            ' '
+	        );
+	    }
+	});
+	
+	module.exports = OrderRow;
+
+/***/ },
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -36739,10 +36843,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(162)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(163)(module)))
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -36758,7 +36862,7 @@
 
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36766,7 +36870,8 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
+	var Item = __webpack_require__(165);
+	var CashDisplay = __webpack_require__(172);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
@@ -36776,37 +36881,60 @@
 	  render: function render() {
 	    var _this = this;
 	
+	    // returns empty div if no items
 	    if (!this.props.items) {
 	      return React.createElement('div', { className: this.props.class });
 	    }
-	
+	    // prepares items for item display 
 	    var nodes = this.props.items.map(function (item, index) {
 	      return React.createElement(Item, _extends({}, item, { key: index, markerID: _this.props.markerID, index: index, onClick: _this.props.onClick, onLongClick: _this.props.onLongClick }));
 	    });
 	
-	    return React.createElement(
-	      'ul',
-	      { className: this.props.class },
-	      React.createElement(
-	        'button',
-	        { className: 'split-button', onClick: this.splitClick },
-	        'Split/Merge'
-	      ),
-	      nodes
-	    );
+	    if (this.props.cashDisplay) {
+	      // displays item window with CashDisplay if active
+	      return React.createElement(
+	        'div',
+	        { className: this.props.class },
+	        React.createElement(CashDisplay, null),
+	        React.createElement(
+	          'ul',
+	          { className: 'item-window-cash-display' },
+	          React.createElement(
+	            'button',
+	            { className: 'split-button', onClick: this.splitClick },
+	            'Split/Merge'
+	          ),
+	          nodes
+	        )
+	      );
+	    } else {
+	      return (
+	        // displays item window no cash display
+	        React.createElement(
+	          'ul',
+	          { className: this.props.class },
+	          React.createElement(
+	            'button',
+	            { className: 'split-button', onClick: this.splitClick },
+	            'Split/Merge'
+	          ),
+	          nodes
+	        )
+	      );
+	    }
 	  }
 	});
 	
 	module.exports = Itemwindow;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ExpandedItem = __webpack_require__(171);
+	var ExpandedItem = __webpack_require__(166);
 	
 	var Item = React.createClass({
 	  displayName: 'Item',
@@ -36855,127 +36983,7 @@
 	module.exports = Item;
 
 /***/ },
-/* 165 */,
-/* 166 */,
-/* 167 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	_ = __webpack_require__(161);
-	
-	var CashManager = function CashManager() {};
-	
-	CashManager.prototype = {
-	    total: function total(order, index) {
-	        var total = 0.00;
-	        for (var key in order[0]) {
-	            total += order[0][key].total;
-	        }
-	        return total;
-	    }
-	};
-	
-	module.exports = CashManager;
-
-/***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	_ = __webpack_require__(161);
-	
-	var OrderManager = function OrderManager() {};
-	
-	OrderManager.prototype = {
-	    addItem: function addItem(orderItems, newItem, input) {
-	        var itemsObject = orderItems[0];
-	        var ref = newItem.name + "(" + newItem.sizes[0] + ")";
-	        var price = newItem.prices[0];
-	        var qty = parseInt(input) || 1;
-	        if (itemsObject[ref]) {
-	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    removeItem: function removeItem(orderItems, key, input) {
-	        var itemsObject = orderItems[0];
-	        var currentTotal = parseFloat(itemsObject[key].total);
-	        var origQty = itemsObject[key].qty;
-	        var price = currentTotal / origQty;
-	        var qty = origQty - (parseInt(input) || 1);
-	        var id = itemsObject[key].id;
-	        if (qty < 1) {
-	            delete itemsObject[key];
-	            var _returnArray = [itemsObject];
-	            return _returnArray;
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    }
-	};
-	
-	module.exports = OrderManager;
-
-/***/ },
-/* 169 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var ButtonColumn = function ButtonColumn(props) {
-	    return React.createElement(
-	        'div',
-	        { className: 'button-column' },
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button', onClick: props.splitClick },
-	            'Split'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Tables'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Orders'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Log Out'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Save'
-	        )
-	    );
-	};
-	
-	module.exports = ButtonColumn;
-
-/***/ },
-/* 170 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	module.exports = __webpack_require__(3);
-
-
-/***/ },
-/* 171 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36983,7 +36991,7 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
+	var Item = __webpack_require__(165);
 	
 	var ExpandedItem = function ExpandedItem(props) {
 	
@@ -37051,84 +37059,7 @@
 	module.exports = ExpandedItem;
 
 /***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var Cashwindow = function Cashwindow(props) {
-	    return React.createElement(
-	        'div',
-	        { className: 'cash-window' },
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '1' },
-	            '1'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '2' },
-	            '2'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '3' },
-	            '3'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '4' },
-	            '4'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '5' },
-	            '5'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '6' },
-	            '6'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '7' },
-	            '7'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '8' },
-	            '8'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '9' },
-	            '9'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: 'del' },
-	            'del'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: '0' },
-	            '0'
-	        ),
-	        React.createElement(
-	            'button',
-	            { onClick: props.onClick, className: 'cash-button', value: 'C' },
-	            'C'
-	        )
-	    );
-	};
-	
-	module.exports = Cashwindow;
-
-/***/ },
-/* 173 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37168,74 +37099,219 @@
 	module.exports = Infowindow;
 
 /***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	var OrderRow = __webpack_require__(175);
-	_ = __webpack_require__(161);
-	
-	var Orderwindow = React.createClass({
-	  displayName: 'Orderwindow',
-	  render: function render() {
-	    var orderNodes = [];
-	    for (var key in this.props.items[0]) {
-	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
-	      orderNodes.push(row);
-	    }
-	
-	    return React.createElement(
-	      'div',
-	      { className: 'order-window' },
-	      React.createElement(
-	        'ul',
-	        { id: 'order-list' },
-	        orderNodes
-	      )
-	    );
-	  }
-	});
-	
-	module.exports = Orderwindow;
-
-/***/ },
-/* 175 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
 	
-	var OrderRow = React.createClass({
-	    displayName: 'OrderRow',
-	    onClick: function onClick() {
-	        this.props.onClick(this.props.name, this.props.markerID);
+	var Cashwindow = React.createClass({
+	    displayName: 'Cashwindow',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event, this.props.markerID);
 	    },
 	    render: function render() {
 	        return React.createElement(
-	            'li',
-	            { value: this.props.name, onClick: this.onClick },
+	            'div',
+	            { className: 'cash-window' },
 	            React.createElement(
-	                'p',
-	                null,
-	                this.props.qty,
-	                ' * ',
-	                this.props.name,
-	                ':'
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '1' },
+	                '1'
 	            ),
 	            React.createElement(
-	                'div',
-	                { className: 'order-price' },
-	                this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '2' },
+	                '2'
 	            ),
-	            ' '
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '3' },
+	                '3'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '4' },
+	                '4'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '5' },
+	                '5'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '6' },
+	                '6'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '7' },
+	                '7'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '8' },
+	                '8'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '9' },
+	                '9'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: 'del' },
+	                'del'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '0' },
+	                '0'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: 'C' },
+	                'C'
+	            )
 	        );
 	    }
 	});
 	
-	module.exports = OrderRow;
+	module.exports = Cashwindow;
+
+/***/ },
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	_ = __webpack_require__(162);
+	
+	var CashManager = function CashManager() {};
+	
+	CashManager.prototype = {
+	    total: function total(order, index) {
+	        var total = 0.00;
+	        for (var key in order[0]) {
+	            total += order[0][key].total;
+	        }
+	        console.log(total);
+	        return total;
+	    }
+	};
+	
+	module.exports = CashManager;
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	_ = __webpack_require__(162);
+	
+	var OrderManager = function OrderManager() {};
+	
+	OrderManager.prototype = {
+	    addItem: function addItem(orderItems, newItem, input) {
+	        var itemsObject = orderItems[0];
+	        var ref = newItem.name + "(" + newItem.sizes[0] + ")";
+	        var price = newItem.prices[0];
+	        var qty = parseInt(input) || 1;
+	        if (itemsObject[ref]) {
+	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
+	        }
+	        var total = parseFloat(price * qty);
+	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
+	    },
+	    removeItem: function removeItem(orderItems, key, input) {
+	        var itemsObject = orderItems[0];
+	        console.log(input);
+	        var currentTotal = parseFloat(itemsObject[key].total);
+	        var origQty = itemsObject[key].qty;
+	        var price = currentTotal / origQty;
+	        var qty = origQty - (parseInt(input) || 1);
+	        var id = itemsObject[key].id;
+	        if (qty < 1) {
+	            delete itemsObject[key];
+	            var _returnArray = [itemsObject];
+	            return _returnArray;
+	        }
+	        var total = parseFloat(price * qty);
+	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
+	    }
+	};
+	
+	module.exports = OrderManager;
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var ButtonColumn = function ButtonColumn(props) {
+	    return React.createElement(
+	        'div',
+	        { className: 'button-column' },
+	        React.createElement(
+	            'button',
+	            { className: 'menu-button' },
+	            'Split'
+	        ),
+	        React.createElement(
+	            'button',
+	            { className: 'menu-button' },
+	            'Tables'
+	        ),
+	        React.createElement(
+	            'button',
+	            { className: 'menu-button' },
+	            'Orders'
+	        ),
+	        React.createElement(
+	            'button',
+	            { className: 'menu-button' },
+	            'Log Out'
+	        ),
+	        React.createElement(
+	            'button',
+	            { className: 'menu-button' },
+	            'Save'
+	        )
+	    );
+	};
+	
+	module.exports = ButtonColumn;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var CashDisplay = React.createClass({
+	    displayName: 'CashDisplay',
+	    render: function render() {
+	        return React.createElement(
+	            'div',
+	            { className: 'cash-display' },
+	            'Test'
+	        );
+	    }
+	});
+	
+	module.exports = CashDisplay;
 
 /***/ }
 /******/ ]);

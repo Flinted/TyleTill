@@ -11,6 +11,7 @@ total(order, index){
     for(let key in order[0]){
         total += order[0][key].total
     }
+    console.log(total)
     return total
 }
 

@@ -14,15 +14,17 @@ const Tyle = React.createClass({
       items: [], 
       displayItems:[],
       primaryUser: "Chris",
-      secondaryUser: "Renwick",
       primaryOrderItems:[{}],
       primaryOrderTotal:0.00,
       primaryInput:'',
+      primaryCashDisplay: true,
+      secondaryUser: "Renwick",
       secondaryOrderItems:[{}],
       secondaryOrderTotal:0.00,
       secondaryInput:'',
+      secondaryCashDisplay: true,
       split: false
-     
+
     }
   },
 
@@ -44,158 +46,181 @@ const Tyle = React.createClass({
         console.log("error on fetch", request.status)
       }
     }
-      request.send(null);
+    request.send(null);
   },
 
   prepareItems(items){
-      let parsedItems =[]
-      for(let item of items){
-          let parseItem = item
-          parseItem.sizes = JSON.parse(item.sizes)
-          parseItem.prices = JSON.parse(item.prices)
-          parsedItems.push(parseItem)
-      }
-      return parsedItems
+    let parsedItems =[]
+    for(let item of items){
+      let parseItem = item
+      parseItem.sizes = JSON.parse(item.sizes)
+      parseItem.prices = JSON.parse(item.prices)
+      parsedItems.push(parseItem)
+    }
+    return parsedItems
   },
 
   onItemClick(event, markerID){
-        let currentOrder = this.state.primaryOrderItems
-        let input = this.state.primaryInput
-        if(markerID === 2){
-        currentOrder = this.state.secondaryOrderItems
-        input = this.state.secondaryInput
-        }
-        const item = this.state.displayItems[event.target.value]
-        const ordermanager = new OrderManager
-        let newOrderArray = ordermanager.addItem(currentOrder, item, input)
-        const cashmanager = new CashManager
-        const total = cashmanager.total(newOrderArray)
-        if(markerID === 2){
-        this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
-        }else{
-        this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
-        }
+    let currentOrder = this.state.primaryOrderItems
+    let input = this.state.primaryInput
+    if(markerID === 2){
+      currentOrder = this.state.secondaryOrderItems
+      input = this.state.secondaryInput
+    }
+    const item = this.state.displayItems[event.target.value]
+    const ordermanager = new OrderManager
+    let newOrderArray = ordermanager.addItem(currentOrder, item, input)
+    const cashmanager = new CashManager
+    const total = cashmanager.total(newOrderArray)
+    if(markerID === 2){
+      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
+    }else{
+      this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
+    }
   },
 
-
-
   onOrderRowClick(key, markerID){
-      let currentOrder = null
-      let items = null;
-      let input = null;
-      if(markerID === 2){
-        currentOrder = this.state.secondaryOrderItems
-        input = this.state.primaryInput
-      }else{
-        currentOrder = this.state.primaryOrderItems
-        input = this.state.secondaryInput
-      }
-      const ordermanager = new OrderManager
-      let newOrderArray = ordermanager.removeItem(currentOrder, key, input)
-      const cashmanager = new CashManager
-      const total = cashmanager.total(newOrderArray)
-      if(markerID === 2){
+    let currentOrder = null
+    let items = null;
+    let input = null;
+    if(markerID === 2){
+      currentOrder = this.state.secondaryOrderItems
+      input = this.state.secondaryInput
+    }else{
+      currentOrder = this.state.primaryOrderItems
+      input = this.state.primaryInput
+    }
+    const ordermanager = new OrderManager
+    let newOrderArray = ordermanager.removeItem(currentOrder, key, input)
+    const cashmanager = new CashManager
+    const total = cashmanager.total(newOrderArray)
+    if(markerID === 2){
       this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: ''})
-      }else{
+    }else{
       this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
     }
   },
 
   cashButtonClick(event, markerID){
-      const input = event.target.value
-      if(input === "del"){
-        // ADD DELETE ONE DIGIT HERE 
-      }else if(input === "C"){
-        this.setState({input:''})
-      }else{
-        let newInput = this.state.primaryInput
-        if(newInput.length < 3){
-        newInput += input
-        this.setState({primaryInput:newInput})
-      }
-      }
-  },
+    const input = event.target.value
 
-  onSplitClick(){
-    console.log("Splitting")
-      if(!this.state.split){
-        this.setState({split: true})
-      }else{
-        this.setState({split: false})
-      }
-  },
+    switch(input){
+        case 'del':
+            break;
+        case 'C':
+            if(markerID=== 2){
+              this.setState({secondaryInput:''})
+            }else{
+              this.setState({primaryInput:''})
+            }
+            break;
+        default:
+            let newInput = this.state.primaryInput
+            if(markerID===2){newInput = this.state.secondaryInput}
+                if(newInput.length < 3){
+                    newInput += input
+                }
+            if(markerID===2){
+                this.setState({secondaryInput:newInput})
+            }else{
+                this.setState({primaryInput:newInput})
+          }
+        }
+      },
 
-  render(){
-    if(this.state.split){
-      return(
-          <div className='tyle-container'>
-                <div className="primary">
-                      <div id='sidebar'>
-                            <Infowindow 
-                            input={this.state.primaryInput} 
-                            total={this.state.primaryOrderTotal} 
-                            user={this.state.primaryUser}
-                            />
-                            <Orderwindow 
-                            markerID={1} 
-                            items={this.state.primaryOrderItems} 
-                            onClick={this.onOrderRowClick}
-                            />
-                            <Cashwindow 
-                            markerID={1} 
-                            onClick={this.cashButtonClick} 
-                            />
-                      </div>
-                      <ButtonColumn 
-                      splitClick= {this.onSplitClick}
-                      />
-                      <Itemwindow 
-                      markerID={1} 
-                      class='item-window-split' 
-                      splitClick= {this.onSplitClick}
-                      items={this.state.displayItems} 
-                      onClick={this.onItemClick} 
-                      onLongClick={this.onLongClick}
-                      />
-                </div>
+      onSplitClick( markerID){
+        console.log("Splitting")
+        if(!this.state.split){
+          this.setState({split: true})
+        }else{
+          if(markerID=== 2){
+            this.setState({split: false, 
+              primaryOrderItems: this.state.secondaryOrderItems, 
+              primaryOrderTotal: this.state.secondaryOrderTotal, 
+              primaryUser: this.state.secondaryUser,
+              primaryCashDisplay: this.state.secondaryCashDisplay,
+              secondaryOrderItems:[{}],
+              secondaryOrderTotal: 0,
+              secondaryUser: this.state.primaryUser,
+              secondaryCashDisplay: false
+            })
+          }else{
+            this.setState({split:false})
+          }
+        }
+      },
 
-                <div id="divider"/>
+      render(){
+        if(this.state.split){
+          return(
+            <div className='tyle-container'>
+            <div className="primary">
+            <div id='sidebar'>
+            <Infowindow 
+            input={this.state.primaryInput} 
+            total={this.state.primaryOrderTotal} 
+            user={this.state.primaryUser}
+            />
+            <Orderwindow 
+            markerID={1} 
+            items={this.state.primaryOrderItems} 
+            onClick={this.onOrderRowClick}
+            />
+            <Cashwindow 
+            markerID={1} 
+            onClick={this.cashButtonClick} 
+            />
+            </div>
+            <ButtonColumn 
+            />
+            <Itemwindow 
+            markerID={1} 
+            class='item-window-split' 
+            cashDisplay={this.state.primaryCashDisplay}
+            splitClick= {this.onSplitClick}
+            items={this.state.displayItems} 
+            onClick={this.onItemClick} 
+            onLongClick={this.onLongClick}
+            />
+            </div>
 
-                <div className="secondary">
-                    <div id='sidebar'>
-                        <Infowindow 
-                        input={this.state.secondaryInput} 
-                        total={this.state.secondaryOrderTotal} 
-                        user={this.state.secondaryUser}
-                        />
-                        <Orderwindow 
-                        markerID={2} 
-                        items={this.state.secondaryOrderItems} 
-                        onClick={this.onOrderRowClick}
-                        />
-                        <Cashwindow 
-                        markerID={2} 
-                        onClick={this.cashButtonClick}
-                        />
-                    </div>
-                    <ButtonColumn 
-                    splitClick= {this.onSplitClick}
-                    />
-                    <Itemwindow 
-                    markerID={2} 
-                    splitClick= {this.onSplitClick}
-                    class='item-window-split' 
-                    items={this.state.displayItems} 
-                    onClick={this.onItemClick} 
-                    onLongClick={this.onLongClick}
-                    />
-                </div>
-          </div>
-        )
-    }else{
+            <div id="divider"/>
 
-    return(
-      <div className='tyle-container'>
+            <div className="secondary">
+            <div id='sidebar'>
+            <Infowindow 
+            input={this.state.secondaryInput} 
+            total={this.state.secondaryOrderTotal} 
+            user={this.state.secondaryUser}
+            />
+            <Orderwindow 
+            markerID={2} 
+            items={this.state.secondaryOrderItems} 
+            onClick={this.onOrderRowClick}
+            />
+            <Cashwindow 
+            markerID={2} 
+            onClick={this.cashButtonClick}
+            />
+            </div>
+            <ButtonColumn 
+            />
+            <Itemwindow 
+            markerID={2} 
+            cashDisplay={this.state.secondaryCashDisplay}
+            splitClick= {this.onSplitClick}
+            class='item-window-split' 
+            items={this.state.displayItems} 
+            onClick={this.onItemClick} 
+            onLongClick={this.onLongClick}
+            />
+            </div>
+            </div>
+            )
+        }else{
+
+          return(
+            <div className='tyle-container'>
             <div id='sidebar'>
             <Infowindow 
             input={this.state.primaryInput} 
@@ -212,21 +237,22 @@ const Tyle = React.createClass({
             onClick={this.cashButtonClick}/>
             </div>
             <ButtonColumn 
-            splitClick= {this.onSplitClick}/>
+            />
             <Itemwindow 
             markerID={1} 
+            cashDisplay={this.state.primaryCashDisplay}
             splitClick= {this.onSplitClick}
             class= 'item-window' 
             items={this.state.displayItems} 
             onClick={this.onItemClick} 
             onLongClick={this.onLongClick}
             />
-      </div>
-      )
+            </div>
+            )
 
-  }
-}
+        }
+      }
 
-})
+    })
 
 module.exports = Tyle
