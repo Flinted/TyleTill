@@ -10,6 +10,9 @@ Rails.application.routes.draw do
           resources :divisions, defaults: {format: :json} 
           resources :subtypes, defaults: {format: :json} 
           resources :items, defaults: {format: :json}
+          get 'types/find/:title' => 'types#find'
+          get 'subtypes/find/:title' => 'subtypes#find'
+          get 'divisions/find/:title' => 'divisions#find'
     end
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

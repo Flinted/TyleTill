@@ -10,4 +10,9 @@ class TypesController < ApplicationController
       render json: type.as_json(include: {subtypes: {include: :items} })
   end
 
+  def find
+      type = Type.where(name: params[:title])
+      render json: type.as_json(include: {subtypes: {include: :items}})
+  end
+
 end

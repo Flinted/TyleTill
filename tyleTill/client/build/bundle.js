@@ -19755,6 +19755,7 @@
 	var ButtonColumn = __webpack_require__(172);
 	var MenuTray = __webpack_require__(173);
 	var APIRunner = __webpack_require__(174);
+	_ = __webpack_require__(162);
 	
 	var Tyle = React.createClass({
 	  displayName: 'Tyle',
@@ -19887,6 +19888,24 @@
 	  },
 	  menuOptionClick: function menuOptionClick(selected, markerID) {
 	    console.log(selected);
+	    var runner = new APIRunner();
+	    var url = "http://localhost:5000/api/";
+	    if (_.includes(this.state.categories["divisions"], selected)) {
+	      url += "divisions/find/" + selected;
+	    }
+	    if (_.includes(this.state.categories["types"], selected)) {
+	      url += "types/find/" + selected;
+	    }
+	    if (_.includes(this.state.categories["subtypes"], selected)) {
+	      url += "subtypes/find/" + selected;
+	    }
+	    console.log(url);
+	    var promise = runner.run("GET", url);
+	    promise.then(function (result) {
+	      console.log(result);
+	
+	      // ASSIGN NEW OBJECTS HERE
+	    });
 	  },
 	  cashButtonClick: function cashButtonClick(input, markerID) {
 	    var newInput = this.state.primaryInput;
@@ -19901,7 +19920,7 @@
 	        newInput = '';
 	        break;
 	      default:
-	        if (newInput.length < 3) {
+	        if (newInput.length < 3 || newInput.indexOf(".") > -1) {
 	          newInput += input;
 	        }
 	    }

@@ -10,4 +10,9 @@ class DivisionsController < ApplicationController
       render json: division.as_json(include: [{types: {include: {subtypes: {include: :items} }}}])
   end
 
+  def find
+      division = Division.where(name: params[:title])
+      render json: division.as_json(include: [{types: {include: {subtypes: {include: :items} }}}])
+  end
+
 end

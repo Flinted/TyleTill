@@ -8,6 +8,7 @@ const OrderManager = require('../models/OrderManager')
 const ButtonColumn =require('./ButtonColumn')
 const MenuTray = require('./MenuTray')
 const APIRunner = require('../models/APIRunner')
+_=require('lodash')
 
 const Tyle = React.createClass({
 
@@ -124,6 +125,18 @@ const Tyle = React.createClass({
 
   menuOptionClick(selected, markerID){
       console.log(selected)
+      const runner = new APIRunner
+      let url = "http://localhost:5000/api/"
+      if(_.includes(this.state.categories["divisions"], selected)){url += "divisions/find/"+selected}
+      if(_.includes(this.state.categories["types"], selected)){url += "types/find/"+selected}
+      if(_.includes(this.state.categories["subtypes"], selected)){url += "subtypes/find/"+selected}
+        console.log(url)
+      const promise = runner.run("GET",url)
+      promise.then(function(result){
+        console.log(result)
+
+        // ASSIGN NEW OBJECTS HERE
+      })
   },
 
   cashButtonClick(input, markerID){
@@ -137,9 +150,9 @@ const Tyle = React.createClass({
             newInput=''
             break;
         default:
-                if(newInput.length < 3){
+            if(newInput.length < 3 || newInput.indexOf(".") > -1 ){
                     newInput += input
-                }
+            }
           }
           if(markerID===2){
               this.setState({secondaryInput:newInput})
@@ -185,7 +198,6 @@ const Tyle = React.createClass({
                   this.setState({primaryCashDisplay:true})            
               }
           }
-
       },
 
       render(){
@@ -233,38 +245,38 @@ const Tyle = React.createClass({
 
             <div className="secondary">
             <div id='sidebar'>
-            <Infowindow 
-            input={this.state.secondaryInput} 
-            total={this.state.secondaryOrderTotal} 
-            user={this.state.secondaryUser}
-            />
-            <Orderwindow 
-            markerID={2} 
-            items={this.state.secondaryOrderItems} 
-            onClick={this.onOrderRowClick}
-            />
-            <Cashwindow 
-            markerID={2} 
-            onClick={this.cashButtonClick}
-            />
+                <Infowindow 
+                    input={this.state.secondaryInput} 
+                    total={this.state.secondaryOrderTotal} 
+                    user={this.state.secondaryUser}
+                />
+                <Orderwindow 
+                    markerID={2} 
+                    items={this.state.secondaryOrderItems} 
+                    onClick={this.onOrderRowClick}
+                />
+                <Cashwindow 
+                    markerID={2} 
+                    onClick={this.cashButtonClick}
+                />
             </div>
             <ButtonColumn 
-            markerID={2}
-            payToggle={this.onPayToggle} 
+                markerID={2}
+                payToggle={this.onPayToggle} 
             />
             <Itemwindow 
-            markerID={2} 
-            cashDisplay={this.state.secondaryCashDisplay}
-            splitClick= {this.onSplitClick}
-            class='item-window-split' 
-            items={this.state.secondaryDisplayItems} 
-            onClick={this.onItemClick} 
-            onLongClick={this.onLongClick}
+                markerID={2} 
+                cashDisplay={this.state.secondaryCashDisplay}
+                splitClick= {this.onSplitClick}
+                class='item-window-split' 
+                items={this.state.secondaryDisplayItems} 
+                onClick={this.onItemClick} 
+                onLongClick={this.onLongClick}
             />
            <MenuTray 
-           categories={this.state.categories} 
-           onClick={this.menuOptionClick} 
-           markerID={2}
+              categories={this.state.categories} 
+              onClick={this.menuOptionClick} 
+              markerID={2}
            />
             </div>
             </div>
@@ -274,38 +286,38 @@ const Tyle = React.createClass({
           return(
             <div className='tyle-container'>
             <div id='sidebar'>
-            <Infowindow 
-            input={this.state.primaryInput} 
-            total={this.state.primaryOrderTotal} 
-            user={this.state.primaryUser}
-            />
-            <Orderwindow 
-            markerID={1} 
-            items={this.state.primaryOrderItems} 
-            onClick={this.onOrderRowClick}
-            />
-            <Cashwindow 
-            markerID={1} 
-            onClick={this.cashButtonClick}/>
+                <Infowindow 
+                    input={this.state.primaryInput} 
+                    total={this.state.primaryOrderTotal} 
+                    user={this.state.primaryUser}
+                />
+                <Orderwindow 
+                    markerID={1} 
+                    items={this.state.primaryOrderItems} 
+                    onClick={this.onOrderRowClick}
+                />
+                <Cashwindow 
+                    markerID={1} 
+                    onClick={this.cashButtonClick}/>
             </div>
             <ButtonColumn
-            markerID={1}
-            payToggle={this.onPayToggle} 
+                markerID={1}
+                payToggle={this.onPayToggle} 
             />
             <Itemwindow 
-            markerID={1} 
-            cashDisplay={this.state.primaryCashDisplay}
-            splitClick= {this.onSplitClick}
-            class= 'item-window' 
-            items={this.state.primaryDisplayItems} 
-            onClick={this.onItemClick} 
-            onLongClick={this.onLongClick}
+                markerID={1} 
+                cashDisplay={this.state.primaryCashDisplay}
+                splitClick= {this.onSplitClick}
+                class= 'item-window' 
+                items={this.state.primaryDisplayItems} 
+                onClick={this.onItemClick} 
+                onLongClick={this.onLongClick}
             />
-                <MenuTray 
-                  categories={this.state.categories} 
-                  onClick={this.menuOptionClick} 
-                  markerID={1}
-                  />
+            <MenuTray 
+                categories={this.state.categories} 
+                onClick={this.menuOptionClick} 
+                markerID={1}
+            />
             </div>
             )
 
