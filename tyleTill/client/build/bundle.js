@@ -19748,53 +19748,49 @@
 	var React = __webpack_require__(1);
 	var Orderwindow = __webpack_require__(160);
 	var Itemwindow = __webpack_require__(164);
-	var Infowindow = __webpack_require__(167);
-	var Cashwindow = __webpack_require__(168);
-	var CashManager = __webpack_require__(169);
-	var OrderManager = __webpack_require__(170);
-	var ButtonColumn = __webpack_require__(171);
+	var Infowindow = __webpack_require__(168);
+	var Cashwindow = __webpack_require__(169);
+	var CashManager = __webpack_require__(170);
+	var OrderManager = __webpack_require__(171);
+	var ButtonColumn = __webpack_require__(172);
+	var MenuTray = __webpack_require__(173);
+	var APIRunner = __webpack_require__(174);
 	
 	var Tyle = React.createClass({
 	  displayName: 'Tyle',
 	  getInitialState: function getInitialState() {
 	    return {
 	      items: [],
-	      displayItems: [],
+	      categories: {},
+	      primaryDisplayItems: [],
 	      primaryUser: "Chris",
 	      primaryOrderItems: [{}],
 	      primaryOrderTotal: 0.00,
 	      primaryInput: '',
-	      primaryCashDisplay: true,
+	      primaryCashDisplay: false,
 	      secondaryUser: "Renwick",
 	      secondaryOrderItems: [{}],
+	      secondaryDisplayItems: [],
 	      secondaryOrderTotal: 0.00,
 	      secondaryInput: '',
-	      secondaryCashDisplay: true,
+	      secondaryCashDisplay: false,
 	      split: false
 	
 	    };
 	  },
 	  componentDidMount: function componentDidMount() {
-	    var _this = this;
-	
 	    console.log("attempting api call");
-	    var request = new XMLHttpRequest();
-	    request.open("GET", "http://localhost:5000/api/divisions");
-	    request.setRequestHeader('Content-Type', 'application/json');
-	    request.onload = function () {
-	      if (request.status === 200) {
-	        if (request.responseText) {
-	          var jsonString = request.responseText;
-	          var response = JSON.parse(jsonString);
-	          var displayItems = _this.prepareItems(response[0].types[0].subtypes[1].items);
-	          console.log(response);
-	          _this.setState({ items: response, displayItems: displayItems });
-	        }
-	      } else {
-	        console.log("error on fetch", request.status);
-	      }
-	    };
-	    request.send(null);
+	    var runner = new APIRunner();
+	    var APIpromise = runner.run("GET", "http://localhost:5000/api/divisions");
+	
+	    APIpromise.then(function (result) {
+	      console.log(result);
+	      var displayItems = this.prepareItems(result[0].types[0].subtypes[1].items);
+	      this.setState({ items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems });
+	      this.getCategories();
+	    }.bind(this), function (err) {
+	      console.log(err);
+	    });
 	  },
 	  prepareItems: function prepareItems(items) {
 	    var parsedItems = [];
@@ -19828,6 +19824,25 @@
 	
 	    return parsedItems;
 	  },
+	  getCategories: function getCategories() {
+	    var divisions = [];
+	    var types = [];
+	    var subtypes = [];
+	    var items = this.state.items;
+	    for (var a in items) {
+	      divisions.push(items[a].name);
+	      for (var b in items[a].types) {
+	        types.push(items[a].types[b].name);
+	        for (var c in items[a].types[b].subtypes) {
+	          subtypes.push(items[a].types[b].subtypes[c].name);
+	        }
+	      }
+	    }
+	
+	    var categories = { divisions: divisions, types: types, subtypes: subtypes };
+	    console.log("divisions", categories);
+	    this.setState({ categories: categories });
+	  },
 	  onItemClick: function onItemClick(event, markerID) {
 	    var currentOrder = this.state.primaryOrderItems;
 	    var input = this.state.primaryInput;
@@ -19835,7 +19850,10 @@
 	      currentOrder = this.state.secondaryOrderItems;
 	      input = this.state.secondaryInput;
 	    }
-	    var item = this.state.displayItems[event.target.value];
+	    var item = this.state.primaryDisplayItems[event.target.value];
+	    if (markerID === 2) {
+	      item = this.state.secondaryDisplayItems[event.target.value];
+	    }
 	    var ordermanager = new OrderManager();
 	    var newOrderArray = ordermanager.addItem(currentOrder, item, input);
 	    var cashmanager = new CashManager();
@@ -19867,32 +19885,30 @@
 	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
 	    }
 	  },
-	  cashButtonClick: function cashButtonClick(event, markerID) {
-	    var input = event.target.value;
-	
+	  menuOptionClick: function menuOptionClick(selected, markerID) {
+	    console.log(selected);
+	  },
+	  cashButtonClick: function cashButtonClick(input, markerID) {
+	    var newInput = this.state.primaryInput;
+	    if (markerID === 2) {
+	      newInput = this.state.secondaryInput;
+	    }
 	    switch (input) {
-	      case 'del':
+	      case '.':
+	        newInput += ".";
 	        break;
 	      case 'C':
-	        if (markerID === 2) {
-	          this.setState({ secondaryInput: '' });
-	        } else {
-	          this.setState({ primaryInput: '' });
-	        }
+	        newInput = '';
 	        break;
 	      default:
-	        var newInput = this.state.primaryInput;
-	        if (markerID === 2) {
-	          newInput = this.state.secondaryInput;
-	        }
 	        if (newInput.length < 3) {
 	          newInput += input;
 	        }
-	        if (markerID === 2) {
-	          this.setState({ secondaryInput: newInput });
-	        } else {
-	          this.setState({ primaryInput: newInput });
-	        }
+	    }
+	    if (markerID === 2) {
+	      this.setState({ secondaryInput: newInput });
+	    } else {
+	      this.setState({ primaryInput: newInput });
 	    }
 	  },
 	  onSplitClick: function onSplitClick(markerID) {
@@ -19906,6 +19922,7 @@
 	          primaryOrderTotal: this.state.secondaryOrderTotal,
 	          primaryUser: this.state.secondaryUser,
 	          primaryCashDisplay: this.state.secondaryCashDisplay,
+	          primaryDisplayItems: this.state.secondaryDisplayItems,
 	          secondaryOrderItems: [{}],
 	          secondaryOrderTotal: 0,
 	          secondaryUser: this.state.primaryUser,
@@ -19913,6 +19930,21 @@
 	        });
 	      } else {
 	        this.setState({ split: false });
+	      }
+	    }
+	  },
+	  onPayToggle: function onPayToggle(markerID) {
+	    if (markerID === 2) {
+	      if (this.state.secondaryCashDisplay) {
+	        this.setState({ secondaryCashDisplay: false });
+	      } else {
+	        this.setState({ secondaryCashDisplay: true });
+	      }
+	    } else {
+	      if (this.state.primaryCashDisplay) {
+	        this.setState({ primaryCashDisplay: false });
+	      } else {
+	        this.setState({ primaryCashDisplay: true });
 	      }
 	    }
 	  },
@@ -19942,15 +19974,23 @@
 	              onClick: this.cashButtonClick
 	            })
 	          ),
-	          React.createElement(ButtonColumn, null),
+	          React.createElement(ButtonColumn, {
+	            markerID: 1,
+	            payToggle: this.onPayToggle
+	          }),
 	          React.createElement(Itemwindow, {
 	            markerID: 1,
 	            'class': 'item-window-split',
 	            cashDisplay: this.state.primaryCashDisplay,
 	            splitClick: this.onSplitClick,
-	            items: this.state.displayItems,
+	            items: this.state.primaryDisplayItems,
 	            onClick: this.onItemClick,
 	            onLongClick: this.onLongClick
+	          }),
+	          React.createElement(MenuTray, {
+	            categories: this.state.categories,
+	            onClick: this.menuOptionClick,
+	            markerID: 1
 	          })
 	        ),
 	        React.createElement('div', { id: 'divider' }),
@@ -19975,15 +20015,23 @@
 	              onClick: this.cashButtonClick
 	            })
 	          ),
-	          React.createElement(ButtonColumn, null),
+	          React.createElement(ButtonColumn, {
+	            markerID: 2,
+	            payToggle: this.onPayToggle
+	          }),
 	          React.createElement(Itemwindow, {
 	            markerID: 2,
 	            cashDisplay: this.state.secondaryCashDisplay,
 	            splitClick: this.onSplitClick,
 	            'class': 'item-window-split',
-	            items: this.state.displayItems,
+	            items: this.state.secondaryDisplayItems,
 	            onClick: this.onItemClick,
 	            onLongClick: this.onLongClick
+	          }),
+	          React.createElement(MenuTray, {
+	            categories: this.state.categories,
+	            onClick: this.menuOptionClick,
+	            markerID: 2
 	          })
 	        )
 	      );
@@ -20009,15 +20057,23 @@
 	            markerID: 1,
 	            onClick: this.cashButtonClick })
 	        ),
-	        React.createElement(ButtonColumn, null),
+	        React.createElement(ButtonColumn, {
+	          markerID: 1,
+	          payToggle: this.onPayToggle
+	        }),
 	        React.createElement(Itemwindow, {
 	          markerID: 1,
 	          cashDisplay: this.state.primaryCashDisplay,
 	          splitClick: this.onSplitClick,
 	          'class': 'item-window',
-	          items: this.state.displayItems,
+	          items: this.state.primaryDisplayItems,
 	          onClick: this.onItemClick,
 	          onLongClick: this.onLongClick
+	        }),
+	        React.createElement(MenuTray, {
+	          categories: this.state.categories,
+	          onClick: this.menuOptionClick,
+	          markerID: 1
 	        })
 	      );
 	    }
@@ -36871,7 +36927,7 @@
 	
 	var React = __webpack_require__(1);
 	var Item = __webpack_require__(165);
-	var CashDisplay = __webpack_require__(172);
+	var CashDisplay = __webpack_require__(167);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
@@ -37066,6 +37122,66 @@
 	
 	var React = __webpack_require__(1);
 	
+	var CashDisplay = React.createClass({
+	    displayName: 'CashDisplay',
+	    render: function render() {
+	        return React.createElement(
+	            'div',
+	            { className: 'cash-display' },
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: 'discount' },
+	                'Discount'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: 'card' },
+	                'Card'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: 'cash' },
+	                'Cash'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: '5' },
+	                '£50'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: '5' },
+	                '£20'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: '5' },
+	                '£10'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: '5' },
+	                '£5'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'pay-button', value: 'exact' },
+	                'Exact Cash'
+	            )
+	        );
+	    }
+	});
+	
+	module.exports = CashDisplay;
+
+/***/ },
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
 	var Infowindow = function Infowindow(props) {
 	    return React.createElement(
 	        'div',
@@ -37099,7 +37215,7 @@
 	module.exports = Infowindow;
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37109,7 +37225,7 @@
 	var Cashwindow = React.createClass({
 	    displayName: 'Cashwindow',
 	    onClick: function onClick(event) {
-	        this.props.onClick(event, this.props.markerID);
+	        this.props.onClick(event.target.value, this.props.markerID);
 	    },
 	    render: function render() {
 	        return React.createElement(
@@ -37162,8 +37278,8 @@
 	            ),
 	            React.createElement(
 	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: 'del' },
-	                'del'
+	                { onClick: this.onClick, className: 'cash-button', value: '.' },
+	                '.'
 	            ),
 	            React.createElement(
 	                'button',
@@ -37182,7 +37298,7 @@
 	module.exports = Cashwindow;
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37205,7 +37321,7 @@
 	module.exports = CashManager;
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37251,48 +37367,6 @@
 	module.exports = OrderManager;
 
 /***/ },
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var ButtonColumn = function ButtonColumn(props) {
-	    return React.createElement(
-	        'div',
-	        { className: 'button-column' },
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Split'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Tables'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Orders'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Log Out'
-	        ),
-	        React.createElement(
-	            'button',
-	            { className: 'menu-button' },
-	            'Save'
-	        )
-	    );
-	};
-	
-	module.exports = ButtonColumn;
-
-/***/ },
 /* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -37300,18 +37374,168 @@
 	
 	var React = __webpack_require__(1);
 	
-	var CashDisplay = React.createClass({
-	    displayName: 'CashDisplay',
+	var ButtonColumn = React.createClass({
+	    displayName: 'ButtonColumn',
+	    onPayClick: function onPayClick() {
+	        this.props.payToggle(this.props.markerID);
+	    },
 	    render: function render() {
 	        return React.createElement(
 	            'div',
-	            { className: 'cash-display' },
-	            'Test'
+	            { className: 'button-column' },
+	            React.createElement(
+	                'button',
+	                { className: 'menu-button' },
+	                'Save'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'menu-button' },
+	                'Tables'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'menu-button' },
+	                'Orders'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'menu-button' },
+	                'Log Out'
+	            ),
+	            React.createElement(
+	                'button',
+	                { className: 'menu-button', onClick: this.onPayClick },
+	                'Pay Screen'
+	            )
 	        );
 	    }
 	});
 	
-	module.exports = CashDisplay;
+	module.exports = ButtonColumn;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var MenuTray = React.createClass({
+	  displayName: 'MenuTray',
+	  onClick: function onClick(event) {
+	    this.props.onClick(event.target.value, this.props.markerID);
+	  },
+	  render: function render() {
+	
+	    var buttons = [];
+	    var categories = this.props.categories;
+	    for (var key in categories) {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+	
+	      try {
+	        for (var _iterator = categories[key][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var item = _step.value;
+	
+	          var button = React.createElement(
+	            'button',
+	            { className: 'menu-item', onClick: this.onClick, key: item, value: item },
+	            item
+	          );
+	          buttons.push(button);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	    }
+	    return React.createElement(
+	      'div',
+	      { className: 'menu-tray' },
+	      buttons
+	    );
+	  }
+	});
+	
+	module.exports = MenuTray;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var APIRunner = function APIRunner() {};
+	
+	APIRunner.prototype = {
+	  run: function run(type, url, data) {
+	    return new Promise(function (resolve, reject) {
+	      var request = new XMLHttpRequest();
+	      request.open(type, url);
+	      request.setRequestHeader('Content-Type', 'application/json');
+	      request.onload = function () {
+	        if (request.status === 200) {
+	          if (request.responseText) {
+	            var jsonString = request.responseText;
+	            var response = JSON.parse(jsonString);
+	            resolve(response);
+	          }
+	        } else {
+	          console.log("error on fetch", request.status);
+	          reject(Error(request.statusText));
+	        }
+	      };
+	      request.send(data || null);
+	    });
+	  },
+	  prepareItems: function prepareItems(items) {
+	    var parsedItems = [];
+	    var _iteratorNormalCompletion = true;
+	    var _didIteratorError = false;
+	    var _iteratorError = undefined;
+	
+	    try {
+	      for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	        var item = _step.value;
+	
+	        var parseItem = item;
+	        parseItem.sizes = JSON.parse(item.sizes);
+	        parseItem.prices = JSON.parse(item.prices);
+	        parsedItems.push(parseItem);
+	      }
+	    } catch (err) {
+	      _didIteratorError = true;
+	      _iteratorError = err;
+	    } finally {
+	      try {
+	        if (!_iteratorNormalCompletion && _iterator.return) {
+	          _iterator.return();
+	        }
+	      } finally {
+	        if (_didIteratorError) {
+	          throw _iteratorError;
+	        }
+	      }
+	    }
+	
+	    return parsedItems;
+	  }
+	};
+	
+	module.exports = APIRunner;
 
 /***/ }
 /******/ ]);

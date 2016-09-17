@@ -3,7 +3,7 @@ const React = require('react')
 const Cashwindow= React.createClass({
 
 onClick(event){
-    this.props.onClick(event, this.props.markerID)
+    this.props.onClick(event.target.value, this.props.markerID)
 },
 
 render(){
@@ -18,7 +18,7 @@ render(){
                 <button onClick={this.onClick}className="cash-button" value="7">7</button>
                 <button onClick={this.onClick}className="cash-button" value="8">8</button>
                 <button onClick={this.onClick}className="cash-button" value="9">9</button>
-                <button onClick={this.onClick}className="cash-button" value="del">del</button>
+                <button onClick={this.onClick}className="cash-button" value=".">.</button>
                 <button onClick={this.onClick}className="cash-button" value="0">0</button>
                 <button onClick={this.onClick}className="cash-button" value="C">C</button>
 

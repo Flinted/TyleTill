@@ -6,23 +6,27 @@ const Cashwindow = require('./sidebar/Cashwindow')
 const CashManager = require('../models/CashManager')
 const OrderManager = require('../models/OrderManager')
 const ButtonColumn =require('./ButtonColumn')
+const MenuTray = require('./MenuTray')
+const APIRunner = require('../models/APIRunner')
 
 const Tyle = React.createClass({
 
   getInitialState(){
     return {
       items: [], 
-      displayItems:[],
+      categories: {},
+      primaryDisplayItems:[],
       primaryUser: "Chris",
       primaryOrderItems:[{}],
       primaryOrderTotal:0.00,
       primaryInput:'',
-      primaryCashDisplay: true,
+      primaryCashDisplay: false,
       secondaryUser: "Renwick",
       secondaryOrderItems:[{}],
+      secondaryDisplayItems:[],
       secondaryOrderTotal:0.00,
       secondaryInput:'',
-      secondaryCashDisplay: true,
+      secondaryCashDisplay: false,
       split: false
 
     }
@@ -30,23 +34,17 @@ const Tyle = React.createClass({
 
   componentDidMount(){
     console.log("attempting api call")
-    const request = new XMLHttpRequest();
-    request.open("GET","http://localhost:5000/api/divisions");
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.onload = () =>{
-      if (request.status === 200){
-        if(request.responseText){
-          const jsonString = request.responseText;
-          const response = JSON.parse(jsonString)
-          const displayItems = this.prepareItems(response[0].types[0].subtypes[1].items)
-          console.log(response)
-          this.setState({items: response, displayItems: displayItems})
-        }
-      }else{
-        console.log("error on fetch", request.status)
-      }
-    }
-    request.send(null);
+    const runner = new APIRunner
+    const APIpromise = runner.run("GET", "http://localhost:5000/api/divisions")
+
+    APIpromise.then(function(result){
+      console.log(result)
+      const displayItems = this.prepareItems(result[0].types[0].subtypes[1].items)
+      this.setState({items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
+      this.getCategories()
+    }.bind(this), function(err){
+      console.log(err)
+    })
   },
 
   prepareItems(items){
@@ -60,6 +58,28 @@ const Tyle = React.createClass({
     return parsedItems
   },
 
+  getCategories(){
+      let divisions = []
+      let types =[]
+      let subtypes =[]
+      const items = this.state.items
+      for(let a in items){
+            divisions.push(items[a].name)
+            for(let b in items[a].types){
+                types.push(items[a].types[b].name)
+                for(let c in items[a].types[b].subtypes){
+                    subtypes.push(items[a].types[b].subtypes[c].name)
+                  }
+            }
+      }
+
+      const categories= {divisions: divisions, types: types, subtypes: subtypes}
+      console.log("divisions", categories)
+      this.setState({categories: categories})
+      
+  },
+
+
   onItemClick(event, markerID){
     let currentOrder = this.state.primaryOrderItems
     let input = this.state.primaryInput
@@ -67,7 +87,8 @@ const Tyle = React.createClass({
       currentOrder = this.state.secondaryOrderItems
       input = this.state.secondaryInput
     }
-    const item = this.state.displayItems[event.target.value]
+    let item = this.state.primaryDisplayItems[event.target.value]
+    if(markerID === 2){item = this.state.secondaryDisplayItems[event.target.value]}
     const ordermanager = new OrderManager
     let newOrderArray = ordermanager.addItem(currentOrder, item, input)
     const cashmanager = new CashManager
@@ -101,30 +122,29 @@ const Tyle = React.createClass({
     }
   },
 
-  cashButtonClick(event, markerID){
-    const input = event.target.value
+  menuOptionClick(selected, markerID){
+      console.log(selected)
+  },
 
-    switch(input){
-        case 'del':
-            break;
-        case 'C':
-            if(markerID=== 2){
-              this.setState({secondaryInput:''})
-            }else{
-              this.setState({primaryInput:''})
-            }
-            break;
-        default:
+  cashButtonClick(input, markerID){
             let newInput = this.state.primaryInput
             if(markerID===2){newInput = this.state.secondaryInput}
+    switch(input){
+        case '.':
+            newInput+= "."
+            break;
+        case 'C':
+            newInput=''
+            break;
+        default:
                 if(newInput.length < 3){
                     newInput += input
                 }
-            if(markerID===2){
-                this.setState({secondaryInput:newInput})
-            }else{
-                this.setState({primaryInput:newInput})
           }
+          if(markerID===2){
+              this.setState({secondaryInput:newInput})
+          }else{
+              this.setState({primaryInput:newInput})
         }
       },
 
@@ -139,6 +159,7 @@ const Tyle = React.createClass({
               primaryOrderTotal: this.state.secondaryOrderTotal, 
               primaryUser: this.state.secondaryUser,
               primaryCashDisplay: this.state.secondaryCashDisplay,
+              primaryDisplayItems: this.state.secondaryDisplayItems,
               secondaryOrderItems:[{}],
               secondaryOrderTotal: 0,
               secondaryUser: this.state.primaryUser,
@@ -150,38 +171,62 @@ const Tyle = React.createClass({
         }
       },
 
+      onPayToggle(markerID){
+          if(markerID === 2){
+              if(this.state.secondaryCashDisplay){
+                  this.setState({secondaryCashDisplay:false})
+              }else{
+                  this.setState({secondaryCashDisplay:true})            
+              }
+          }else{
+              if(this.state.primaryCashDisplay){
+                  this.setState({primaryCashDisplay:false})
+              }else{
+                  this.setState({primaryCashDisplay:true})            
+              }
+          }
+
+      },
+
       render(){
         if(this.state.split){
           return(
             <div className='tyle-container'>
             <div className="primary">
-            <div id='sidebar'>
-            <Infowindow 
-            input={this.state.primaryInput} 
-            total={this.state.primaryOrderTotal} 
-            user={this.state.primaryUser}
-            />
-            <Orderwindow 
-            markerID={1} 
-            items={this.state.primaryOrderItems} 
-            onClick={this.onOrderRowClick}
-            />
-            <Cashwindow 
-            markerID={1} 
-            onClick={this.cashButtonClick} 
-            />
-            </div>
-            <ButtonColumn 
-            />
-            <Itemwindow 
-            markerID={1} 
-            class='item-window-split' 
-            cashDisplay={this.state.primaryCashDisplay}
-            splitClick= {this.onSplitClick}
-            items={this.state.displayItems} 
-            onClick={this.onItemClick} 
-            onLongClick={this.onLongClick}
-            />
+                  <div id='sidebar'>
+                        <Infowindow 
+                              input={this.state.primaryInput} 
+                              total={this.state.primaryOrderTotal} 
+                              user={this.state.primaryUser}
+                        />
+                        <Orderwindow 
+                              markerID={1} 
+                              items={this.state.primaryOrderItems} 
+                              onClick={this.onOrderRowClick}
+                        />
+                        <Cashwindow 
+                              markerID={1} 
+                              onClick={this.cashButtonClick} 
+                        />
+                  </div>
+                  <ButtonColumn 
+                        markerID={1}
+                        payToggle={this.onPayToggle} 
+                  />
+                  <Itemwindow 
+                        markerID={1} 
+                        class='item-window-split' 
+                        cashDisplay={this.state.primaryCashDisplay}
+                        splitClick= {this.onSplitClick}
+                        items={this.state.primaryDisplayItems} 
+                        onClick={this.onItemClick} 
+                        onLongClick={this.onLongClick}
+                    />
+                    <MenuTray 
+                        categories={this.state.categories} 
+                        onClick={this.menuOptionClick} 
+                        markerID={1}
+                    />
             </div>
 
             <div id="divider"/>
@@ -204,16 +249,23 @@ const Tyle = React.createClass({
             />
             </div>
             <ButtonColumn 
+            markerID={2}
+            payToggle={this.onPayToggle} 
             />
             <Itemwindow 
             markerID={2} 
             cashDisplay={this.state.secondaryCashDisplay}
             splitClick= {this.onSplitClick}
             class='item-window-split' 
-            items={this.state.displayItems} 
+            items={this.state.secondaryDisplayItems} 
             onClick={this.onItemClick} 
             onLongClick={this.onLongClick}
             />
+           <MenuTray 
+           categories={this.state.categories} 
+           onClick={this.menuOptionClick} 
+           markerID={2}
+           />
             </div>
             </div>
             )
@@ -236,17 +288,24 @@ const Tyle = React.createClass({
             markerID={1} 
             onClick={this.cashButtonClick}/>
             </div>
-            <ButtonColumn 
+            <ButtonColumn
+            markerID={1}
+            payToggle={this.onPayToggle} 
             />
             <Itemwindow 
             markerID={1} 
             cashDisplay={this.state.primaryCashDisplay}
             splitClick= {this.onSplitClick}
             class= 'item-window' 
-            items={this.state.displayItems} 
+            items={this.state.primaryDisplayItems} 
             onClick={this.onItemClick} 
             onLongClick={this.onLongClick}
             />
+                <MenuTray 
+                  categories={this.state.categories} 
+                  onClick={this.menuOptionClick} 
+                  markerID={1}
+                  />
             </div>
             )
 
