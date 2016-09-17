@@ -1,18 +1,28 @@
 const React = require('react')
 const Item = require('./Item')
 
-const Itemwindow= function(props){
-      if(!props.items){ return(<div className={props.class}></div> ) }
+const Itemwindow= React.createClass({
+  splitClick(){
+    this.props.splitClick(this.props.markerID)
+  },
 
-    const nodes = props.items.map((item, index)=>(
-             <Item  {...item}  key={index} markerID={props.markerID}index={index} onClick={props.onClick} onLongClick={props.onLongClick}/> 
-            ))
+  render(){
+    if(!this.props.items){ return(<div className={this.props.class}></div> ) }
 
-    return(
-      <ul className={props.class}>
-       {nodes}
+     const nodes = this.props.items.map((item, index)=>(
+       <Item  {...item}  key={index} markerID={this.props.markerID}index={index} onClick={this.props.onClick} onLongClick={this.props.onLongClick}/> 
+       ))
+
+   return(
+    <ul className={this.props.class}>
+    <button className = 'split-button' onClick={this.splitClick}>Split/Merge</button>
+    {nodes}
     </ul>
     )
-}
+ }  
+ 
+
+})
+
 
 module.exports = Itemwindow

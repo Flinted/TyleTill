@@ -37,6 +37,7 @@ const Tyle = React.createClass({
           const jsonString = request.responseText;
           const response = JSON.parse(jsonString)
           const displayItems = this.prepareItems(response[0].types[0].subtypes[1].items)
+          console.log(response)
           this.setState({items: response, displayItems: displayItems})
         }
       }else{
@@ -130,24 +131,64 @@ const Tyle = React.createClass({
           <div className='tyle-container'>
                 <div className="primary">
                       <div id='sidebar'>
-                            <Infowindow input={this.state.input} total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
-                            <Orderwindow markerID={1} items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
-                            <Cashwindow markerID={1} onClick={this.cashButtonClick} />
+                            <Infowindow 
+                            input={this.state.primaryInput} 
+                            total={this.state.primaryOrderTotal} 
+                            user={this.state.primaryUser}
+                            />
+                            <Orderwindow 
+                            markerID={1} 
+                            items={this.state.primaryOrderItems} 
+                            onClick={this.onOrderRowClick}
+                            />
+                            <Cashwindow 
+                            markerID={1} 
+                            onClick={this.cashButtonClick} 
+                            />
                       </div>
-                      <ButtonColumn splitClick= {this.onSplitClick}/>
-                      <Itemwindow markerID={1} class='item-window-split' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>
+                      <ButtonColumn 
+                      splitClick= {this.onSplitClick}
+                      />
+                      <Itemwindow 
+                      markerID={1} 
+                      class='item-window-split' 
+                      splitClick= {this.onSplitClick}
+                      items={this.state.displayItems} 
+                      onClick={this.onItemClick} 
+                      onLongClick={this.onLongClick}
+                      />
                 </div>
 
                 <div id="divider"/>
 
                 <div className="secondary">
                     <div id='sidebar'>
-                        <Infowindow input={this.state.input} total={this.state.secondaryOrderTotal} user={this.state.secondaryUser}/>
-                        <Orderwindow markerID={2} items={this.state.secondaryOrderItems} onClick={this.onOrderRowClick}/>
-                        <Cashwindow markerID={2} onClick={this.cashButtonClick}/>
+                        <Infowindow 
+                        input={this.state.secondaryInput} 
+                        total={this.state.secondaryOrderTotal} 
+                        user={this.state.secondaryUser}
+                        />
+                        <Orderwindow 
+                        markerID={2} 
+                        items={this.state.secondaryOrderItems} 
+                        onClick={this.onOrderRowClick}
+                        />
+                        <Cashwindow 
+                        markerID={2} 
+                        onClick={this.cashButtonClick}
+                        />
                     </div>
-                    <ButtonColumn splitClick= {this.onSplitClick}/>
-                    <Itemwindow markerID={2} class='item-window-split' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>
+                    <ButtonColumn 
+                    splitClick= {this.onSplitClick}
+                    />
+                    <Itemwindow 
+                    markerID={2} 
+                    splitClick= {this.onSplitClick}
+                    class='item-window-split' 
+                    items={this.state.displayItems} 
+                    onClick={this.onItemClick} 
+                    onLongClick={this.onLongClick}
+                    />
                 </div>
           </div>
         )
@@ -156,12 +197,30 @@ const Tyle = React.createClass({
     return(
       <div className='tyle-container'>
             <div id='sidebar'>
-            <Infowindow input={this.state.input} total={this.state.primaryOrderTotal} user={this.state.primaryUser}/>
-            <Orderwindow markerID={1} items={this.state.primaryOrderItems} onClick={this.onOrderRowClick}/>
-            <Cashwindow markerID={1} onClick={this.cashButtonClick}/>
+            <Infowindow 
+            input={this.state.primaryInput} 
+            total={this.state.primaryOrderTotal} 
+            user={this.state.primaryUser}
+            />
+            <Orderwindow 
+            markerID={1} 
+            items={this.state.primaryOrderItems} 
+            onClick={this.onOrderRowClick}
+            />
+            <Cashwindow 
+            markerID={1} 
+            onClick={this.cashButtonClick}/>
             </div>
-            <ButtonColumn splitClick= {this.onSplitClick}/>
-            <Itemwindow markerID={1} class= 'item-window' items={this.state.displayItems} onClick={this.onItemClick} onLongClick={this.onLongClick}/>
+            <ButtonColumn 
+            splitClick= {this.onSplitClick}/>
+            <Itemwindow 
+            markerID={1} 
+            splitClick= {this.onSplitClick}
+            class= 'item-window' 
+            items={this.state.displayItems} 
+            onClick={this.onItemClick} 
+            onLongClick={this.onLongClick}
+            />
       </div>
       )
 

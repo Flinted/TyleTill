@@ -19785,6 +19785,7 @@
 	          var jsonString = request.responseText;
 	          var response = JSON.parse(jsonString);
 	          var displayItems = _this.prepareItems(response[0].types[0].subtypes[1].items);
+	          console.log(response);
 	          _this.setState({ items: response, displayItems: displayItems });
 	        }
 	      } else {
@@ -19897,12 +19898,32 @@
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
-	            React.createElement(Infowindow, { input: this.state.input, total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
-	            React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
-	            React.createElement(Cashwindow, { markerID: 1, onClick: this.cashButtonClick })
+	            React.createElement(Infowindow, {
+	              input: this.state.primaryInput,
+	              total: this.state.primaryOrderTotal,
+	              user: this.state.primaryUser
+	            }),
+	            React.createElement(Orderwindow, {
+	              markerID: 1,
+	              items: this.state.primaryOrderItems,
+	              onClick: this.onOrderRowClick
+	            }),
+	            React.createElement(Cashwindow, {
+	              markerID: 1,
+	              onClick: this.cashButtonClick
+	            })
 	          ),
-	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
-	          React.createElement(Itemwindow, { markerID: 1, 'class': 'item-window-split', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
+	          React.createElement(ButtonColumn, {
+	            splitClick: this.onSplitClick
+	          }),
+	          React.createElement(Itemwindow, {
+	            markerID: 1,
+	            'class': 'item-window-split',
+	            splitClick: this.onSplitClick,
+	            items: this.state.displayItems,
+	            onClick: this.onItemClick,
+	            onLongClick: this.onLongClick
+	          })
 	        ),
 	        React.createElement('div', { id: 'divider' }),
 	        React.createElement(
@@ -19911,12 +19932,32 @@
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
-	            React.createElement(Infowindow, { input: this.state.input, total: this.state.secondaryOrderTotal, user: this.state.secondaryUser }),
-	            React.createElement(Orderwindow, { markerID: 2, items: this.state.secondaryOrderItems, onClick: this.onOrderRowClick }),
-	            React.createElement(Cashwindow, { markerID: 2, onClick: this.cashButtonClick })
+	            React.createElement(Infowindow, {
+	              input: this.state.secondaryInput,
+	              total: this.state.secondaryOrderTotal,
+	              user: this.state.secondaryUser
+	            }),
+	            React.createElement(Orderwindow, {
+	              markerID: 2,
+	              items: this.state.secondaryOrderItems,
+	              onClick: this.onOrderRowClick
+	            }),
+	            React.createElement(Cashwindow, {
+	              markerID: 2,
+	              onClick: this.cashButtonClick
+	            })
 	          ),
-	          React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
-	          React.createElement(Itemwindow, { markerID: 2, 'class': 'item-window-split', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
+	          React.createElement(ButtonColumn, {
+	            splitClick: this.onSplitClick
+	          }),
+	          React.createElement(Itemwindow, {
+	            markerID: 2,
+	            splitClick: this.onSplitClick,
+	            'class': 'item-window-split',
+	            items: this.state.displayItems,
+	            onClick: this.onItemClick,
+	            onLongClick: this.onLongClick
+	          })
 	        )
 	      );
 	    } else {
@@ -19927,12 +19968,30 @@
 	        React.createElement(
 	          'div',
 	          { id: 'sidebar' },
-	          React.createElement(Infowindow, { input: this.state.input, total: this.state.primaryOrderTotal, user: this.state.primaryUser }),
-	          React.createElement(Orderwindow, { markerID: 1, items: this.state.primaryOrderItems, onClick: this.onOrderRowClick }),
-	          React.createElement(Cashwindow, { markerID: 1, onClick: this.cashButtonClick })
+	          React.createElement(Infowindow, {
+	            input: this.state.primaryInput,
+	            total: this.state.primaryOrderTotal,
+	            user: this.state.primaryUser
+	          }),
+	          React.createElement(Orderwindow, {
+	            markerID: 1,
+	            items: this.state.primaryOrderItems,
+	            onClick: this.onOrderRowClick
+	          }),
+	          React.createElement(Cashwindow, {
+	            markerID: 1,
+	            onClick: this.cashButtonClick })
 	        ),
-	        React.createElement(ButtonColumn, { splitClick: this.onSplitClick }),
-	        React.createElement(Itemwindow, { markerID: 1, 'class': 'item-window', items: this.state.displayItems, onClick: this.onItemClick, onLongClick: this.onLongClick })
+	        React.createElement(ButtonColumn, {
+	          splitClick: this.onSplitClick }),
+	        React.createElement(Itemwindow, {
+	          markerID: 1,
+	          splitClick: this.onSplitClick,
+	          'class': 'item-window',
+	          items: this.state.displayItems,
+	          onClick: this.onItemClick,
+	          onLongClick: this.onLongClick
+	        })
 	      );
 	    }
 	  }
@@ -36709,21 +36768,34 @@
 	var React = __webpack_require__(1);
 	var Item = __webpack_require__(164);
 	
-	var Itemwindow = function Itemwindow(props) {
-	  if (!props.items) {
-	    return React.createElement('div', { className: props.class });
+	var Itemwindow = React.createClass({
+	  displayName: 'Itemwindow',
+	  splitClick: function splitClick() {
+	    this.props.splitClick(this.props.markerID);
+	  },
+	  render: function render() {
+	    var _this = this;
+	
+	    if (!this.props.items) {
+	      return React.createElement('div', { className: this.props.class });
+	    }
+	
+	    var nodes = this.props.items.map(function (item, index) {
+	      return React.createElement(Item, _extends({}, item, { key: index, markerID: _this.props.markerID, index: index, onClick: _this.props.onClick, onLongClick: _this.props.onLongClick }));
+	    });
+	
+	    return React.createElement(
+	      'ul',
+	      { className: this.props.class },
+	      React.createElement(
+	        'button',
+	        { className: 'split-button', onClick: this.splitClick },
+	        'Split/Merge'
+	      ),
+	      nodes
+	    );
 	  }
-	
-	  var nodes = props.items.map(function (item, index) {
-	    return React.createElement(Item, _extends({}, item, { key: index, markerID: props.markerID, index: index, onClick: props.onClick, onLongClick: props.onLongClick }));
-	  });
-	
-	  return React.createElement(
-	    'ul',
-	    { className: props.class },
-	    nodes
-	  );
-	};
+	});
 	
 	module.exports = Itemwindow;
 
@@ -36825,22 +36897,24 @@
 	        if (itemsObject[ref]) {
 	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
 	        }
-	        var total = price * qty;
+	        var total = parseFloat(price * qty);
 	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
 	        var returnArray = [itemsObject];
 	        return returnArray;
 	    },
 	    removeItem: function removeItem(orderItems, key, input) {
 	        var itemsObject = orderItems[0];
-	        var price = itemsObject[key].price;
-	        var qty = itemsObject[key].qty - (parseInt(input) || 1);
+	        var currentTotal = parseFloat(itemsObject[key].total);
+	        var origQty = itemsObject[key].qty;
+	        var price = currentTotal / origQty;
+	        var qty = origQty - (parseInt(input) || 1);
 	        var id = itemsObject[key].id;
 	        if (qty < 1) {
 	            delete itemsObject[key];
 	            var _returnArray = [itemsObject];
 	            return _returnArray;
 	        }
-	        var total = price * qty;
+	        var total = parseFloat(price * qty);
 	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
 	        var returnArray = [itemsObject];
 	        return returnArray;

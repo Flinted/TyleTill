@@ -6,6 +6,8 @@
 }
 
 html{
+  background-image: url("/images/tiles.png");
+  background-repeat: repeat;
   background-color: #43474A;
   height: 100%;
   width:100%;
@@ -33,7 +35,7 @@ body{
 
 #divider{
   height:100%;
-  width: 2%;
+  width: 1%;
   margin-left: 49%;
   position: absolute;
   background-color: black;
@@ -55,8 +57,8 @@ body{
   /*border: 2px solid black;*/
 }
 .split-button{
-  position: absolute;
   margin-top: -60px;
+  float: right;
   background-color: black;
   height: 50px;
   width: 70px;
