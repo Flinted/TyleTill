@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(159);
+	var ReactDOM = __webpack_require__(175);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19746,345 +19746,337 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Orderwindow = __webpack_require__(160);
-	var Itemwindow = __webpack_require__(164);
-	var Infowindow = __webpack_require__(168);
-	var Cashwindow = __webpack_require__(169);
-	var CashManager = __webpack_require__(170);
-	var OrderManager = __webpack_require__(171);
-	var ItemManager = __webpack_require__(175);
+	var Orderwindow = __webpack_require__(159);
+	var Itemwindow = __webpack_require__(163);
+	var Infowindow = __webpack_require__(167);
+	var Cashwindow = __webpack_require__(168);
+	var CashManager = __webpack_require__(169);
+	var OrderManager = __webpack_require__(170);
+	var ItemManager = __webpack_require__(171);
 	var ButtonColumn = __webpack_require__(172);
 	var MenuTray = __webpack_require__(173);
 	var APIRunner = __webpack_require__(174);
-	_ = __webpack_require__(162);
+	_ = __webpack_require__(161);
 	
 	var Tyle = React.createClass({
-	    displayName: 'Tyle',
-	    getInitialState: function getInitialState() {
-	        return {
-	            items: [],
-	            categories: {},
-	            primaryDisplayItems: [],
-	            primaryUser: "Chris",
-	            primaryOrderItems: [{}],
-	            primaryOrderTotal: 0.00,
-	            primaryInput: '',
-	            primaryCashDisplay: false,
-	            secondaryUser: "Renwick",
-	            secondaryOrderItems: [{}],
-	            secondaryDisplayItems: [],
-	            secondaryOrderTotal: 0.00,
-	            secondaryInput: '',
-	            secondaryCashDisplay: false,
-	            split: false
+	  displayName: 'Tyle',
+	  getInitialState: function getInitialState() {
+	    return {
+	      items: [],
+	      categories: {},
+	      tables: { one: [], two: [], three: [], four: [], five: [], six: [], seven: [], eight: [], nine: [], ten: [] },
+	      tableShow: false,
+	      primaryDisplayItems: [],
+	      primaryUser: "Chris",
+	      primaryOrderItems: [{}],
+	      primaryOrderTotal: 0.00,
+	      primaryInput: '',
+	      primaryCashDisplay: false,
+	      secondaryUser: "Renwick",
+	      secondaryOrderItems: [{}],
+	      secondaryDisplayItems: [],
+	      secondaryOrderTotal: 0.00,
+	      secondaryInput: '',
+	      secondaryCashDisplay: false,
+	      split: false
 	
-	        };
-	    },
-	    componentDidMount: function componentDidMount() {
-	        console.log("attempting api call");
-	        var runner = new APIRunner();
-	        var APIpromise = runner.run("GET", "http://localhost:5000/api/divisions");
+	    };
+	  },
+	  componentDidMount: function componentDidMount() {
+	    console.log("attempting api call");
+	    var runner = new APIRunner();
+	    var APIpromise = runner.run("GET", "http://localhost:5000/api/divisions");
 	
-	        APIpromise.then(function (result) {
-	            var itemManager = new ItemManager();
-	            var categories = itemManager.getCategories(result);
-	            var displayItems = itemManager.prepareItems(result[0].types[0].subtypes[1].items);
-	            this.setState({ categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems });
-	        }.bind(this), function (err) {
-	            console.log(err);
-	        });
-	    },
-	
-	
-	    // prepareItems(items){
-	    //   let parsedItems =[]
-	    //   console.log(items)
-	    //   for(let item of items){
-	    //     let parseItem = item
-	    //     parseItem.sizes = JSON.parse(item.sizes)
-	    //     parseItem.prices = JSON.parse(item.prices)
-	    //     parsedItems.push(parseItem)
-	    //   }
-	    //   return parsedItems
-	    // },
-	
-	    // getCategories(){
-	    //     let divisions = []
-	    //     let types =[]
-	    //     let subtypes =[]
-	    //     const items = this.state.items
-	    //     for(let a in items){
-	    //           divisions.push(items[a].name)
-	    //           for(let b in items[a].types){
-	    //               types.push(items[a].types[b].name)
-	    //               for(let c in items[a].types[b].subtypes){
-	    //                   subtypes.push(items[a].types[b].subtypes[c].name)
-	    //                 }
-	    //           }
-	    //     }
-	
-	    //     const categories= {divisions: divisions, types: types, subtypes: subtypes}
-	    //     console.log("divisions", categories)
-	    //     this.setState({categories: categories})
-	
-	    // },
-	
-	
-	    onItemClick: function onItemClick(event, markerID) {
-	        var currentOrder = this.state.primaryOrderItems;
-	        var input = this.state.primaryInput;
-	        if (markerID === 2) {
-	            currentOrder = this.state.secondaryOrderItems;
-	            input = this.state.secondaryInput;
-	        }
-	        var item = this.state.primaryDisplayItems[event.target.value];
-	        if (markerID === 2) {
-	            item = this.state.secondaryDisplayItems[event.target.value];
-	        }
-	        var ordermanager = new OrderManager();
-	        var newOrderArray = ordermanager.addItem(currentOrder, item, input);
-	        var cashmanager = new CashManager();
-	        var total = cashmanager.total(newOrderArray);
-	        if (markerID === 2) {
-	            this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
-	        } else {
-	            this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
-	        }
-	    },
-	    onOrderRowClick: function onOrderRowClick(key, markerID) {
-	        var currentOrder = null;
-	        var items = null;
-	        var input = null;
-	        if (markerID === 2) {
-	            currentOrder = this.state.secondaryOrderItems;
-	            input = this.state.secondaryInput;
-	        } else {
-	            currentOrder = this.state.primaryOrderItems;
-	            input = this.state.primaryInput;
-	        }
-	        var ordermanager = new OrderManager();
-	        var newOrderArray = ordermanager.removeItem(currentOrder, key, input);
-	        var cashmanager = new CashManager();
-	        var total = cashmanager.total(newOrderArray);
-	        if (markerID === 2) {
-	            this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
-	        } else {
-	            this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
-	        }
-	    },
-	    menuOptionClick: function menuOptionClick(selected, markerID) {
-	        var runner = new APIRunner();
-	        var url = "http://localhost:5000/api/";
-	        if (_.includes(this.state.categories["divisions"], selected)) {
-	            url += "divisions/find/" + selected;
-	        }
-	        if (_.includes(this.state.categories["types"], selected)) {
-	            url += "types/find/" + selected;
-	        }
-	        if (_.includes(this.state.categories["subtypes"], selected)) {
-	            url += "subtypes/find/" + selected;
-	        }
-	        var promise = runner.run("GET", url);
-	        promise.then(function (result) {
-	            var itemManager = new ItemManager();
-	            var finalItems = itemManager.getItems(result);
-	            if (markerID === 2) {
-	                this.setState({ secondaryDisplayItems: finalItems });
-	            } else {
-	                this.setState({ primaryDisplayItems: finalItems });
-	            }
-	        }.bind(this));
-	    },
-	    cashButtonClick: function cashButtonClick(input, markerID) {
-	        var newInput = this.state.primaryInput;
-	        if (markerID === 2) {
-	            newInput = this.state.secondaryInput;
-	        }
-	        switch (input) {
-	            case '.':
-	                newInput += ".";
-	                break;
-	            case 'C':
-	                newInput = '';
-	                break;
-	            default:
-	                if (newInput.length < 3 || newInput.indexOf(".") > -1) {
-	                    newInput += input;
-	                }
-	        }
-	        if (markerID === 2) {
-	            this.setState({ secondaryInput: newInput });
-	        } else {
-	            this.setState({ primaryInput: newInput });
-	        }
-	    },
-	    onSplitClick: function onSplitClick(markerID) {
-	        console.log("Splitting");
-	        if (!this.state.split) {
-	            this.setState({ split: true });
-	        } else {
-	            if (markerID === 2) {
-	                this.setState({ split: false,
-	                    primaryOrderItems: this.state.secondaryOrderItems,
-	                    primaryOrderTotal: this.state.secondaryOrderTotal,
-	                    primaryUser: this.state.secondaryUser,
-	                    primaryCashDisplay: this.state.secondaryCashDisplay,
-	                    primaryDisplayItems: this.state.secondaryDisplayItems,
-	                    secondaryOrderItems: [{}],
-	                    secondaryOrderTotal: 0,
-	                    secondaryUser: this.state.primaryUser,
-	                    secondaryCashDisplay: false
-	                });
-	            } else {
-	                this.setState({ split: false });
-	            }
-	        }
-	    },
-	    onPayToggle: function onPayToggle(markerID) {
-	        if (markerID === 2) {
-	            if (this.state.secondaryCashDisplay) {
-	                this.setState({ secondaryCashDisplay: false });
-	            } else {
-	                this.setState({ secondaryCashDisplay: true });
-	            }
-	        } else {
-	            if (this.state.primaryCashDisplay) {
-	                this.setState({ primaryCashDisplay: false });
-	            } else {
-	                this.setState({ primaryCashDisplay: true });
-	            }
-	        }
-	    },
-	    render: function render() {
-	        if (this.state.split) {
-	            return React.createElement(
-	                'div',
-	                { className: 'tyle-container' },
-	                React.createElement(
-	                    'div',
-	                    { className: 'primary' },
-	                    React.createElement(
-	                        'div',
-	                        { id: 'sidebar' },
-	                        React.createElement(Infowindow, {
-	                            input: this.state.primaryInput,
-	                            total: this.state.primaryOrderTotal,
-	                            user: this.state.primaryUser
-	                        }),
-	                        React.createElement(Orderwindow, {
-	                            markerID: 1,
-	                            items: this.state.primaryOrderItems,
-	                            onClick: this.onOrderRowClick
-	                        }),
-	                        React.createElement(Cashwindow, {
-	                            markerID: 1,
-	                            onClick: this.cashButtonClick
-	                        })
-	                    ),
-	                    React.createElement(ButtonColumn, {
-	                        markerID: 1,
-	                        payToggle: this.onPayToggle
-	                    }),
-	                    React.createElement(Itemwindow, {
-	                        markerID: 1,
-	                        'class': 'item-window-split',
-	                        cashDisplay: this.state.primaryCashDisplay,
-	                        splitClick: this.onSplitClick,
-	                        items: this.state.primaryDisplayItems,
-	                        onClick: this.onItemClick,
-	                        onLongClick: this.onLongClick
-	                    }),
-	                    React.createElement(MenuTray, {
-	                        categories: this.state.categories,
-	                        onClick: this.menuOptionClick,
-	                        markerID: 1
-	                    })
-	                ),
-	                React.createElement('div', { id: 'divider' }),
-	                React.createElement(
-	                    'div',
-	                    { className: 'secondary' },
-	                    React.createElement(
-	                        'div',
-	                        { id: 'sidebar' },
-	                        React.createElement(Infowindow, {
-	                            input: this.state.secondaryInput,
-	                            total: this.state.secondaryOrderTotal,
-	                            user: this.state.secondaryUser
-	                        }),
-	                        React.createElement(Orderwindow, {
-	                            markerID: 2,
-	                            items: this.state.secondaryOrderItems,
-	                            onClick: this.onOrderRowClick
-	                        }),
-	                        React.createElement(Cashwindow, {
-	                            markerID: 2,
-	                            onClick: this.cashButtonClick
-	                        })
-	                    ),
-	                    React.createElement(ButtonColumn, {
-	                        markerID: 2,
-	                        payToggle: this.onPayToggle
-	                    }),
-	                    React.createElement(Itemwindow, {
-	                        markerID: 2,
-	                        cashDisplay: this.state.secondaryCashDisplay,
-	                        splitClick: this.onSplitClick,
-	                        'class': 'item-window-split',
-	                        items: this.state.secondaryDisplayItems,
-	                        onClick: this.onItemClick,
-	                        onLongClick: this.onLongClick
-	                    }),
-	                    React.createElement(MenuTray, {
-	                        categories: this.state.categories,
-	                        onClick: this.menuOptionClick,
-	                        markerID: 2
-	                    })
-	                )
-	            );
-	        } else {
-	
-	            return React.createElement(
-	                'div',
-	                { className: 'tyle-container' },
-	                React.createElement(
-	                    'div',
-	                    { id: 'sidebar' },
-	                    React.createElement(Infowindow, {
-	                        input: this.state.primaryInput,
-	                        total: this.state.primaryOrderTotal,
-	                        user: this.state.primaryUser
-	                    }),
-	                    React.createElement(Orderwindow, {
-	                        markerID: 1,
-	                        items: this.state.primaryOrderItems,
-	                        onClick: this.onOrderRowClick
-	                    }),
-	                    React.createElement(Cashwindow, {
-	                        markerID: 1,
-	                        onClick: this.cashButtonClick })
-	                ),
-	                React.createElement(ButtonColumn, {
-	                    markerID: 1,
-	                    payToggle: this.onPayToggle
-	                }),
-	                React.createElement(Itemwindow, {
-	                    markerID: 1,
-	                    cashDisplay: this.state.primaryCashDisplay,
-	                    splitClick: this.onSplitClick,
-	                    'class': 'item-window',
-	                    items: this.state.primaryDisplayItems,
-	                    onClick: this.onItemClick,
-	                    onLongClick: this.onLongClick
-	                }),
-	                React.createElement(MenuTray, {
-	                    categories: this.state.categories,
-	                    onClick: this.menuOptionClick,
-	                    markerID: 1
-	                })
-	            );
+	    APIpromise.then(function (result) {
+	      var itemManager = new ItemManager();
+	      var categories = itemManager.getCategories(result);
+	      console.log(categories);
+	      console.log(result);
+	      var displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items);
+	      this.setState({ categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems });
+	    }.bind(this), function (err) {
+	      console.log(err);
+	    });
+	  },
+	  onItemClick: function onItemClick(event, markerID) {
+	    var currentOrder = this.state.primaryOrderItems;
+	    var input = this.state.primaryInput;
+	    if (markerID === 2) {
+	      currentOrder = this.state.secondaryOrderItems;
+	      input = this.state.secondaryInput;
+	    }
+	    var item = this.state.primaryDisplayItems[event.target.value];
+	    if (markerID === 2) {
+	      item = this.state.secondaryDisplayItems[event.target.value];
+	    }
+	    var ordermanager = new OrderManager();
+	    var newOrderArray = ordermanager.addItem(currentOrder, item, input);
+	    var cashmanager = new CashManager();
+	    var total = cashmanager.total(newOrderArray);
+	    if (markerID === 2) {
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
+	    } else {
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
+	    }
+	  },
+	  onOrderRowClick: function onOrderRowClick(key, markerID) {
+	    var items = null;
+	    var currentOrder = this.state.primaryOrderItems;
+	    var input = this.state.primaryInput;
+	    if (markerID === 2) {
+	      currentOrder = this.state.secondaryOrderItems;
+	      input = this.state.secondaryInput;
+	    }
+	    var ordermanager = new OrderManager();
+	    var newOrderArray = ordermanager.removeItem(currentOrder, key, input);
+	    var cashmanager = new CashManager();
+	    var total = cashmanager.total(newOrderArray);
+	    if (markerID === 2) {
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
+	    } else {
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
+	    }
+	  },
+	  menuOptionClick: function menuOptionClick(selected, markerID) {
+	    var runner = new APIRunner();
+	    var url = "http://localhost:5000/api/";
+	    if (_.includes(this.state.categories["divisions"], selected)) {
+	      url += "divisions/find/" + selected;
+	    }
+	    if (_.includes(this.state.categories["types"], selected)) {
+	      url += "types/find/" + selected;
+	    }
+	    if (_.includes(this.state.categories["subtypes"], selected)) {
+	      url += "subtypes/find/" + selected;
+	    }
+	    var promise = runner.run("GET", url);
+	    promise.then(function (result) {
+	      var itemManager = new ItemManager();
+	      var finalItems = itemManager.getItems(result);
+	      if (markerID === 2) {
+	        this.setState({ secondaryDisplayItems: finalItems });
+	      } else {
+	        this.setState({ primaryDisplayItems: finalItems });
+	      }
+	    }.bind(this));
+	  },
+	  cashButtonClick: function cashButtonClick(input, markerID) {
+	    var newInput = this.state.primaryInput;
+	    if (markerID === 2) {
+	      newInput = this.state.secondaryInput;
+	    }
+	    switch (input) {
+	      case '.':
+	        newInput += ".";
+	        break;
+	      case 'C':
+	        newInput = '';
+	        break;
+	      default:
+	        if (newInput.length < 3 || newInput.indexOf(".") > -1) {
+	          newInput += input;
 	        }
 	    }
+	    if (markerID === 2) {
+	      this.setState({ secondaryInput: newInput });
+	    } else {
+	      this.setState({ primaryInput: newInput });
+	    }
+	  },
+	  onSplitClick: function onSplitClick(markerID) {
+	    console.log("Splitting");
+	    if (!this.state.split) {
+	      this.setState({ split: true });
+	    } else {
+	      if (markerID === 2) {
+	        this.setState({ split: false,
+	          primaryOrderItems: this.state.secondaryOrderItems,
+	          primaryOrderTotal: this.state.secondaryOrderTotal,
+	          primaryUser: this.state.secondaryUser,
+	          primaryCashDisplay: this.state.secondaryCashDisplay,
+	          primaryDisplayItems: this.state.secondaryDisplayItems,
+	          secondaryOrderItems: [{}],
+	          secondaryOrderTotal: 0,
+	          secondaryUser: this.state.primaryUser,
+	          secondaryCashDisplay: false
+	        });
+	      } else {
+	        this.setState({ split: false });
+	      }
+	    }
+	  },
+	  onPayClick: function onPayClick(selected, markerID) {
+	    var input = this.state.primaryInput;
+	    var oldTotal = this.state.primaryOrderTotal;
+	    var items = this.state.primaryOrderItems;
+	    if (markerID === 2) {
+	      input = this.state.secondaryInput;
+	      oldTotal = this.state.secondaryOrderTotal;
+	      items = this.state.secondaryOrderItems;
+	    }
+	    var cashManager = new CashManager();
+	    var orderManager = new OrderManager();
+	    var newPayment = cashManager.checkPayAmount(selected, input, oldTotal);
+	    var newOrderArray = orderManager.addPayment(items, newPayment);
+	    var total = cashManager.total(newOrderArray);
+	    if (markerID === 2) {
+	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
+	    } else {
+	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
+	    }
+	  },
+	  onPayToggle: function onPayToggle(markerID) {
+	    if (markerID === 2) {
+	      if (this.state.secondaryCashDisplay) {
+	        this.setState({ secondaryCashDisplay: false });
+	      } else {
+	        this.setState({ secondaryCashDisplay: true });
+	      }
+	    } else {
+	      if (this.state.primaryCashDisplay) {
+	        this.setState({ primaryCashDisplay: false });
+	      } else {
+	        this.setState({ primaryCashDisplay: true });
+	      }
+	    }
+	  },
+	  onTableToggle: function onTableToggle(markerID) {},
+	  render: function render() {
+	    if (this.state.split) {
+	      return React.createElement(
+	        'div',
+	        { className: 'tyle-container' },
+	        React.createElement(
+	          'div',
+	          { className: 'primary' },
+	          React.createElement(
+	            'div',
+	            { id: 'sidebar' },
+	            React.createElement(Infowindow, {
+	              input: this.state.primaryInput,
+	              total: this.state.primaryOrderTotal,
+	              user: this.state.primaryUser
+	            }),
+	            React.createElement(Orderwindow, {
+	              markerID: 1,
+	              items: this.state.primaryOrderItems,
+	              onClick: this.onOrderRowClick
+	            }),
+	            React.createElement(Cashwindow, {
+	              markerID: 1,
+	              onClick: this.cashButtonClick
+	            })
+	          ),
+	          React.createElement(ButtonColumn, {
+	            markerID: 1,
+	            tableToggle: this.onTableToggle,
+	            splitClick: this.onSplitClick,
+	            payToggle: this.onPayToggle
+	          }),
+	          React.createElement(Itemwindow, {
+	            markerID: 1,
+	            'class': 'item-window-split',
+	            onPayClick: this.onPayClick,
+	            cashDisplay: this.state.primaryCashDisplay,
+	            items: this.state.primaryDisplayItems,
+	            onClick: this.onItemClick,
+	            onLongClick: this.onLongClick
+	          }),
+	          React.createElement(MenuTray, {
+	            categories: this.state.categories,
+	            onClick: this.menuOptionClick,
+	            markerID: 1
+	          })
+	        ),
+	        React.createElement('div', { id: 'divider' }),
+	        React.createElement(
+	          'div',
+	          { className: 'secondary' },
+	          React.createElement(
+	            'div',
+	            { id: 'sidebar' },
+	            React.createElement(Infowindow, {
+	              input: this.state.secondaryInput,
+	              total: this.state.secondaryOrderTotal,
+	              user: this.state.secondaryUser
+	            }),
+	            React.createElement(Orderwindow, {
+	              markerID: 2,
+	              items: this.state.secondaryOrderItems,
+	              onClick: this.onOrderRowClick
+	            }),
+	            React.createElement(Cashwindow, {
+	              markerID: 2,
+	              onClick: this.cashButtonClick
+	            })
+	          ),
+	          React.createElement(ButtonColumn, {
+	            markerID: 2,
+	            tableToggle: this.onTableToggle,
+	            splitClick: this.onSplitClick,
+	            payToggle: this.onPayToggle
+	          }),
+	          React.createElement(Itemwindow, {
+	            markerID: 2,
+	            onPayClick: this.onPayClick,
+	            cashDisplay: this.state.secondaryCashDisplay,
+	            'class': 'item-window-split',
+	            items: this.state.secondaryDisplayItems,
+	            onClick: this.onItemClick,
+	            onLongClick: this.onLongClick
+	          }),
+	          React.createElement(MenuTray, {
+	            categories: this.state.categories,
+	            onClick: this.menuOptionClick,
+	            markerID: 2
+	          })
+	        )
+	      );
+	    } else {
+	
+	      return React.createElement(
+	        'div',
+	        { className: 'tyle-container' },
+	        React.createElement(
+	          'div',
+	          { id: 'sidebar' },
+	          React.createElement(Infowindow, {
+	            input: this.state.primaryInput,
+	            total: this.state.primaryOrderTotal,
+	            user: this.state.primaryUser
+	          }),
+	          React.createElement(Orderwindow, {
+	            markerID: 1,
+	            items: this.state.primaryOrderItems,
+	            onClick: this.onOrderRowClick
+	          }),
+	          React.createElement(Cashwindow, {
+	            markerID: 1,
+	            onClick: this.cashButtonClick })
+	        ),
+	        React.createElement(ButtonColumn, {
+	          markerID: 1,
+	          tableToggle: this.onTableToggle,
+	          splitClick: this.onSplitClick,
+	          payToggle: this.onPayToggle
+	        }),
+	        React.createElement(Itemwindow, {
+	          markerID: 1,
+	          onPayClick: this.onPayClick,
+	          cashDisplay: this.state.primaryCashDisplay,
+	          'class': 'item-window',
+	          items: this.state.primaryDisplayItems,
+	          onClick: this.onItemClick,
+	          onLongClick: this.onLongClick
+	        }),
+	        React.createElement(MenuTray, {
+	          categories: this.state.categories,
+	          onClick: this.menuOptionClick,
+	          markerID: 1
+	        })
+	      );
+	    }
+	  }
 	});
 	
 	module.exports = Tyle;
@@ -20095,18 +20087,9 @@
 
 	'use strict';
 	
-	module.exports = __webpack_require__(3);
-
-
-/***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
 	var React = __webpack_require__(1);
-	var OrderRow = __webpack_require__(161);
-	_ = __webpack_require__(162);
+	var OrderRow = __webpack_require__(160);
+	_ = __webpack_require__(161);
 	
 	var Orderwindow = React.createClass({
 	  displayName: 'Orderwindow',
@@ -20132,44 +20115,66 @@
 	module.exports = Orderwindow;
 
 /***/ },
-/* 161 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	var React = __webpack_require__(1);
 	
 	var OrderRow = React.createClass({
-	    displayName: 'OrderRow',
-	    onClick: function onClick() {
-	        this.props.onClick(this.props.name, this.props.markerID);
-	    },
-	    render: function render() {
-	        return React.createElement(
-	            'li',
-	            { value: this.props.name, onClick: this.onClick },
-	            React.createElement(
-	                'p',
-	                null,
-	                this.props.qty,
-	                ' * ',
-	                this.props.name,
-	                ':'
-	            ),
-	            React.createElement(
-	                'div',
-	                { className: 'order-price' },
-	                this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	            ),
-	            ' '
-	        );
+	  displayName: "OrderRow",
+	  onClick: function onClick() {
+	    this.props.onClick(this.props.name, this.props.markerID);
+	  },
+	  render: function render() {
+	    if (parseFloat(this.props.total) < 0) {
+	      return React.createElement(
+	        "li",
+	        { value: this.props.name, onClick: this.onClick, className: "payment" },
+	        React.createElement(
+	          "p",
+	          null,
+	          "PAYMENT: ",
+	          this.props.qty,
+	          " * ",
+	          this.props.name
+	        ),
+	        React.createElement(
+	          "div",
+	          { className: "order-price" },
+	          this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	        ),
+	        " "
+	      );
+	    } else {
+	
+	      return React.createElement(
+	        "li",
+	        { value: this.props.name, onClick: this.onClick },
+	        React.createElement(
+	          "p",
+	          null,
+	          this.props.qty,
+	          " * ",
+	          this.props.name,
+	          ":"
+	        ),
+	        React.createElement(
+	          "div",
+	          { className: "order-price" },
+	          this.props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	        ),
+	        " "
+	      );
 	    }
+	  }
 	});
 	
 	module.exports = OrderRow;
 
 /***/ },
-/* 162 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -36906,10 +36911,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(163)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(162)(module)))
 
 /***/ },
-/* 163 */
+/* 162 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -36925,7 +36930,7 @@
 
 
 /***/ },
-/* 164 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36933,14 +36938,11 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(165);
-	var CashDisplay = __webpack_require__(167);
+	var Item = __webpack_require__(164);
+	var CashDisplay = __webpack_require__(166);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
-	  splitClick: function splitClick() {
-	    this.props.splitClick(this.props.markerID);
-	  },
 	  render: function render() {
 	    var _this = this;
 	
@@ -36958,15 +36960,10 @@
 	      return React.createElement(
 	        'div',
 	        { className: this.props.class },
-	        React.createElement(CashDisplay, null),
+	        React.createElement(CashDisplay, { markerID: this.props.markerID, onClick: this.props.onPayClick }),
 	        React.createElement(
 	          'ul',
 	          { className: 'item-window-cash-display' },
-	          React.createElement(
-	            'button',
-	            { className: 'split-button', onClick: this.splitClick },
-	            'Split/Merge'
-	          ),
 	          nodes
 	        )
 	      );
@@ -36976,11 +36973,6 @@
 	        React.createElement(
 	          'ul',
 	          { className: this.props.class },
-	          React.createElement(
-	            'button',
-	            { className: 'split-button', onClick: this.splitClick },
-	            'Split/Merge'
-	          ),
 	          nodes
 	        )
 	      );
@@ -36991,13 +36983,13 @@
 	module.exports = Itemwindow;
 
 /***/ },
-/* 165 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ExpandedItem = __webpack_require__(166);
+	var ExpandedItem = __webpack_require__(165);
 	
 	var Item = React.createClass({
 	  displayName: 'Item',
@@ -37046,7 +37038,7 @@
 	module.exports = Item;
 
 /***/ },
-/* 166 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37054,7 +37046,7 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(165);
+	var Item = __webpack_require__(164);
 	
 	var ExpandedItem = function ExpandedItem(props) {
 	
@@ -37122,7 +37114,7 @@
 	module.exports = ExpandedItem;
 
 /***/ },
-/* 167 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37131,49 +37123,47 @@
 	
 	var CashDisplay = React.createClass({
 	    displayName: 'CashDisplay',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event.target.value, this.props.markerID);
+	    },
 	    render: function render() {
 	        return React.createElement(
 	            'div',
 	            { className: 'cash-display' },
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: 'discount' },
+	                { onClick: this.onClick, className: 'pay-button', value: 'discount' },
 	                'Discount'
 	            ),
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: 'card' },
+	                { onClick: this.onClick, className: 'pay-button', value: 'card' },
 	                'Card'
 	            ),
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: 'cash' },
-	                'Cash'
+	                { onClick: this.onClick, className: 'pay-button', value: 'mobile' },
+	                'Mobile Pay'
 	            ),
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: '5' },
-	                '£50'
-	            ),
-	            React.createElement(
-	                'button',
-	                { className: 'pay-button', value: '5' },
+	                { onClick: this.onClick, className: 'pay-button', value: '20' },
 	                '£20'
 	            ),
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: '5' },
+	                { onClick: this.onClick, className: 'pay-button', value: '10' },
 	                '£10'
 	            ),
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: '5' },
+	                { onClick: this.onClick, className: 'pay-button', value: '5' },
 	                '£5'
 	            ),
 	            React.createElement(
 	                'button',
-	                { className: 'pay-button', value: 'exact' },
-	                'Exact Cash'
+	                { onClick: this.onClick, className: 'pay-button', value: 'cash' },
+	                'Cash'
 	            )
 	        );
 	    }
@@ -37182,7 +37172,7 @@
 	module.exports = CashDisplay;
 
 /***/ },
-/* 168 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37194,21 +37184,27 @@
 	        'div',
 	        { className: 'info-window' },
 	        React.createElement(
-	            'h5',
+	            'h6',
 	            null,
 	            'User: ',
 	            props.user
 	        ),
 	        React.createElement(
-	            'h5',
+	            'h6',
 	            null,
 	            'Last Order Change: £3.00'
+	        ),
+	        React.createElement(
+	            'h6',
+	            null,
+	            'Table:'
 	        ),
 	        React.createElement(
 	            'h5',
 	            null,
 	            'Input: ',
-	            props.input
+	            props.input,
+	            ' '
 	        ),
 	        React.createElement(
 	            'h4',
@@ -37222,7 +37218,7 @@
 	module.exports = Infowindow;
 
 /***/ },
-/* 169 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37305,12 +37301,12 @@
 	module.exports = Cashwindow;
 
 /***/ },
-/* 170 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
-	_ = __webpack_require__(162);
+	_ = __webpack_require__(161);
 	
 	var CashManager = function CashManager() {};
 	
@@ -37322,18 +37318,51 @@
 	        }
 	        console.log(total);
 	        return total;
+	    },
+	    checkPayAmount: function checkPayAmount(selected, input, total) {
+	        var category = null;
+	        var amount = null;
+	        var value = null;
+	        var qty = null;
+	        switch (selected) {
+	            case "mobile":
+	            case "card":
+	            case "discount":
+	            case "cash":
+	                category = selected;
+	                break;
+	            default:
+	                category = "cash(" + selected + ")";
+	                value = parseInt(selected);
+	                qty = input;
+	                console.log("value", value);
+	                break;
+	        }
+	
+	        if (input) {
+	            console.log("input", input);
+	            amount = input * (value || 1);
+	        } else if (value) {
+	            console.log("value present", value);
+	            amount = value;
+	        } else {
+	            console.log("amountisTotal", total);
+	            amount = total;
+	        }
+	
+	        return { id: Date.now(), name: category, qty: qty || 1, total: -amount };
 	    }
 	};
 	
 	module.exports = CashManager;
 
 /***/ },
-/* 171 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(162);
+	_ = __webpack_require__(161);
 	
 	var OrderManager = function OrderManager() {};
 	
@@ -37368,10 +37397,117 @@
 	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
 	        var returnArray = [itemsObject];
 	        return returnArray;
+	    },
+	    addPayment: function addPayment(orderItems, payment) {
+	        // if(orderItems[0][payment.name]){
+	        //     payment["name"] = orderItems[0][payment.name].name+ 1
+	        // }
+	        // orderItems[0][payment.name] = payment
+	        // return orderItems
+	
+	        var itemsObject = orderItems[0];
+	        var ref = payment.name;
+	        var oldTotal = 0;
+	        var qty = parseInt(payment.qty);
+	        if (itemsObject[ref]) {
+	            qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
+	            oldTotal = itemsObject[ref].total;
+	        }
+	        var total = parseFloat(payment.total + oldTotal);
+	        itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
 	    }
 	};
 	
 	module.exports = OrderManager;
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	_ = __webpack_require__(161);
+	
+	var ItemManager = function ItemManager() {};
+	
+	ItemManager.prototype = {
+	      getItems: function getItems(result) {
+	            var items = [];
+	            if (result[0].types) {
+	                  result[0].types.forEach(function (type) {
+	                        type.subtypes.forEach(function (subtype) {
+	                              items = items.concat(subtype.items);
+	                        });
+	                  });
+	            }
+	            if (result[0].subtypes) {
+	                  result[0].subtypes.forEach(function (subtype) {
+	                        items = items.concat(subtype.items);
+	                  });
+	            }
+	            if (!result[0].types && !result[0].subtypes) {
+	                  items = result[0].items;
+	            }
+	
+	            var finalItems = this.prepareItems(items);
+	            return finalItems;
+	      },
+	      prepareItems: function prepareItems(items) {
+	            var parsedItems = [];
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+	
+	            try {
+	                  for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var item = _step.value;
+	
+	                        var parseItem = item;
+	                        parseItem.sizes = JSON.parse(item.sizes);
+	                        parseItem.prices = JSON.parse(item.prices);
+	                        parsedItems.push(parseItem);
+	                  }
+	            } catch (err) {
+	                  _didIteratorError = true;
+	                  _iteratorError = err;
+	            } finally {
+	                  try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                              _iterator.return();
+	                        }
+	                  } finally {
+	                        if (_didIteratorError) {
+	                              throw _iteratorError;
+	                        }
+	                  }
+	            }
+	
+	            return parsedItems;
+	      },
+	      getCategories: function getCategories(items) {
+	            console.log(items);
+	            var divisions = [];
+	            var types = [];
+	            var subtypes = [];
+	            for (var a in items) {
+	                  divisions.push(items[a].name);
+	                  for (var b in items[a].types) {
+	                        types.push(items[a].types[b].name);
+	                        for (var c in items[a].types[b].subtypes) {
+	                              subtypes.push(items[a].types[b].subtypes[c].name);
+	                        }
+	                  }
+	            }
+	
+	            var categories = { divisions: divisions, types: types, subtypes: subtypes };
+	            console.log("divisions", categories);
+	            return categories;
+	      }
+	};
+	
+	module.exports = ItemManager;
 
 /***/ },
 /* 172 */
@@ -37382,41 +37518,47 @@
 	var React = __webpack_require__(1);
 	
 	var ButtonColumn = React.createClass({
-	    displayName: 'ButtonColumn',
-	    onPayClick: function onPayClick() {
-	        this.props.payToggle(this.props.markerID);
-	    },
-	    render: function render() {
-	        return React.createElement(
-	            'div',
-	            { className: 'button-column' },
-	            React.createElement(
-	                'button',
-	                { className: 'menu-button' },
-	                'Save'
-	            ),
-	            React.createElement(
-	                'button',
-	                { className: 'menu-button' },
-	                'Tables'
-	            ),
-	            React.createElement(
-	                'button',
-	                { className: 'menu-button' },
-	                'Orders'
-	            ),
-	            React.createElement(
-	                'button',
-	                { className: 'menu-button' },
-	                'Log Out'
-	            ),
-	            React.createElement(
-	                'button',
-	                { className: 'menu-button', onClick: this.onPayClick },
-	                'Pay Screen'
-	            )
-	        );
-	    }
+	  displayName: 'ButtonColumn',
+	  onPayClick: function onPayClick() {
+	    this.props.payToggle(this.props.markerID);
+	  },
+	  onSplitClick: function onSplitClick() {
+	    this.props.splitClick(this.props.markerID);
+	  },
+	  onTableClick: function onTableClick() {
+	    this.props.tableToggle(this.props.markerID);
+	  },
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'button-column' },
+	      React.createElement(
+	        'button',
+	        { className: 'menu-button', onClick: this.onSplitClick },
+	        'Toggle Split'
+	      ),
+	      React.createElement(
+	        'button',
+	        { className: 'menu-button', onClick: this.onTableClick },
+	        'Tables'
+	      ),
+	      React.createElement(
+	        'button',
+	        { className: 'menu-button' },
+	        'Orders'
+	      ),
+	      React.createElement(
+	        'button',
+	        { className: 'menu-button' },
+	        'Log Out'
+	      ),
+	      React.createElement(
+	        'button',
+	        { className: 'menu-button', onClick: this.onPayClick },
+	        'Pay Screen'
+	      )
+	    );
+	  }
 	});
 	
 	module.exports = ButtonColumn;
@@ -37548,88 +37690,10 @@
 /* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
-	_ = __webpack_require__(162);
-	
-	var ItemManager = function ItemManager() {};
-	
-	ItemManager.prototype = {
-	      getItems: function getItems(result) {
-	            var items = [];
-	            if (result[0].types) {
-	                  result[0].types.forEach(function (type) {
-	                        type.subtypes.forEach(function (subtype) {
-	                              items = items.concat(subtype.items);
-	                        });
-	                  });
-	            }
-	            if (result[0].subtypes) {
-	                  result[0].subtypes.forEach(function (subtype) {
-	                        items = items.concat(subtype.items);
-	                  });
-	            }
-	            if (!result[0].types && !result[0].subtypes) {
-	                  items = result[0].items;
-	            }
-	
-	            var finalItems = this.prepareItems(items);
-	            return finalItems;
-	      },
-	      prepareItems: function prepareItems(items) {
-	            var parsedItems = [];
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-	
-	            try {
-	                  for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var item = _step.value;
-	
-	                        var parseItem = item;
-	                        parseItem.sizes = JSON.parse(item.sizes);
-	                        parseItem.prices = JSON.parse(item.prices);
-	                        parsedItems.push(parseItem);
-	                  }
-	            } catch (err) {
-	                  _didIteratorError = true;
-	                  _iteratorError = err;
-	            } finally {
-	                  try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                              _iterator.return();
-	                        }
-	                  } finally {
-	                        if (_didIteratorError) {
-	                              throw _iteratorError;
-	                        }
-	                  }
-	            }
-	
-	            return parsedItems;
-	      },
-	      getCategories: function getCategories(items) {
-	            console.log(items);
-	            var divisions = [];
-	            var types = [];
-	            var subtypes = [];
-	            for (var a in items) {
-	                  divisions.push(items[a].name);
-	                  for (var b in items[a].types) {
-	                        types.push(items[a].types[b].name);
-	                        for (var c in items[a].types[b].subtypes) {
-	                              subtypes.push(items[a].types[b].subtypes[c].name);
-	                        }
-	                  }
-	            }
-	
-	            var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	            console.log("divisions", categories);
-	            return categories;
-	      }
-	};
-	
-	module.exports = ItemManager;
+	module.exports = __webpack_require__(3);
+
 
 /***/ }
 /******/ ]);

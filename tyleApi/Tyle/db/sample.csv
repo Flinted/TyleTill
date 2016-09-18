@@ -1,0 +1,25 @@
+name,subtype_id,sizes,prices
+Merlot,sT1.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Primitivo,sT1.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Pinot Noir,sT1.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Malbec,sT1.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Montepulciano,sT1.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Cabernet Sauvignon,sT1.id,"[125ml,250ml,750ml]","[3.00,6.00,18.00]"
+Bordeaux,sT1.id,[750ml],[25.00]
+Chenin Blanc,sT2.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Pinot Grigio,sT2.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Riesling,sT2.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Chardonnay,sT2.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Sauvignon Blanc,sT2.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Viognier,sT2.id,"[125ml,250ml,750ml]","[3.00,6.00,18.00]"
+Gewutrztraminer,sT2.id,[750ml],[25.00]
+Zinfandel,sT3.id,"[125ml,250ml,750ml]","[2.50,5.00,15.00]"
+Grenache,sT3.id,"[125ml,250ml,750ml]","[3.00,6.00,18.00]"
+House Champagne,sT4.id,"[125ml,750ml]","[7.00,40.00]"
+Ruinart BdB,sT4.id,"[125ml,750ml]","[11.00,65.00]"
+Ruinart Rose,sT4.id,[750ml],[75.00]
+Krug,sT4.id,[750ml],[250.00]
+Coke,sT8.id,"[dsh,gls,pt]","[0.70,1.80,2.30]"
+Diet Coke,sT8.id,"[dsh,gls,pt]","[0.70,1.80,2.30]"
+Lemonade,sT8.id,"[dsh,gls,pt]","[0.70,1.80,2.30]"
+Tonic,sT8.id,"[dsh,gls,pt]","[0.70,1.80,2.30]"

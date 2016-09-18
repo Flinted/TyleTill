@@ -33,6 +33,27 @@ OrderManager.prototype = {
         itemsObject[key] = {id: id, name: key, qty: qty, total: total}
         const returnArray= [itemsObject]
         return returnArray
+    },
+
+    addPayment(orderItems, payment){
+        // if(orderItems[0][payment.name]){
+        //     payment["name"] = orderItems[0][payment.name].name+ 1
+        // }
+        // orderItems[0][payment.name] = payment
+        // return orderItems
+
+        let itemsObject = orderItems[0]
+        const ref = payment.name
+        let oldTotal = 0
+        let qty = parseInt(payment.qty)
+        if(itemsObject[ref]){ 
+          qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty)
+          oldTotal=  itemsObject[ref].total
+        } 
+        const total = parseFloat(payment.total + oldTotal)
+        itemsObject[ref] = {id: payment.id, name: ref, qty: qty, total: total}
+        const returnArray= [itemsObject]
+        return returnArray
     }
 }
 

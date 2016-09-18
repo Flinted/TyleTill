@@ -1,0 +1,140 @@
+name,subtype_id,sizes,prices
+Balthazar,Aperitif,"[""50ml""]",[3.60]
+Carpano Antica,Aperitif,"[""50ml""]",[3.60]
+Dubbonet,Aperitif,"[""50ml""]",[3.60]
+Lillet Blanc,Aperitif,"[""50ml""]",[3.60]
+Mancino Rosso,Aperitif,"[""50ml""]",[3.60]
+Martini Blanc,Aperitif,"[""50ml""]",[3.60]
+Noilly,Aperitif,"[""50ml""]",[3.60]
+Bombay Mix,Bar Snacks,"[""Sgl""]",[1.50]
+Crisps,Bar Snacks,"[""Sgl""]",[1.50]
+Nuts,Bar Snacks,"[""Sgl""]",[1.50]
+Wasabi Peas,Bar Snacks,"[""Sgl""]",[1.50]
+CheeseCake,Cold Desserts,"[""Sgl""]",[4.95]
+Ice Cream,Cold Desserts,"[""Sgl""]",[4.95]
+Lemon Posset,Cold Desserts,"[""Sgl""]",[4.95]
+Aspalls ,Draught Beer,"[""half"",""pt""]","[2.40,4.80]"
+Blue Moon,Draught Beer,"[""half"",""pt""]","[2.50,5.00]"
+Estrella Damm,Draught Beer,"[""half"",""pt""]","[2.40,4.80]"
+GladEye IPA,Draught Beer,"[""half"",""pt""]","[2.50,5.00]"
+Kirin,Draught Beer,"[""half"",""pt""]","[2.40,4.80]"
+London Stout,Draught Beer,"[""half"",""pt""]","[2.40,4.80]"
+Coke,Draught Soft,"[""dsh"",""gls"",""pt""]","[0.70,1.80,2.30]"
+Diet Coke,Draught Soft,"[""dsh"",""gls"",""pt""]","[0.70,1.80,2.30]"
+Lemonade,Draught Soft,"[""dsh"",""gls"",""pt""]","[0.70,1.80,2.30]"
+Tonic,Draught Soft,"[""dsh"",""gls"",""pt""]","[0.70,1.80,2.30]"
+Comte De Lauvia,Eaux De Vie,"[""25ml""]",[2.80]
+Courvoisier,Eaux De Vie,"[""25ml""]",[2.80]
+Grappa,Eaux De Vie,"[""25ml""]",[2.80]
+Hennessy,Eaux De Vie,"[""25ml""]",[2.80]
+Kirsch,Eaux De Vie,"[""25ml""]",[2.80]
+Pere Magloire,Eaux De Vie,"[""25ml""]",[2.80]
+Pere Magloire Pommeau,Eaux De Vie,"[""25ml""]",[2.80]
+Beefeater,Gin,"[""25ml""]",[2.80]
+Bombay,Gin,"[""25ml""]",[2.80]
+Hendricks,Gin,"[""25ml""]",[2.80]
+Jensens,Gin,"[""25ml""]",[2.80]
+Junipero,Gin,"[""25ml""]",[2.80]
+Pickerings,Gin,"[""25ml""]",[2.80]
+Tanqueray,Gin,"[""25ml""]",[2.80]
+Beef Burger,Grill,"[""Sgl""]",[11.95]
+Chicken,Grill,"[""Sgl""]",[11.95]
+Kebabs,Grill,"[""Sgl""]",[11.95]
+Pork Belly,Grill,"[""Sgl""]",[11.95]
+Ribs,Grill,"[""Sgl""]",[18.95]
+Steak,Grill,"[""Sgl""]",[18.95]
+Chocolate Fondant,Hot Desserts,"[""Sgl""]",[4.95]
+Creme Brulee,Hot Desserts,"[""Sgl""]",[4.95]
+Sticky Toffee,Hot Desserts,"[""Sgl""]",[4.95]
+Chicken Skewers,Light Bites,"[""Sgl""]",[4.95]
+Fishcakes,Light Bites,"[""Sgl""]",[4.95]
+Haggis BonBons,Light Bites,"[""Sgl""]",[4.95]
+Nachos,Light Bites,"[""Sgl""]",[4.95]
+Soup,Light Bites,"[""Sgl""]",[4.95]
+Absente,Liqueurs,"[""25ml""]",[2.80]
+Baileys,Liqueurs,"[""50ml""]",[3.60]
+Briottet(all),Liqueurs,"[""25ml""]",[2.80]
+Chambord,Liqueurs,"[""25ml""]",[2.80]
+Frangelico,Liqueurs,"[""25ml""]",[2.80]
+Grand Marnier,Liqueurs,"[""25ml""]",[2.80]
+Heerings ,Liqueurs,"[""25ml""]",[2.80]
+Triple Sec,Liqueurs,"[""25ml""]",[2.80]
+13 guns IPA,Packaged Beer,"[""btl""]",[4.50]
+7 Giraffes,Packaged Beer,"[""btl""]",[4.50]
+God lager,Packaged Beer,"[""btl""]",[4.00]
+Innis & Gunn,Packaged Beer,"[""btl""]",[4.90]
+Pacifico,Packaged Beer,"[""btl""]",[3.70]
+Peroni,Packaged Beer,"[""btl""]",[3.70]
+Punk IPA,Packaged Beer,"[""btl""]",[3.70]
+Tiger,Packaged Beer,"[""btl""]",[3.70]
+Tsingtao,Packaged Beer,"[""btl""]",[3.70]
+Aspalls ,Packaged Other,"[""btl""]",[4.50]
+Magners,Packaged Other,"[""btl""]",[4.50]
+Old Rosie,Packaged Other,"[""btl""]",[4.50]
+Rekorderlig fruit,Packaged Other,"[""btl""]",[4.50]
+Stowford Press,Packaged Other,"[""btl""]",[4.50]
+Appletiser,Packaged Soft,"[""Sgl""]",[1.80]
+Bitter Lemon,Packaged Soft,"[""Sgl""]",[1.20]
+Coke,Packaged Soft,"[""Sgl""]",[1.80]
+Diet Coke,Packaged Soft,"[""Sgl""]",[1.80]
+Ginger Ale,Packaged Soft,"[""Sgl""]",[1.20]
+Ginger Beer,Packaged Soft,"[""Sgl""]",[1.20]
+Irn Bru,Packaged Soft,"[""Sgl""]",[1.80]
+Red Bull,Packaged Soft,"[""Sgl""]",[2.80]
+Slimline Tonic,Packaged Soft,"[""Sgl""]",[1.20]
+Tonic,Packaged Soft,"[""Sgl""]",[1.20]
+Bordeaux,Red Wine,"[""750ml""]",[25.00]
+Cabernet Sauvignon,Red Wine,"[""125ml"",""250ml"",""750ml""]","[3.00,6.00,18.00]"
+Malbec,Red Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Merlot,Red Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Montepulciano,Red Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Pinot Noir,Red Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Primitivo,Red Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Grenache,Rose Wine,"[""125ml"",""250ml"",""750ml""]","[3.00,6.00,18.00]"
+Zinfandel,Rose Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Caesar salad,Salads,"[""Sgl""]",[8.95]
+Goats Cheese salad,Salads,"[""Sgl""]",[8.95]
+Halloumi salad,Salads,"[""Sgl""]",[8.95]
+Pinenut salad,Salads,"[""Sgl""]",[8.95]
+BLT,Sandwiches,"[""Sgl""]",[8.95]
+Club Sandwich,Sandwiches,"[""Sgl""]",[8.95]
+Crayfish,Sandwiches,"[""Sgl""]",[8.95]
+Tuna Mayo,Sandwiches,"[""Sgl""]",[8.95]
+Bread & Oils,Side Orders,"[""Sgl""]",[2.50]
+Fries,Side Orders,"[""Sgl""]",[2.50]
+Handcut Chips,Side Orders,"[""Sgl""]",[2.50]
+Mixed Veg,Side Orders,"[""Sgl""]",[2.50]
+Olives,Side Orders,"[""Sgl""]",[2.50]
+Side Salad,Side Orders,"[""Sgl""]",[2.50]
+House Champagne,Sparkling Wine,"[""125ml"",""750ml""]","[7.00,40.00]"
+Krug,Sparkling Wine,"[""750ml""]",[250.00]
+Ruinart BdB,Sparkling Wine,"[""125ml"",""750ml""]","[11.00,65.00]"
+Ruinart Rose,Sparkling Wine,"[""750ml""]",[75.00]
+Absolut,Vodka,"[""25ml""]",[2.80]
+Ketel Citron,Vodka,"[""25ml""]",[2.80]
+Ketel One,Vodka,"[""25ml""]",[2.80]
+Koniks Tail,Vodka,"[""25ml""]",[2.80]
+Luksusowa,Vodka,"[""25ml""]",[2.80]
+Stolichnaya,Vodka,"[""25ml""]",[2.80]
+Wyborowa,Vodka,"[""25ml""]",[2.80]
+Ardbeg,Whiskies,"[""25ml""]",[2.80]
+Auchentoshan,Whiskies,"[""25ml""]",[2.80]
+Blantons Gold,Whiskies,"[""25ml""]",[2.80]
+BNJ,Whiskies,"[""25ml""]",[2.80]
+Bruichladdich,Whiskies,"[""25ml""]",[2.80]
+Buffalo Trace,Whiskies,"[""25ml""]",[2.80]
+Dalmore,Whiskies,"[""25ml""]",[2.80]
+Dalwhinnie,Whiskies,"[""25ml""]",[2.80]
+Heaven Hill,Whiskies,"[""25ml""]",[2.80]
+Jack Daniels,Whiskies,"[""25ml""]",[2.80]
+Knob Creek,Whiskies,"[""25ml""]",[2.80]
+Lagavulin,Whiskies,"[""25ml""]",[2.80]
+Laphraoig,Whiskies,"[""25ml""]",[2.80]
+Talisker,Whiskies,"[""25ml""]",[2.80]
+Chardonnay,White Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Chenin Blanc,White Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Gewutrztraminer,White Wine,"[""750ml""]",[25.00]
+Pinot Grigio,White Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Riesling,White Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Sauvignon Blanc,White Wine,"[""125ml"",""250ml"",""750ml""]","[2.50,5.00,15.00]"
+Viognier,White Wine,"[""125ml"",""250ml"",""750ml""]","[3.00,6.00,18.00]"

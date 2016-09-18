@@ -3,9 +3,6 @@ const Item = require('./Item')
 const CashDisplay = require('./CashDisplay')
 
 const Itemwindow= React.createClass({
-  splitClick(){
-    this.props.splitClick(this.props.markerID)
-  },
 
   render(){
 
@@ -21,9 +18,8 @@ const Itemwindow= React.createClass({
       // displays item window with CashDisplay if active
       return(
         <div className={this.props.class}>
-        <CashDisplay/>
+        <CashDisplay markerID={this.props.markerID} onClick={this.props.onPayClick}/>
        <ul className="item-window-cash-display">
-       <button className = 'split-button' onClick={this.splitClick}>Split/Merge</button>
        {nodes}
        </ul>
        </div>
@@ -32,7 +28,6 @@ const Itemwindow= React.createClass({
    return(
     // displays item window no cash display
     <ul className={this.props.class}>
-    <button className = 'split-button' onClick={this.splitClick}>Split/Merge</button>
     {nodes}
     </ul>
     )

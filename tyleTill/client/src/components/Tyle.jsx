@@ -17,6 +17,8 @@ const Tyle = React.createClass({
     return {
       items: [], 
       categories: {},
+      tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
+      tableShow:false,
       primaryDisplayItems:[],
       primaryUser: "Chris",
       primaryOrderItems:[{}],
@@ -42,46 +44,14 @@ const Tyle = React.createClass({
     APIpromise.then(function(result){
       const itemManager = new ItemManager
       const categories = itemManager.getCategories(result)
-      const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[1].items)
+      console.log(categories)
+      console.log(result)
+      const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items)
       this.setState({categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
     }.bind(this), function(err){
       console.log(err)
     })
   },
-
-  // prepareItems(items){
-  //   let parsedItems =[]
-  //   console.log(items)
-  //   for(let item of items){
-  //     let parseItem = item
-  //     parseItem.sizes = JSON.parse(item.sizes)
-  //     parseItem.prices = JSON.parse(item.prices)
-  //     parsedItems.push(parseItem)
-  //   }
-  //   return parsedItems
-  // },
-
-  // getCategories(){
-  //     let divisions = []
-  //     let types =[]
-  //     let subtypes =[]
-  //     const items = this.state.items
-  //     for(let a in items){
-  //           divisions.push(items[a].name)
-  //           for(let b in items[a].types){
-  //               types.push(items[a].types[b].name)
-  //               for(let c in items[a].types[b].subtypes){
-  //                   subtypes.push(items[a].types[b].subtypes[c].name)
-  //                 }
-  //           }
-  //     }
-
-  //     const categories= {divisions: divisions, types: types, subtypes: subtypes}
-  //     console.log("divisions", categories)
-  //     this.setState({categories: categories})
-      
-  // },
-
 
   onItemClick(event, markerID){
     let currentOrder = this.state.primaryOrderItems
@@ -104,15 +74,12 @@ const Tyle = React.createClass({
   },
 
   onOrderRowClick(key, markerID){
-    let currentOrder = null
-    let items = null;
-    let input = null;
+    let items = null
+    let currentOrder = this.state.primaryOrderItems
+    let input = this.state.primaryInput
     if(markerID === 2){
       currentOrder = this.state.secondaryOrderItems
       input = this.state.secondaryInput
-    }else{
-      currentOrder = this.state.primaryOrderItems
-      input = this.state.primaryInput
     }
     const ordermanager = new OrderManager
     let newOrderArray = ordermanager.removeItem(currentOrder, key, input)
@@ -188,6 +155,27 @@ const Tyle = React.createClass({
         }
       },
 
+      onPayClick(selected, markerID){
+          let input = this.state.primaryInput
+          let oldTotal = this.state.primaryOrderTotal
+          let items = this.state.primaryOrderItems
+          if(markerID ===2){
+            input = this.state.secondaryInput
+            oldTotal = this.state.secondaryOrderTotal
+            items = this.state.secondaryOrderItems
+          }
+          const cashManager = new CashManager
+          const orderManager = new OrderManager
+          const newPayment = cashManager.checkPayAmount(selected, input, oldTotal)
+          const newOrderArray = orderManager.addPayment(items, newPayment)
+          const total = cashManager.total(newOrderArray)
+          if(markerID === 2){
+            this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
+          }else{
+            this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
+          }
+      },
+
       onPayToggle(markerID){
           if(markerID === 2){
               if(this.state.secondaryCashDisplay){
@@ -202,6 +190,10 @@ const Tyle = React.createClass({
                   this.setState({primaryCashDisplay:true})            
               }
           }
+      },
+
+      onTableToggle(markerID){
+
       },
 
       render(){
@@ -227,13 +219,15 @@ const Tyle = React.createClass({
                   </div>
                   <ButtonColumn 
                         markerID={1}
+                        tableToggle={this.onTableToggle}
+                        splitClick= {this.onSplitClick}                    
                         payToggle={this.onPayToggle} 
                   />
                   <Itemwindow 
                         markerID={1} 
                         class='item-window-split' 
+                        onPayClick={this.onPayClick}
                         cashDisplay={this.state.primaryCashDisplay}
-                        splitClick= {this.onSplitClick}
                         items={this.state.primaryDisplayItems} 
                         onClick={this.onItemClick} 
                         onLongClick={this.onLongClick}
@@ -266,12 +260,14 @@ const Tyle = React.createClass({
             </div>
             <ButtonColumn 
                 markerID={2}
+                tableToggle={this.onTableToggle}
+                splitClick= {this.onSplitClick}
                 payToggle={this.onPayToggle} 
             />
             <Itemwindow 
                 markerID={2} 
+                onPayClick={this.onPayClick}
                 cashDisplay={this.state.secondaryCashDisplay}
-                splitClick= {this.onSplitClick}
                 class='item-window-split' 
                 items={this.state.secondaryDisplayItems} 
                 onClick={this.onItemClick} 
@@ -306,12 +302,14 @@ const Tyle = React.createClass({
             </div>
             <ButtonColumn
                 markerID={1}
+                tableToggle={this.onTableToggle}
+                splitClick= {this.onSplitClick}
                 payToggle={this.onPayToggle} 
             />
             <Itemwindow 
                 markerID={1} 
+                onPayClick={this.onPayClick}
                 cashDisplay={this.state.primaryCashDisplay}
-                splitClick= {this.onSplitClick}
                 class= 'item-window' 
                 items={this.state.primaryDisplayItems} 
                 onClick={this.onItemClick} 
