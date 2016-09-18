@@ -5,6 +5,7 @@ const Infowindow = require('./sidebar/Infowindow')
 const Cashwindow = require('./sidebar/Cashwindow')
 const CashManager = require('../models/CashManager')
 const OrderManager = require('../models/OrderManager')
+const ItemManager = require('../models/ItemManager')
 const ButtonColumn =require('./ButtonColumn')
 const MenuTray = require('./MenuTray')
 const APIRunner = require('../models/APIRunner')
@@ -39,47 +40,47 @@ const Tyle = React.createClass({
     const APIpromise = runner.run("GET", "http://localhost:5000/api/divisions")
 
     APIpromise.then(function(result){
-      console.log(result)
-      const displayItems = this.prepareItems(result[0].types[0].subtypes[1].items)
-      this.setState({items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
-      this.getCategories()
+      const itemManager = new ItemManager
+      const categories = itemManager.getCategories(result)
+      const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[1].items)
+      this.setState({categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
     }.bind(this), function(err){
       console.log(err)
     })
   },
 
-  prepareItems(items){
-    let parsedItems =[]
-    console.log(items)
-    for(let item of items){
-      let parseItem = item
-      parseItem.sizes = JSON.parse(item.sizes)
-      parseItem.prices = JSON.parse(item.prices)
-      parsedItems.push(parseItem)
-    }
-    return parsedItems
-  },
+  // prepareItems(items){
+  //   let parsedItems =[]
+  //   console.log(items)
+  //   for(let item of items){
+  //     let parseItem = item
+  //     parseItem.sizes = JSON.parse(item.sizes)
+  //     parseItem.prices = JSON.parse(item.prices)
+  //     parsedItems.push(parseItem)
+  //   }
+  //   return parsedItems
+  // },
 
-  getCategories(){
-      let divisions = []
-      let types =[]
-      let subtypes =[]
-      const items = this.state.items
-      for(let a in items){
-            divisions.push(items[a].name)
-            for(let b in items[a].types){
-                types.push(items[a].types[b].name)
-                for(let c in items[a].types[b].subtypes){
-                    subtypes.push(items[a].types[b].subtypes[c].name)
-                  }
-            }
-      }
+  // getCategories(){
+  //     let divisions = []
+  //     let types =[]
+  //     let subtypes =[]
+  //     const items = this.state.items
+  //     for(let a in items){
+  //           divisions.push(items[a].name)
+  //           for(let b in items[a].types){
+  //               types.push(items[a].types[b].name)
+  //               for(let c in items[a].types[b].subtypes){
+  //                   subtypes.push(items[a].types[b].subtypes[c].name)
+  //                 }
+  //           }
+  //     }
 
-      const categories= {divisions: divisions, types: types, subtypes: subtypes}
-      console.log("divisions", categories)
-      this.setState({categories: categories})
+  //     const categories= {divisions: divisions, types: types, subtypes: subtypes}
+  //     console.log("divisions", categories)
+  //     this.setState({categories: categories})
       
-  },
+  // },
 
 
   onItemClick(event, markerID){
@@ -125,28 +126,15 @@ const Tyle = React.createClass({
   },
 
   menuOptionClick(selected, markerID){
-      console.log(selected)
       const runner = new APIRunner
       let url = "http://localhost:5000/api/"
       if(_.includes(this.state.categories["divisions"], selected)){url += "divisions/find/"+selected}
       if(_.includes(this.state.categories["types"], selected)){url += "types/find/"+selected}
       if(_.includes(this.state.categories["subtypes"], selected)){url += "subtypes/find/"+selected}
-        console.log(url)
       const promise = runner.run("GET",url)
       promise.then(function(result){
-        // ASSIGN NEW OBJECTS HERE
-        let items = []
-        if(result[0].types){}
-        if(result[0].subtypes){
-              result[0].subtypes.forEach(function(subtype){
-                  items = items.concat(subtype.items)
-              })
-        }
-        if(!result[0].types && !result[0].subtypes){
-          items = result[0].items
-        }
-
-        const finalItems = this.prepareItems(items)
+        const itemManager = new ItemManager
+        const finalItems = itemManager.getItems(result)
         if(markerID===2){
           this.setState({secondaryDisplayItems: finalItems})
         }else{
