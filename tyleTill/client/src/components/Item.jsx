@@ -3,7 +3,11 @@ const ExpandedItem = require('./ExpandedItem')
 
 const Item = React.createClass({
   getInitialState(){
-    return ({expanded: false, timer: null})
+    return ({expanded: false, timer: null, linkItems:[]})
+  },
+
+  checkSubItem(){
+
   },
 
   startTimer(){
@@ -24,12 +28,31 @@ const Item = React.createClass({
       if(this.state.expanded){
         this.setState({expanded:false})
       }else{
-        this.setState({expanded:true})
+        const links = this.getLinks()
+        this.setState({expanded:true, linkItems:[{name: "hello"}]})
       }
   },
 
-  onClick(event){
-    this.props.onClick(event, this.props.markerID)
+  getLinks(){
+      let itemArray =[
+      {name:"" ,size:'' ,price:''},
+      {name:"" ,size:'' ,price:''},
+      {name:"" ,size:'' ,price:''},
+      {name:"" ,size:'' ,price:''},
+      {name:this.props.name, value: this.props.index, size:this.props.sizes[0] ,price:this.props.prices[0]},
+      {name:"" ,size:'' ,price:''},
+      {name:"" ,size:'' ,price:''},
+      {name:"" ,size:'' ,price:''},
+      {name:"" ,size:'' ,price:''},
+      ]
+      const sizes = this.props.sizes
+      const prices = this.props.prices
+      console.log(sizes)
+
+  },
+
+  onClick(event, arrayRef){
+    this.props.onClick(event, this.props.markerID,arrayRef)
   },
 
   render(){
@@ -41,7 +64,7 @@ const Item = React.createClass({
         )
     }else{
       return(
-        <ExpandedItem value={this.props.index} name={this.props.name} markerID={this.props.markerID} onMouseUp={this.stopTimer}/>
+        <ExpandedItem value={this.props.index} onClick={this.checkSubItem} items={this.state.linkItems} name={this.props.name} markerID={this.props.markerID} onMouseUp={this.stopTimer}/>
         )
 
     }

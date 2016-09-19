@@ -10,6 +10,7 @@ const TableManager = require('../models/TableManager')
 const ItemManager = require('../models/ItemManager')
 const ButtonColumn =require('./ButtonColumn')
 const TableWindow =require('./TableWindow')
+const ReactCSSTransitionGroup=require('react-addons-css-transition-group') 
 const MenuTray = require('./MenuTray')
 const APIRunner = require('../models/APIRunner')
 _=require('lodash')
@@ -65,7 +66,7 @@ const Tyle = React.createClass({
     })
   },
 
-  onItemClick(event, markerID){
+  onItemClick(event, markerID, arrayRef){
     let currentOrder = this.state.primaryOrderItems
     let input = this.state.primaryInput
     if(markerID === 2){
@@ -75,7 +76,7 @@ const Tyle = React.createClass({
     let item = this.state.primaryDisplayItems[event.target.value]
     if(markerID === 2){item = this.state.secondaryDisplayItems[event.target.value]}
     const ordermanager = new OrderManager
-    let newOrderArray = ordermanager.addItem(currentOrder, item, input)
+    let newOrderArray = ordermanager.addItem(currentOrder, item, input, arrayRef)
     const cashmanager = new CashManager
     const total = cashmanager.total(newOrderArray)
     if(markerID === 2){
@@ -310,6 +311,13 @@ const Tyle = React.createClass({
             <div id="divider"/>
 
             <div className="secondary">
+            <ReactCSSTransitionGroup
+                     transitionName="background"
+                     transitionAppear={true} 
+                      transitionAppearTimeout={500}
+                      transitionEnterTimeout={500}
+                      transitionLeaveTimeout={500}
+                   >
             <Login onLogin={this.onLogin} display={this.state.secondaryLogin} markerID={2} users={this.state.users}/>
             <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
             <div id='sidebar'>
@@ -349,7 +357,10 @@ const Tyle = React.createClass({
               onClick={this.menuOptionClick} 
               markerID={2}
            />
+           </ReactCSSTransitionGroup>
             </div>
+                   
+
             </div>
             )
         }else{

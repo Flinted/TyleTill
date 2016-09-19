@@ -1,4 +1,5 @@
 const React = require('react')
+const ReactCSSTransitionGroup=require('react-addons-css-transition-group')
 
 
 const TableWindow = React.createClass({
@@ -24,9 +25,17 @@ const TableWindow = React.createClass({
         }
 
     return(
+      <ReactCSSTransitionGroup
+               transitionName="background"
+               transitionAppear={true} 
+                transitionAppearTimeout={500}
+                transitionEnterTimeout={500}
+                transitionLeaveTimeout={500}
+             >
         <div className="table-show">
             {tables}
         </div>
+    </ReactCSSTransitionGroup>
       )
 
   }
