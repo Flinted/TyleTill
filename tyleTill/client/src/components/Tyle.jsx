@@ -20,17 +20,18 @@ const Tyle = React.createClass({
     return {
       items: [], 
       categories: {},
+      users:[],
       tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
       primaryDisplayItems:[],
       primaryLogin: true,
-      primaryUser: "Chris",
+      primaryUser: "",
       primaryOrderItems:[{}],
       primaryOrderTotal:0.00,
       primaryInput:'',
       primaryCashDisplay: false,
       primaryTableShow:false,
-      secondaryUser: "Renwick",
-      secondaryLogin: false,
+      secondaryUser: "",
+      secondaryLogin: true,
       secondaryOrderItems:[{}],
       secondaryDisplayItems:[],
       secondaryOrderTotal:0.00,
@@ -44,7 +45,12 @@ const Tyle = React.createClass({
 
   componentDidMount(){
     console.log("attempting api call")
+    let users= null
     const runner = new APIRunner
+
+    runner.run("GET","http://localhost:5000/api/users").then(function(result){
+      users= result
+    })
     const APIpromise = runner.run("GET", "http://localhost:5000/api/divisions")
 
     APIpromise.then(function(result){
@@ -53,7 +59,7 @@ const Tyle = React.createClass({
       console.log(categories)
       console.log(result)
       const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items)
-      this.setState({categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
+      this.setState({users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
     }.bind(this), function(err){
       console.log(err)
     })
@@ -72,9 +78,8 @@ const Tyle = React.createClass({
     let newOrderArray = ordermanager.addItem(currentOrder, item, input)
     const cashmanager = new CashManager
     const total = cashmanager.total(newOrderArray)
-    const temp = "secondaryOrderItems"
     if(markerID === 2){
-      this.setState({temp: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
+      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
     }else{
       this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
     }
@@ -153,11 +158,12 @@ const Tyle = React.createClass({
               primaryDisplayItems: this.state.secondaryDisplayItems,
               secondaryOrderItems:[{}],
               secondaryOrderTotal: 0,
-              secondaryUser: this.state.primaryUser,
-              secondaryCashDisplay: false
+              secondaryUser: '',
+              secondaryCashDisplay: false,
+              secondaryLogin: true
             })
           }else{
-            this.setState({split:false})
+            this.setState({split:false, secondaryLogin: true})
           }
         }
       },
@@ -216,23 +222,41 @@ const Tyle = React.createClass({
       },
 
       tableClick(table, markerID){
-        console.log("TABLE CLICKED")
         let order = this.state.primaryOrderItems  
         if(markerID===2){order = this.state.secondaryOrderItems }
         const tableManager = new TableManager
-      console.log("order", order)
         const result = tableManager.manageTable(this.state.tables, table, order)
-        console.log("table result", result)
         if(!result){
             console.log("CANNOT DO THIS!")
         }else if(result[0] === "tables"){
-            this.setState({tables: result[1]})
+          if(markerID === 2){
+            this.setState({secondaryOrderItems: [{}],secondaryOrderTotal:0.00,tables: result[1]})
+          }else{
+            this.setState({primaryOrderItems: [{}], primaryOrderTotal:0.00 ,tables: result[1]})
+          }
         }else{
           if(markerID === 2){
-                this.setState({secondaryOrderItems: result[1]})
+                this.setState({secondaryOrderItems: result[1], tables:result[2]})
           }else{
-                this.setState({primaryOrderItems: result[1]})
+                this.setState({primaryOrderItems: result[1], tables:result[2]})
           }
+        }
+
+      },
+
+      onLogin(user, markerID){
+          if(markerID === 2){
+              this.setState({secondaryUser: user.name, secondaryLogin: false})
+          }else{
+              this.setState({primaryUser: user.name, primaryLogin: false})
+          }
+      },
+
+      logout(markerID){
+        if(markerID === 2){
+          this.setState({secondaryUser: "", secondaryLogin:true, secondaryOrderItems:[{}], secondaryOrderTotal:0.00})
+        }else{
+          this.setState({primaryUser:"", primaryLogin:true, primaryOrderItems:[{}], primaryOrderTotal:0.00})
         }
 
       },
@@ -242,6 +266,7 @@ const Tyle = React.createClass({
           return(
             <div className='tyle-container'>
             <div className="primary">
+            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
                   <div id='sidebar'>
                         <Infowindow 
@@ -264,6 +289,7 @@ const Tyle = React.createClass({
                         tableToggle={this.onTableToggle}
                         splitClick= {this.onSplitClick}                    
                         payToggle={this.onPayToggle} 
+                        logout={this.logout}
                   />
                   <Itemwindow 
                         markerID={1} 
@@ -284,6 +310,7 @@ const Tyle = React.createClass({
             <div id="divider"/>
 
             <div className="secondary">
+            <Login onLogin={this.onLogin} display={this.state.secondaryLogin} markerID={2} users={this.state.users}/>
             <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
             <div id='sidebar'>
                 <Infowindow 
@@ -306,6 +333,7 @@ const Tyle = React.createClass({
                 tableToggle={this.onTableToggle}
                 splitClick= {this.onSplitClick}
                 payToggle={this.onPayToggle} 
+                logout={this.logout}
             />
             <Itemwindow 
                 markerID={2} 
@@ -328,7 +356,7 @@ const Tyle = React.createClass({
 
           return(
             <div className='tyle-container'>
-            <Login display={this.state.primaryLogin}/>
+            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick}/>
             <div id='sidebar'>
                 <Infowindow 
@@ -349,7 +377,8 @@ const Tyle = React.createClass({
                 markerID={1}
                 tableToggle={this.onTableToggle}
                 splitClick= {this.onSplitClick}
-                payToggle={this.onPayToggle} 
+                payToggle={this.onPayToggle}
+                logout={this.logout}
             />
             <Itemwindow 
                 markerID={1} 

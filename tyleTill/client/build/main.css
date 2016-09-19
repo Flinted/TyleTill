@@ -42,11 +42,11 @@ body{
 }
 
 
-.primary div:nth-child(5){
+.primary div:nth-child(6){
 margin-right: 0px !important;
 }
 
-.secondary div:nth-child(5){
+.secondary div:nth-child(6){
   margin-right: 0px !important;
 }
 
@@ -144,8 +144,28 @@ margin-right: 0px !important;
 .info-window{
   width: 100%;
   height:10%;
-  margin-bottom: 10px;
+  /*margin-bottom: 10px;*/
 }
+
+.info-window h6{
+  line-height: 48px;
+  margin:0px;
+  color: black;
+}
+
+.info-window h4{
+  text-align: center;
+}
+
+.info-window div{
+  height: 48px;
+  width:48px;
+  display: inline-block;
+  border: 1px solid black;
+  text-align: center;
+  vertical-align: top;
+}
+
 
 .cash-window{
   width: 100%;
@@ -159,7 +179,7 @@ margin-right: 0px !important;
   width: 110px;
   height: 100%;
   display: inline-block;
-  margin-left: -10px;
+  margin-left: -5px;
   text-align: center;
 }
 
@@ -271,7 +291,7 @@ margin-right: 0px !important;
   display: inline-flex;
 }
 
-.item-button:hover, .table-taken:hover, .table-free:hover, .menu-button:hover, .menu-item:hover{
+.item-button:hover, .table-taken:hover, .table-free:hover, .pay-button:hover,.menu-button:hover, .menu-item:hover, .login-button:hover{
   border: 2px solid white;  
 
 }
@@ -336,9 +356,98 @@ margin-left: 5px;
 .login-show{
   width: 100%;
   height: 100%;
-  background-color: red;
+  background-color: rgba(0,0,0,0.8);
+  position: absolute;
+  text-align: center;
+  z-index: 10000;
+}
+
+/*.login-show h1{
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 3px solid black;
+  color: black;
+  height: 50px;
+  width: 310px;
+  background-color: rgba(255,255,255,0.8);
+}*/
+
+.primary .login-show:nth-child(1), .secondary .login-show:nth-child(1){
+width: 49% !important;
+margin-left: -20px;
+padding-left: 20px;
+}
+
+.login-window{
+    width: 310px;
+    max-height: 80%;
+    text-align: center;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.login-window :last-child{
+  width: 200px;
+  background: black;
+  color: #779ECB;
+  border: 2px solid #779ECB;
+}
+
+.login-window :last-child:hover{
+  background: #779ECB;
+  border: 2px solid black;
+  color: black;
+}
+
+#logo{
+  width: 450px;
+  margin: auto;
+}
+
+#logo div{
+margin: 80px 2px 40px 2px;
+width: 100px;
+height: 100px;
+display: inline-block;
+}
+
+#logo div h1{
+  line-height: 100px;
+  font-size: 3em;
+  color: black;
+}
+
+#logo div:first-child, .info-window div:first-child{
+  background: #779ECB
 
 }
+
+#logo div:nth-child(2), .info-window div:nth-child(2){
+  background:#AEC6CF;
+
+}
+
+#logo div:nth-child(3), .info-window div:nth-child(3){
+  background: #DEA5A4;
+
+}
+
+#logo div:last-child, .info-window div:nth-child(4){
+  background: #FFB347;
+}
+
+.login-button{
+    width:100px;
+    height:100px;
+    font-size: 2.5em;
+    color:black;
+    background-color: #779ECB;
+    margin: 0px 1px 2px 1px;
+    border: 2px solid black;
+}
+
 /*TABLES*/
 .hidden{
   display: none;

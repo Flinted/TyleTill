@@ -18,7 +18,8 @@ manageTable(tables, table, order){
   if(tables[table].length >0  && !Object.keys(order[0]).length>0){
     console.log("assign table to order")
     order = tables[table]
-    return ["order", order]
+    tables[table]=[]
+    return ["order", order, tables]
     }
 
 

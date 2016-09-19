@@ -13,6 +13,9 @@ const ButtonColumn= React.createClass({
         this.props.tableToggle(this.props.markerID)
       },
 
+      onLogout(){
+        this.props.logout(this.props.markerID)
+      },
 
       render(){
         return  (
@@ -20,7 +23,7 @@ const ButtonColumn= React.createClass({
               <image className='menu-button' src= '/images/split.png' onClick={this.onSplitClick}/>
               <image className='menu-button' src= '/images/table.png' onClick={this.onTableClick}/>
               <image className='menu-button' src= '/images/save.png'/>
-              <image className='menu-button' src= '/images/logout.png'/>
+              <image className='menu-button' src= '/images/logout.png' onClick={this.onLogout}/>
               <image className='menu-button' src= '/images/pay.png' onClick={this.onPayClick}/>
               </div>
           )
