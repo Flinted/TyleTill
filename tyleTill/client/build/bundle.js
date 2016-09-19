@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(185);
+	var ReactDOM = __webpack_require__(184);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19748,18 +19748,18 @@
 	var React = __webpack_require__(1);
 	var Orderwindow = __webpack_require__(159);
 	var Itemwindow = __webpack_require__(163);
-	var Login = __webpack_require__(167);
-	var Infowindow = __webpack_require__(168);
-	var Cashwindow = __webpack_require__(169);
-	var CashManager = __webpack_require__(170);
-	var OrderManager = __webpack_require__(171);
-	var TableManager = __webpack_require__(172);
-	var ItemManager = __webpack_require__(173);
-	var ButtonColumn = __webpack_require__(174);
-	var TableWindow = __webpack_require__(175);
-	var ReactCSSTransitionGroup = __webpack_require__(176);
-	var MenuTray = __webpack_require__(183);
-	var APIRunner = __webpack_require__(184);
+	var Login = __webpack_require__(173);
+	var Infowindow = __webpack_require__(174);
+	var Cashwindow = __webpack_require__(175);
+	var CashManager = __webpack_require__(176);
+	var OrderManager = __webpack_require__(177);
+	var TableManager = __webpack_require__(178);
+	var ItemManager = __webpack_require__(179);
+	var ButtonColumn = __webpack_require__(180);
+	var TableWindow = __webpack_require__(181);
+	var ReactCSSTransitionGroup = __webpack_require__(166);
+	var MenuTray = __webpack_require__(182);
+	var APIRunner = __webpack_require__(183);
 	_ = __webpack_require__(161);
 	
 	var Tyle = React.createClass({
@@ -19769,6 +19769,8 @@
 	      items: [],
 	      categories: {},
 	      users: [],
+	      time: '',
+	      date: '',
 	      tables: { one: [], two: [], three: [], four: [], five: [], six: [], seven: [], eight: [], nine: [], ten: [] },
 	      primaryDisplayItems: [],
 	      primaryLogin: true,
@@ -19803,6 +19805,8 @@
 	    APIpromise.then(function (result) {
 	      var itemManager = new ItemManager();
 	      var categories = itemManager.getCategories(result);
+	      this.clock();
+	      setInterval(this.clock, 60000);
 	      console.log(categories);
 	      console.log(result);
 	      var displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items);
@@ -19810,6 +19814,19 @@
 	    }.bind(this), function (err) {
 	      console.log(err);
 	    });
+	  },
+	  clock: function clock() {
+	    var newTime = new Date();
+	    var month = newTime.getUTCMonth() + 1;
+	    var day = newTime.getUTCDate();
+	    var hour = newTime.getHours();
+	    var minutes = newTime.getMinutes();
+	    if (minutes.toString().length === 1) {
+	      minutes = "0" + minutes.toString();
+	    }
+	    var displayTime = hour + ":" + minutes;
+	    var displayDate = day + "/" + month;
+	    this.setState({ time: displayTime, date: displayDate });
 	  },
 	  onItemClick: function onItemClick(event, markerID, arrayRef) {
 	    var currentOrder = this.state.primaryOrderItems;
@@ -20020,6 +20037,8 @@
 	            'div',
 	            { id: 'sidebar' },
 	            React.createElement(Infowindow, {
+	              time: this.state.time,
+	              date: this.state.date,
 	              input: this.state.primaryInput,
 	              total: this.state.primaryOrderTotal,
 	              user: this.state.primaryUser
@@ -20075,6 +20094,8 @@
 	              'div',
 	              { id: 'sidebar' },
 	              React.createElement(Infowindow, {
+	                time: this.state.time,
+	                date: this.state.date,
 	                input: this.state.secondaryInput,
 	                total: this.state.secondaryOrderTotal,
 	                user: this.state.secondaryUser
@@ -20124,6 +20145,8 @@
 	          'div',
 	          { id: 'sidebar' },
 	          React.createElement(Infowindow, {
+	            time: this.state.time,
+	            date: this.state.date,
 	            input: this.state.primaryInput,
 	            total: this.state.primaryOrderTotal,
 	            user: this.state.primaryUser
@@ -20180,7 +20203,7 @@
 	  render: function render() {
 	    var orderNodes = [];
 	    for (var key in this.props.items[0]) {
-	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: this.props.items[0][key].id, onClick: this.props.onClick });
+	      var row = React.createElement(OrderRow, { name: this.props.items[0][key].name, markerID: this.props.markerID, qty: this.props.items[0][key].qty, total: this.props.items[0][key].total, key: key, onClick: this.props.onClick });
 	      orderNodes.push(row);
 	    }
 	
@@ -37023,7 +37046,7 @@
 	
 	var React = __webpack_require__(1);
 	var Item = __webpack_require__(164);
-	var CashDisplay = __webpack_require__(166);
+	var CashDisplay = __webpack_require__(165);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
@@ -37073,7 +37096,7 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ExpandedItem = __webpack_require__(165);
+	var ExpandedItem = __webpack_require__(185);
 	
 	var Item = React.createClass({
 	  displayName: 'Item',
@@ -37083,29 +37106,32 @@
 	  checkSubItem: function checkSubItem() {},
 	  startTimer: function startTimer() {
 	    console.log("down");
-	    this.state.timer = setTimeout(this.toggleExpanded, 500);
+	    this.state.timer = setTimeout(this.toggleExpanded, 200);
 	  },
-	  stopTimer: function stopTimer(event) {
+	  stopTimer: function stopTimer(event, arrayRef) {
 	    console.log("up");
 	    clearInterval(this.state.timer);
 	    if (this.state.expanded) {
 	      this.toggleExpanded();
 	    }
-	    this.onClick(event);
+	    this.onClick(event, arrayRef);
 	  },
 	  toggleExpanded: function toggleExpanded() {
 	    if (this.state.expanded) {
 	      this.setState({ expanded: false });
 	    } else {
 	      var links = this.getLinks();
-	      this.setState({ expanded: true, linkItems: [{ name: "hello" }] });
+	      this.setState({ expanded: true, linkItems: links });
 	    }
 	  },
 	  getLinks: function getLinks() {
-	    var itemArray = [{ name: "", size: '', price: '' }, { name: "", size: '', price: '' }, { name: "", size: '', price: '' }, { name: "", size: '', price: '' }, { name: this.props.name, value: this.props.index, size: this.props.sizes[0], price: this.props.prices[0] }, { name: "", size: '', price: '' }, { name: "", size: '', price: '' }, { name: "", size: '', price: '' }, { name: "", size: '', price: '' }];
 	    var sizes = this.props.sizes;
-	    var prices = this.props.prices;
+	    var itemArray = [{ name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: this.props.name, value: this.props.index, size: "0", sizeDescriptor: sizes[0] }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }];
 	    console.log(sizes);
+	    for (var size in sizes) {
+	      itemArray[size] = { name: this.props.name, sizeDescriptor: sizes[size], value: this.props.index, size: size };
+	    }
+	    return itemArray;
 	  },
 	  onClick: function onClick(event, arrayRef) {
 	    this.props.onClick(event, this.props.markerID, arrayRef);
@@ -37136,81 +37162,7 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
-	
-	var ExpandedItem = function ExpandedItem(props) {
-	  console.log(props.items[0].name);
-	
-	  var nodes = props.items.map(function (item, index) {
-	    return React.createElement(
-	      'div',
-	      { className: 'subItem', key: index, markerID: props.markerID, index: index, onClick: props.onClick },
-	      item.name,
-	      ' '
-	    );
-	  });
-	
-	  return React.createElement(
-	    'li',
-	    { className: 'item-button-expanded', onMouseUp: props.onMouseUp },
-	    React.createElement(
-	      'div',
-	      { className: 'subItem-container' },
-	      nodes,
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'ITEM'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'subItem' },
-	        'test'
-	      )
-	    )
-	  );
-	};
-	
-	module.exports = ExpandedItem;
-
-/***/ },
-/* 166 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(176);
+	var ReactCSSTransitionGroup = __webpack_require__(166);
 	
 	var CashDisplay = React.createClass({
 	    displayName: 'CashDisplay',
@@ -37273,655 +37225,13 @@
 	module.exports = CashDisplay;
 
 /***/ },
+/* 166 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(167);
+
+/***/ },
 /* 167 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var Login = React.createClass({
-	  displayName: 'Login',
-	  getInitialState: function getInitialState() {
-	    return { code: '', displayCode: ["T", "Y", "L", "E"] };
-	  },
-	  onClick: function onClick(event) {
-	    var newPress = event.target.value;
-	    if (newPress === "C") {
-	      this.setState({ code: '', displayCode: ["T", "Y", "L", "E"] });
-	      return;
-	    }
-	    var input = this.state.code;
-	    var display = this.state.displayCode;
-	    input += newPress;
-	    display[input.length - 1] = "*";
-	    this.setState({ code: input, displayCode: display });
-	
-	    if (input.length === 4) {
-	      this.setState({ code: '', displayCode: ["T", "Y", "L", "E"] });
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-	
-	      try {
-	        for (var _iterator = this.props.users[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var user = _step.value;
-	
-	          if (parseInt(input) === user.code) {
-	            this.props.onLogin(user, this.props.markerID);
-	            return;
-	          }
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-	    }
-	  },
-	  render: function render() {
-	    if (!this.props.display) {
-	      return React.createElement('div', { className: 'hidden' });
-	    } else {
-	      return React.createElement(
-	        'div',
-	        { className: 'login-show' },
-	        React.createElement(
-	          'div',
-	          { id: 'logo' },
-	          React.createElement(
-	            'div',
-	            null,
-	            React.createElement(
-	              'h1',
-	              null,
-	              this.state.displayCode[0]
-	            )
-	          ),
-	          React.createElement(
-	            'div',
-	            null,
-	            React.createElement(
-	              'h1',
-	              null,
-	              this.state.displayCode[1]
-	            )
-	          ),
-	          React.createElement(
-	            'div',
-	            null,
-	            React.createElement(
-	              'h1',
-	              null,
-	              this.state.displayCode[2]
-	            )
-	          ),
-	          React.createElement(
-	            'div',
-	            null,
-	            React.createElement(
-	              'h1',
-	              null,
-	              this.state.displayCode[3]
-	            )
-	          )
-	        ),
-	        React.createElement(
-	          'div',
-	          { className: 'login-window' },
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '1' },
-	            '1'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '2' },
-	            '2'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '3' },
-	            '3'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '4' },
-	            '4'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '5' },
-	            '5'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '6' },
-	            '6'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '7' },
-	            '7'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '8' },
-	            '8'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '9' },
-	            '9'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: '0' },
-	            '0'
-	          ),
-	          React.createElement(
-	            'button',
-	            { onClick: this.onClick, className: 'login-button', value: 'C' },
-	            'C'
-	          )
-	        )
-	      );
-	    }
-	  }
-	});
-	
-	module.exports = Login;
-
-/***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var Infowindow = function Infowindow(props) {
-	    return React.createElement(
-	        'div',
-	        { className: 'info-window' },
-	        React.createElement(
-	            'div',
-	            null,
-	            React.createElement(
-	                'h6',
-	                null,
-	                props.user
-	            )
-	        ),
-	        React.createElement(
-	            'div',
-	            null,
-	            React.createElement(
-	                'h6',
-	                null,
-	                props.input
-	            )
-	        ),
-	        React.createElement('div', null),
-	        React.createElement('div', null),
-	        React.createElement(
-	            'h4',
-	            { id: 'order-total' },
-	            'Total: ',
-	            props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	        )
-	    );
-	};
-	
-	module.exports = Infowindow;
-	
-	// <h6>User: {props.user}</h6>
-	// <h6>Last Order Change: £3.00</h6>
-	// <h6>Table:</h6>
-	// <h5>Input: {props.input} </h5>
-
-/***/ },
-/* 169 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var Cashwindow = React.createClass({
-	    displayName: 'Cashwindow',
-	    onClick: function onClick(event) {
-	        this.props.onClick(event.target.value, this.props.markerID);
-	    },
-	    render: function render() {
-	        return React.createElement(
-	            'div',
-	            { className: 'cash-window' },
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '1' },
-	                '1'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '2' },
-	                '2'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '3' },
-	                '3'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '4' },
-	                '4'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '5' },
-	                '5'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '6' },
-	                '6'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '7' },
-	                '7'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '8' },
-	                '8'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '9' },
-	                '9'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '.' },
-	                '.'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: '0' },
-	                '0'
-	            ),
-	            React.createElement(
-	                'button',
-	                { onClick: this.onClick, className: 'cash-button', value: 'C' },
-	                'C'
-	            )
-	        );
-	    }
-	});
-	
-	module.exports = Cashwindow;
-
-/***/ },
-/* 170 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	_ = __webpack_require__(161);
-	
-	var CashManager = function CashManager() {};
-	
-	CashManager.prototype = {
-	    total: function total(order, index) {
-	        var total = 0.00;
-	        for (var key in order[0]) {
-	            total += order[0][key].total;
-	        }
-	        console.log(total);
-	        return total;
-	    },
-	    checkPayAmount: function checkPayAmount(selected, input, total) {
-	        var category = null;
-	        var amount = null;
-	        var value = null;
-	        var qty = null;
-	        switch (selected) {
-	            case "mobile":
-	            case "card":
-	            case "discount":
-	            case "cash":
-	                category = selected;
-	                break;
-	            default:
-	                category = "cash(" + selected + ")";
-	                value = parseInt(selected);
-	                qty = input;
-	                console.log("value", value);
-	                break;
-	        }
-	
-	        if (input) {
-	            console.log("input", input);
-	            amount = input * (value || 1);
-	        } else if (value) {
-	            console.log("value present", value);
-	            amount = value;
-	        } else {
-	            console.log("amountisTotal", total);
-	            amount = total;
-	        }
-	
-	        return { id: Date.now(), name: category, qty: qty || 1, total: -amount };
-	    }
-	};
-	
-	module.exports = CashManager;
-
-/***/ },
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	_ = __webpack_require__(161);
-	
-	var OrderManager = function OrderManager() {};
-	
-	OrderManager.prototype = {
-	    addItem: function addItem(orderItems, newItem, input) {
-	        var itemsObject = orderItems[0];
-	        var ref = newItem.name + "(" + newItem.sizes[0] + ")";
-	        var price = newItem.prices[0];
-	        var qty = parseInt(input) || 1;
-	        if (itemsObject[ref]) {
-	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    removeItem: function removeItem(orderItems, key, input) {
-	        var itemsObject = orderItems[0];
-	        console.log(input);
-	        var currentTotal = parseFloat(itemsObject[key].total);
-	        var origQty = itemsObject[key].qty;
-	        var price = currentTotal / origQty;
-	        var qty = origQty - (parseInt(input) || 1);
-	        var id = itemsObject[key].id;
-	        if (qty < 1) {
-	            delete itemsObject[key];
-	            var _returnArray = [itemsObject];
-	            return _returnArray;
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    addPayment: function addPayment(orderItems, payment) {
-	        // if(orderItems[0][payment.name]){
-	        //     payment["name"] = orderItems[0][payment.name].name+ 1
-	        // }
-	        // orderItems[0][payment.name] = payment
-	        // return orderItems
-	
-	        var itemsObject = orderItems[0];
-	        var ref = payment.name;
-	        var oldTotal = 0;
-	        var qty = parseInt(payment.qty);
-	        if (itemsObject[ref]) {
-	            qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
-	            oldTotal = itemsObject[ref].total;
-	        }
-	        var total = parseFloat(payment.total + oldTotal);
-	        itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    }
-	};
-	
-	module.exports = OrderManager;
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var React = __webpack_require__(1);
-	
-	var TableManager = function TableManager() {};
-	
-	TableManager.prototype = {
-	  manageTable: function manageTable(tables, table, order) {
-	    console.log("table", tables[table]);
-	    console.log("order", Object.keys(order[0]));
-	    console.log(tables[table] == !Object.keys(order[0]));
-	    console.log(tables[table].length);
-	
-	    if (!tables[table].length > 0 && Object.keys(order[0]).length > 0) {
-	      console.log("assign order to table");
-	      tables[table] = order;
-	      return ["tables", tables];
-	    }
-	    if (tables[table].length > 0 && !Object.keys(order[0]).length > 0) {
-	      console.log("assign table to order");
-	      order = tables[table];
-	      tables[table] = [];
-	      return ["order", order, tables];
-	    }
-	
-	    return false;
-	  }
-	};
-	
-	module.exports = TableManager;
-
-/***/ },
-/* 173 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	_ = __webpack_require__(161);
-	
-	var ItemManager = function ItemManager() {};
-	
-	ItemManager.prototype = {
-	      getItems: function getItems(result) {
-	            var items = [];
-	            if (result[0].types) {
-	                  result[0].types.forEach(function (type) {
-	                        type.subtypes.forEach(function (subtype) {
-	                              items = items.concat(subtype.items);
-	                        });
-	                  });
-	            }
-	            if (result[0].subtypes) {
-	                  result[0].subtypes.forEach(function (subtype) {
-	                        items = items.concat(subtype.items);
-	                  });
-	            }
-	            if (!result[0].types && !result[0].subtypes) {
-	                  items = result[0].items;
-	            }
-	
-	            var finalItems = this.prepareItems(items);
-	            return finalItems;
-	      },
-	      prepareItems: function prepareItems(items) {
-	            var parsedItems = [];
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
-	
-	            try {
-	                  for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var item = _step.value;
-	
-	                        var parseItem = item;
-	                        parseItem.sizes = JSON.parse(item.sizes);
-	                        parseItem.prices = JSON.parse(item.prices);
-	                        parsedItems.push(parseItem);
-	                  }
-	            } catch (err) {
-	                  _didIteratorError = true;
-	                  _iteratorError = err;
-	            } finally {
-	                  try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                              _iterator.return();
-	                        }
-	                  } finally {
-	                        if (_didIteratorError) {
-	                              throw _iteratorError;
-	                        }
-	                  }
-	            }
-	
-	            return parsedItems;
-	      },
-	      getCategories: function getCategories(items) {
-	            console.log(items);
-	            var divisions = [];
-	            var types = [];
-	            var subtypes = [];
-	            for (var a in items) {
-	                  divisions.push(items[a].name);
-	                  for (var b in items[a].types) {
-	                        types.push(items[a].types[b].name);
-	                        for (var c in items[a].types[b].subtypes) {
-	                              subtypes.push(items[a].types[b].subtypes[c].name);
-	                        }
-	                  }
-	            }
-	
-	            var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	            console.log("divisions", categories);
-	            return categories;
-	      }
-	};
-	
-	module.exports = ItemManager;
-
-/***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var ButtonColumn = React.createClass({
-	  displayName: 'ButtonColumn',
-	  onPayClick: function onPayClick() {
-	    this.props.payToggle(this.props.markerID);
-	  },
-	  onSplitClick: function onSplitClick() {
-	    this.props.splitClick(this.props.markerID);
-	  },
-	  onTableClick: function onTableClick() {
-	    this.props.tableToggle(this.props.markerID);
-	  },
-	  onLogout: function onLogout() {
-	    this.props.logout(this.props.markerID);
-	  },
-	  render: function render() {
-	    return React.createElement(
-	      'div',
-	      { className: 'button-column' },
-	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/save.png' }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick })
-	    );
-	  }
-	});
-	
-	module.exports = ButtonColumn;
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(176);
-	
-	var TableWindow = React.createClass({
-	  displayName: 'TableWindow',
-	  tableClick: function tableClick(event) {
-	    this.props.onClick(event.target.id, this.props.markerID);
-	  },
-	  render: function render() {
-	
-	    if (!this.props.display) {
-	      return React.createElement(
-	        'div',
-	        { className: 'hidden' },
-	        ' '
-	      );
-	    }
-	
-	    var data = this.props.tables;
-	    var tables = [];
-	    var className = null;
-	
-	    for (var key in data) {
-	      if (data[key].length > 0) {
-	        className = "table-taken";
-	      } else {
-	        className = "table-free";
-	      }
-	      tables.push(React.createElement(
-	        'div',
-	        { className: className, id: key, key: key, onClick: this.tableClick },
-	        key
-	      ));
-	    }
-	
-	    return React.createElement(
-	      ReactCSSTransitionGroup,
-	      {
-	        transitionName: 'background',
-	        transitionAppear: true,
-	        transitionAppearTimeout: 500,
-	        transitionEnterTimeout: 500,
-	        transitionLeaveTimeout: 500
-	      },
-	      React.createElement(
-	        'div',
-	        { className: 'table-show' },
-	        tables
-	      )
-	    );
-	  }
-	});
-	
-	module.exports = TableWindow;
-
-/***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(177);
-
-/***/ },
-/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37942,8 +37252,8 @@
 	
 	var assign = __webpack_require__(39);
 	
-	var ReactTransitionGroup = __webpack_require__(178);
-	var ReactCSSTransitionGroupChild = __webpack_require__(180);
+	var ReactTransitionGroup = __webpack_require__(168);
+	var ReactCSSTransitionGroupChild = __webpack_require__(170);
 	
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -38009,7 +37319,7 @@
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 178 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38026,7 +37336,7 @@
 	'use strict';
 	
 	var React = __webpack_require__(2);
-	var ReactTransitionChildMapping = __webpack_require__(179);
+	var ReactTransitionChildMapping = __webpack_require__(169);
 	
 	var assign = __webpack_require__(39);
 	var emptyFunction = __webpack_require__(15);
@@ -38219,7 +37529,7 @@
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 179 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38322,7 +37632,7 @@
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 180 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38342,8 +37652,8 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	
-	var CSSCore = __webpack_require__(181);
-	var ReactTransitionEvents = __webpack_require__(182);
+	var CSSCore = __webpack_require__(171);
+	var ReactTransitionEvents = __webpack_require__(172);
 	
 	var onlyChild = __webpack_require__(156);
 	
@@ -38492,7 +37802,7 @@
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 181 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -38595,7 +37905,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 182 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38709,7 +38019,666 @@
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 183 */
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var Login = React.createClass({
+	  displayName: 'Login',
+	  getInitialState: function getInitialState() {
+	    return { code: '', displayCode: ["T", "Y", "L", "E"] };
+	  },
+	  onClick: function onClick(event) {
+	    var newPress = event.target.value;
+	    if (newPress === "C") {
+	      this.setState({ code: '', displayCode: ["T", "Y", "L", "E"] });
+	      return;
+	    }
+	    var input = this.state.code;
+	    var display = this.state.displayCode;
+	    input += newPress;
+	    display[input.length - 1] = "*";
+	    this.setState({ code: input, displayCode: display });
+	
+	    if (input.length === 4) {
+	      this.setState({ code: '', displayCode: ["T", "Y", "L", "E"] });
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+	
+	      try {
+	        for (var _iterator = this.props.users[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var user = _step.value;
+	
+	          if (parseInt(input) === user.code) {
+	            this.props.onLogin(user, this.props.markerID);
+	            return;
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	    }
+	  },
+	  render: function render() {
+	    if (!this.props.display) {
+	      return React.createElement('div', { className: 'hidden' });
+	    } else {
+	      return React.createElement(
+	        'div',
+	        { className: 'login-show' },
+	        React.createElement(
+	          'div',
+	          { id: 'logo' },
+	          React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	              'h1',
+	              null,
+	              this.state.displayCode[0]
+	            )
+	          ),
+	          React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	              'h1',
+	              null,
+	              this.state.displayCode[1]
+	            )
+	          ),
+	          React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	              'h1',
+	              null,
+	              this.state.displayCode[2]
+	            )
+	          ),
+	          React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	              'h1',
+	              null,
+	              this.state.displayCode[3]
+	            )
+	          )
+	        ),
+	        React.createElement(
+	          'div',
+	          { className: 'login-window' },
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '1' },
+	            '1'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '2' },
+	            '2'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '3' },
+	            '3'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '4' },
+	            '4'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '5' },
+	            '5'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '6' },
+	            '6'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '7' },
+	            '7'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '8' },
+	            '8'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '9' },
+	            '9'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: '0' },
+	            '0'
+	          ),
+	          React.createElement(
+	            'button',
+	            { onClick: this.onClick, className: 'login-button', value: 'C' },
+	            'C'
+	          )
+	        )
+	      );
+	    }
+	  }
+	});
+	
+	module.exports = Login;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var Infowindow = function Infowindow(props) {
+	    return React.createElement(
+	        'div',
+	        { className: 'info-window' },
+	        React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'h6',
+	                null,
+	                props.user
+	            )
+	        ),
+	        React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'h5',
+	                null,
+	                props.input
+	            )
+	        ),
+	        React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'h5',
+	                null,
+	                props.date
+	            )
+	        ),
+	        React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'h5',
+	                null,
+	                props.time
+	            )
+	        ),
+	        React.createElement(
+	            'h4',
+	            { id: 'order-total' },
+	            'Total: ',
+	            props.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	        )
+	    );
+	};
+	
+	module.exports = Infowindow;
+	
+	// <h6>User: {props.user}</h6>
+	// <h6>Last Order Change: £3.00</h6>
+	// <h6>Table:</h6>
+	// <h5>Input: {props.input} </h5>
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var Cashwindow = React.createClass({
+	    displayName: 'Cashwindow',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event.target.value, this.props.markerID);
+	    },
+	    render: function render() {
+	        return React.createElement(
+	            'div',
+	            { className: 'cash-window' },
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '1' },
+	                '1'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '2' },
+	                '2'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '3' },
+	                '3'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '4' },
+	                '4'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '5' },
+	                '5'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '6' },
+	                '6'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '7' },
+	                '7'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '8' },
+	                '8'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '9' },
+	                '9'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '.' },
+	                '.'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: '0' },
+	                '0'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'cash-button', value: 'C' },
+	                'C'
+	            )
+	        );
+	    }
+	});
+	
+	module.exports = Cashwindow;
+
+/***/ },
+/* 176 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	_ = __webpack_require__(161);
+	
+	var CashManager = function CashManager() {};
+	
+	CashManager.prototype = {
+	    total: function total(order, index) {
+	        var total = 0.00;
+	        for (var key in order[0]) {
+	            total += order[0][key].total;
+	        }
+	        console.log(total);
+	        return total;
+	    },
+	    checkPayAmount: function checkPayAmount(selected, input, total) {
+	        var category = null;
+	        var amount = null;
+	        var value = null;
+	        var qty = null;
+	        switch (selected) {
+	            case "mobile":
+	            case "card":
+	            case "discount":
+	            case "cash":
+	                category = selected;
+	                break;
+	            default:
+	                category = "cash(" + selected + ")";
+	                value = parseInt(selected);
+	                qty = input;
+	                console.log("value", value);
+	                break;
+	        }
+	
+	        if (input) {
+	            console.log("input", input);
+	            amount = input * (value || 1);
+	        } else if (value) {
+	            console.log("value present", value);
+	            amount = value;
+	        } else {
+	            console.log("amountisTotal", total);
+	            amount = total;
+	        }
+	
+	        return { id: Date.now(), name: category, qty: qty || 1, total: -amount };
+	    }
+	};
+	
+	module.exports = CashManager;
+
+/***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	_ = __webpack_require__(161);
+	
+	var OrderManager = function OrderManager() {};
+	
+	OrderManager.prototype = {
+	    addItem: function addItem(orderItems, newItem, input, arrayRef) {
+	        var itemsObject = orderItems[0];
+	        var sizeRef = parseInt(arrayRef) || 0;
+	        var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
+	        var price = newItem.prices[sizeRef];
+	        var qty = parseInt(input) || 1;
+	        if (itemsObject[ref]) {
+	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
+	        }
+	        var total = parseFloat(price * qty);
+	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
+	    },
+	    removeItem: function removeItem(orderItems, key, input) {
+	        var itemsObject = orderItems[0];
+	        console.log(input);
+	        var currentTotal = parseFloat(itemsObject[key].total);
+	        var origQty = itemsObject[key].qty;
+	        var price = currentTotal / origQty;
+	        var qty = origQty - (parseInt(input) || 1);
+	        var id = itemsObject[key].id;
+	        if (qty < 1) {
+	            delete itemsObject[key];
+	            var _returnArray = [itemsObject];
+	            return _returnArray;
+	        }
+	        var total = parseFloat(price * qty);
+	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
+	    },
+	    addPayment: function addPayment(orderItems, payment) {
+	        // if(orderItems[0][payment.name]){
+	        //     payment["name"] = orderItems[0][payment.name].name+ 1
+	        // }
+	        // orderItems[0][payment.name] = payment
+	        // return orderItems
+	
+	        var itemsObject = orderItems[0];
+	        var ref = payment.name;
+	        var oldTotal = 0;
+	        var qty = parseInt(payment.qty);
+	        if (itemsObject[ref]) {
+	            qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
+	            oldTotal = itemsObject[ref].total;
+	        }
+	        var total = parseFloat(payment.total + oldTotal);
+	        itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
+	        var returnArray = [itemsObject];
+	        return returnArray;
+	    }
+	};
+	
+	module.exports = OrderManager;
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var React = __webpack_require__(1);
+	
+	var TableManager = function TableManager() {};
+	
+	TableManager.prototype = {
+	  manageTable: function manageTable(tables, table, order) {
+	    console.log("table", tables[table]);
+	    console.log("order", Object.keys(order[0]));
+	    console.log(tables[table] == !Object.keys(order[0]));
+	    console.log(tables[table].length);
+	
+	    if (!tables[table].length > 0 && Object.keys(order[0]).length > 0) {
+	      console.log("assign order to table");
+	      tables[table] = order;
+	      return ["tables", tables];
+	    }
+	    if (tables[table].length > 0 && !Object.keys(order[0]).length > 0) {
+	      console.log("assign table to order");
+	      order = tables[table];
+	      tables[table] = [];
+	      return ["order", order, tables];
+	    }
+	
+	    return false;
+	  }
+	};
+	
+	module.exports = TableManager;
+
+/***/ },
+/* 179 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	_ = __webpack_require__(161);
+	
+	var ItemManager = function ItemManager() {};
+	
+	ItemManager.prototype = {
+	      getItems: function getItems(result) {
+	            var items = [];
+	            if (result[0].types) {
+	                  result[0].types.forEach(function (type) {
+	                        type.subtypes.forEach(function (subtype) {
+	                              items = items.concat(subtype.items);
+	                        });
+	                  });
+	            }
+	            if (result[0].subtypes) {
+	                  result[0].subtypes.forEach(function (subtype) {
+	                        items = items.concat(subtype.items);
+	                  });
+	            }
+	            if (!result[0].types && !result[0].subtypes) {
+	                  items = result[0].items;
+	            }
+	
+	            var finalItems = this.prepareItems(items);
+	            return finalItems;
+	      },
+	      prepareItems: function prepareItems(items) {
+	            var parsedItems = [];
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+	
+	            try {
+	                  for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                        var item = _step.value;
+	
+	                        var parseItem = item;
+	                        parseItem.sizes = JSON.parse(item.sizes);
+	                        parseItem.prices = JSON.parse(item.prices);
+	                        parsedItems.push(parseItem);
+	                  }
+	            } catch (err) {
+	                  _didIteratorError = true;
+	                  _iteratorError = err;
+	            } finally {
+	                  try {
+	                        if (!_iteratorNormalCompletion && _iterator.return) {
+	                              _iterator.return();
+	                        }
+	                  } finally {
+	                        if (_didIteratorError) {
+	                              throw _iteratorError;
+	                        }
+	                  }
+	            }
+	
+	            return parsedItems;
+	      },
+	      getCategories: function getCategories(items) {
+	            console.log(items);
+	            var divisions = [];
+	            var types = [];
+	            var subtypes = [];
+	            for (var a in items) {
+	                  divisions.push(items[a].name);
+	                  for (var b in items[a].types) {
+	                        types.push(items[a].types[b].name);
+	                        for (var c in items[a].types[b].subtypes) {
+	                              subtypes.push(items[a].types[b].subtypes[c].name);
+	                        }
+	                  }
+	            }
+	
+	            var categories = { divisions: divisions, types: types, subtypes: subtypes };
+	            console.log("divisions", categories);
+	            return categories;
+	      }
+	};
+	
+	module.exports = ItemManager;
+
+/***/ },
+/* 180 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var ButtonColumn = React.createClass({
+	  displayName: 'ButtonColumn',
+	  onPayClick: function onPayClick() {
+	    this.props.payToggle(this.props.markerID);
+	  },
+	  onSplitClick: function onSplitClick() {
+	    this.props.splitClick(this.props.markerID);
+	  },
+	  onTableClick: function onTableClick() {
+	    this.props.tableToggle(this.props.markerID);
+	  },
+	  onLogout: function onLogout() {
+	    this.props.logout(this.props.markerID);
+	  },
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'button-column' },
+	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/save.png' }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick })
+	    );
+	  }
+	});
+	
+	module.exports = ButtonColumn;
+
+/***/ },
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var ReactCSSTransitionGroup = __webpack_require__(166);
+	
+	var TableWindow = React.createClass({
+	  displayName: 'TableWindow',
+	  tableClick: function tableClick(event) {
+	    this.props.onClick(event.target.id, this.props.markerID);
+	  },
+	  render: function render() {
+	
+	    if (!this.props.display) {
+	      return React.createElement(
+	        'div',
+	        { className: 'hidden' },
+	        ' '
+	      );
+	    }
+	
+	    var data = this.props.tables;
+	    var tables = [];
+	    var className = null;
+	
+	    for (var key in data) {
+	      if (data[key].length > 0) {
+	        className = "table-taken";
+	      } else {
+	        className = "table-free";
+	      }
+	      tables.push(React.createElement(
+	        'div',
+	        { className: className, id: key, key: key, onClick: this.tableClick },
+	        key
+	      ));
+	    }
+	
+	    return React.createElement(
+	      ReactCSSTransitionGroup,
+	      {
+	        transitionName: 'background',
+	        transitionAppear: true,
+	        transitionAppearTimeout: 500,
+	        transitionEnterTimeout: 500,
+	        transitionLeaveTimeout: 500
+	      },
+	      React.createElement(
+	        'div',
+	        { className: 'table-show' },
+	        tables
+	      )
+	    );
+	  }
+	});
+	
+	module.exports = TableWindow;
+
+/***/ },
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38767,7 +38736,7 @@
 	module.exports = MenuTray;
 
 /***/ },
-/* 184 */
+/* 183 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -38832,13 +38801,67 @@
 	module.exports = APIRunner;
 
 /***/ },
-/* 185 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	module.exports = __webpack_require__(3);
 
+
+/***/ },
+/* 185 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var Item = __webpack_require__(164);
+	
+	var ExpandedItem = React.createClass({
+	    displayName: 'ExpandedItem',
+	    onMouseUp: function onMouseUp(event) {
+	        console.log(event.target);
+	        var arrayRef = this.props.items[event.target.id] || 0;
+	        if (arrayRef != 0) {
+	            arrayRef = arrayRef.size;
+	        }
+	        console.log("Array", arrayRef);
+	        this.props.onMouseUp(event, arrayRef);
+	    },
+	    render: function render() {
+	        var _this = this;
+	
+	        console.log(this.props.items[0].name);
+	
+	        var nodes = this.props.items.map(function (item, index) {
+	            return React.createElement(
+	                'li',
+	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp, onClick: _this.props.onClick },
+	                React.createElement(
+	                    'p',
+	                    null,
+	                    item.name,
+	                    ' (',
+	                    item.sizeDescriptor,
+	                    ')'
+	                )
+	            );
+	        });
+	
+	        return React.createElement(
+	            'div',
+	            { className: 'item-button-expanded' },
+	            React.createElement(
+	                'ul',
+	                { className: 'subItem-container' },
+	                nodes
+	            )
+	        );
+	    }
+	});
+	
+	module.exports = ExpandedItem;
 
 /***/ }
 /******/ ]);

@@ -4,9 +4,9 @@ const Infowindow= (props) =>(
 
     <div className='info-window'>
     <div><h6>{props.user}</h6></div>
-    <div><h6>{props.input}</h6></div>
-    <div></div>
-    <div></div>
+    <div><h5>{props.input}</h5></div>
+    <div><h5>{props.date}</h5></div>
+    <div><h5>{props.time}</h5></div>
     <h4 id='order-total'>Total: {props.total.toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</h4>
     </div>
 )

@@ -1,29 +1,35 @@
 const React = require('react')
 const Item = require('./Item')
 
-const ExpandedItem= function(props){
-    console.log(props.items[0].name)
+const ExpandedItem= React.createClass({
+    onMouseUp(event){
+        console.log(event.target)
+        let arrayRef= this.props.items[event.target.id] || 0
+        if(arrayRef != 0){arrayRef= arrayRef.size}
+        console.log("Array",arrayRef)
+        this.props.onMouseUp(event, arrayRef)
 
-    const nodes = props.items.map((item, index)=>(
-             <div className="subItem" key={index} markerID={props.markerID} index={index} onClick={props.onClick}>{item.name} </div> 
-            ))
+    },
+
+    render(){
+      console.log(this.props.items[0].name)
+
+      const nodes = this.props.items.map((item, index)=>(
+               <li className="subItem" key={"sub"+ index} id={index} value={this.props.value} markerID={this.props.markerID} index={index} onMouseUp={this.onMouseUp} onClick={this.props.onClick}><p>{item.name} ({item.sizeDescriptor})</p></li> 
+              ))
 
 
-    return(
-      <li className='item-button-expanded' onMouseUp={props.onMouseUp}>
-      <div className="subItem-container">
-      {nodes}
-      <div className= "subItem">test</div>
-      <div className= "subItem">test</div>
-      <div className= "subItem">test</div>
-      <div className= "subItem">ITEM</div>
-      <div className= "subItem">test</div>
-      <div className= "subItem">test</div>
-      <div className= "subItem">test</div>
-      <div className= "subItem">test</div>
+      return(
+        <div className='item-button-expanded'>
+        <ul className="subItem-container">
+        {nodes}
+        </ul>
       </div>
-    </li>
-    )
-}
+      )
+  }
+
+
+})
+    
 
 module.exports = ExpandedItem

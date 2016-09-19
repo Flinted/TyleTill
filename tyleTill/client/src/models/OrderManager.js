@@ -4,10 +4,11 @@ const OrderManager = ()=> {}
 
 OrderManager.prototype = {
 
-  addItem(orderItems, newItem, input){
+  addItem(orderItems, newItem, input, arrayRef){
       let itemsObject = orderItems[0]
-      const ref = newItem.name+"("+newItem.sizes[0] +")"
-      const price = newItem.prices[0] 
+      const sizeRef = parseInt(arrayRef) || 0
+      const ref = newItem.name+"("+newItem.sizes[sizeRef] +")"
+      const price = newItem.prices[sizeRef] 
       let qty = parseInt(input) || 1
       if(itemsObject[ref]){ qty = itemsObject[ref].qty + (parseInt(input) || 1) } 
       const total = parseFloat(price * qty)

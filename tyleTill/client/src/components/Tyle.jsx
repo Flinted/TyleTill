@@ -22,6 +22,8 @@ const Tyle = React.createClass({
       items: [], 
       categories: {},
       users:[],
+      time:'',
+      date:'',
       tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
       primaryDisplayItems:[],
       primaryLogin: true,
@@ -57,6 +59,8 @@ const Tyle = React.createClass({
     APIpromise.then(function(result){
       const itemManager = new ItemManager
       const categories = itemManager.getCategories(result)
+      this.clock()
+      setInterval(this.clock,60000)
       console.log(categories)
       console.log(result)
       const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items)
@@ -64,6 +68,18 @@ const Tyle = React.createClass({
     }.bind(this), function(err){
       console.log(err)
     })
+  },
+
+  clock(){    
+      const newTime = new Date();
+      const month = newTime.getUTCMonth()+1
+      const day = newTime.getUTCDate()
+      const hour = newTime.getHours()
+      let minutes = newTime.getMinutes()
+      if(minutes.toString().length === 1){ minutes = "0" + minutes.toString()}
+      const displayTime = hour + ":" + minutes
+      const displayDate = day+"/"+month
+      this.setState({time: displayTime, date:displayDate})
   },
 
   onItemClick(event, markerID, arrayRef){
@@ -271,6 +287,8 @@ const Tyle = React.createClass({
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
                   <div id='sidebar'>
                         <Infowindow 
+                              time={this.state.time}
+                              date={this.state.date} 
                               input={this.state.primaryInput} 
                               total={this.state.primaryOrderTotal} 
                               user={this.state.primaryUser}
@@ -322,6 +340,8 @@ const Tyle = React.createClass({
             <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
             <div id='sidebar'>
                 <Infowindow 
+                    time={this.state.time}
+                    date={this.state.date} 
                     input={this.state.secondaryInput} 
                     total={this.state.secondaryOrderTotal} 
                     user={this.state.secondaryUser}
@@ -370,7 +390,9 @@ const Tyle = React.createClass({
             <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick}/>
             <div id='sidebar'>
-                <Infowindow 
+                <Infowindow
+                    time={this.state.time}
+                    date={this.state.date} 
                     input={this.state.primaryInput} 
                     total={this.state.primaryOrderTotal} 
                     user={this.state.primaryUser}

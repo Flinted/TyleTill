@@ -12,16 +12,16 @@ const Item = React.createClass({
 
   startTimer(){
     console.log("down")
-    this.state.timer = setTimeout(this.toggleExpanded, 500)
+    this.state.timer = setTimeout(this.toggleExpanded, 200)
   },
 
-  stopTimer(event){
+  stopTimer(event, arrayRef){
     console.log("up")
     clearInterval(this.state.timer)
     if(this.state.expanded){
       this.toggleExpanded()
     }
-    this.onClick(event)
+    this.onClick(event, arrayRef)
   },
 
   toggleExpanded(){
@@ -29,25 +29,28 @@ const Item = React.createClass({
         this.setState({expanded:false})
       }else{
         const links = this.getLinks()
-        this.setState({expanded:true, linkItems:[{name: "hello"}]})
+        this.setState({expanded:true, linkItems:links})
       }
   },
 
   getLinks(){
-      let itemArray =[
-      {name:"" ,size:'' ,price:''},
-      {name:"" ,size:'' ,price:''},
-      {name:"" ,size:'' ,price:''},
-      {name:"" ,size:'' ,price:''},
-      {name:this.props.name, value: this.props.index, size:this.props.sizes[0] ,price:this.props.prices[0]},
-      {name:"" ,size:'' ,price:''},
-      {name:"" ,size:'' ,price:''},
-      {name:"" ,size:'' ,price:''},
-      {name:"" ,size:'' ,price:''},
-      ]
       const sizes = this.props.sizes
-      const prices = this.props.prices
+      let itemArray =[
+      {name:"" ,size:'' , sizeDescriptor:""},
+      {name:"" ,size:'' , sizeDescriptor:""},
+      {name:"" ,size:'' , sizeDescriptor: ""},
+      {name:"" ,size:'' , sizeDescriptor: ""},
+      {name:this.props.name, value: this.props.index, size: "0", sizeDescriptor:sizes[0]},
+      {name:"" ,size:'' , sizeDescriptor: ""},
+      {name:"" ,size:'' , sizeDescriptor: ""},
+      {name:"" ,size:'' , sizeDescriptor: ""},
+      {name:"" ,size:'' , sizeDescriptor: ""},
+      ]
       console.log(sizes)
+      for(let size in sizes){
+        itemArray[size]={name: this.props.name, sizeDescriptor: sizes[size] ,value: this.props.index, size: size}
+      }
+      return itemArray
 
   },
 
