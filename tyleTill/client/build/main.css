@@ -8,7 +8,8 @@
 html{
   background-image: url("/images/6pxtile.png");
   background-repeat: repeat;
-  background-color: #43474A;
+  background-color: black;
+  /*background-color: #43474A;*/
   height: 100%;
   width:100%;
 }
@@ -116,17 +117,16 @@ margin-right: 0px !important;
 .item-window{
   float: right;
   width: 65%;
-  max-height:70%;
-  margin-right: 80px;
+  max-height:80%;
   display: inline-flex;
   flex-wrap: wrap;
   overflow-y: scroll;
-  padding: 70px 0px 70px 70px;
+  padding: 70px 70px 70px 70px;
 }
 
 .item-window-cash-display{
   float: right;
-  width: 80%;
+  width: 95%;
   max-height:80%;
   margin-right: 5px;
   display: inline-flex;
@@ -181,6 +181,7 @@ margin-right: 0px !important;
   width: 110px;
   height: 100%;
   display: inline-block;
+  z-index:7000;
   margin-left: -75px;
   text-align: center;
   position: relative;
