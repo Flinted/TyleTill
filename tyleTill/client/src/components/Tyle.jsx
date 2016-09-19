@@ -1,12 +1,15 @@
 const React = require('react')
 const Orderwindow = require('./sidebar/Orderwindow')
 const Itemwindow = require('./Itemwindow')
+const Login = require('./Login')
 const Infowindow = require('./sidebar/Infowindow')
 const Cashwindow = require('./sidebar/Cashwindow')
 const CashManager = require('../models/CashManager')
 const OrderManager = require('../models/OrderManager')
+const TableManager = require('../models/TableManager')
 const ItemManager = require('../models/ItemManager')
 const ButtonColumn =require('./ButtonColumn')
+const TableWindow =require('./TableWindow')
 const MenuTray = require('./MenuTray')
 const APIRunner = require('../models/APIRunner')
 _=require('lodash')
@@ -18,19 +21,22 @@ const Tyle = React.createClass({
       items: [], 
       categories: {},
       tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
-      tableShow:false,
       primaryDisplayItems:[],
+      primaryLogin: true,
       primaryUser: "Chris",
       primaryOrderItems:[{}],
       primaryOrderTotal:0.00,
       primaryInput:'',
       primaryCashDisplay: false,
+      primaryTableShow:false,
       secondaryUser: "Renwick",
+      secondaryLogin: false,
       secondaryOrderItems:[{}],
       secondaryDisplayItems:[],
       secondaryOrderTotal:0.00,
       secondaryInput:'',
       secondaryCashDisplay: false,
+      secondaryTableShow:false,
       split: false
 
     }
@@ -66,8 +72,9 @@ const Tyle = React.createClass({
     let newOrderArray = ordermanager.addItem(currentOrder, item, input)
     const cashmanager = new CashManager
     const total = cashmanager.total(newOrderArray)
+    const temp = "secondaryOrderItems"
     if(markerID === 2){
-      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
+      this.setState({temp: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
     }else{
       this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
     }
@@ -193,6 +200,40 @@ const Tyle = React.createClass({
       },
 
       onTableToggle(markerID){
+        if(markerID===2){
+            if(this.state.secondaryTableShow){
+                this.setState({secondaryTableShow:false})
+            }else{
+                this.setState({secondaryTableShow:true}) 
+            } 
+        }else{
+          if(this.state.primaryTableShow){
+              this.setState({primaryTableShow:false})
+          }else{
+              this.setState({primaryTableShow:true}) 
+          } 
+        }
+      },
+
+      tableClick(table, markerID){
+        console.log("TABLE CLICKED")
+        let order = this.state.primaryOrderItems  
+        if(markerID===2){order = this.state.secondaryOrderItems }
+        const tableManager = new TableManager
+      console.log("order", order)
+        const result = tableManager.manageTable(this.state.tables, table, order)
+        console.log("table result", result)
+        if(!result){
+            console.log("CANNOT DO THIS!")
+        }else if(result[0] === "tables"){
+            this.setState({tables: result[1]})
+        }else{
+          if(markerID === 2){
+                this.setState({secondaryOrderItems: result[1]})
+          }else{
+                this.setState({primaryOrderItems: result[1]})
+          }
+        }
 
       },
 
@@ -201,6 +242,7 @@ const Tyle = React.createClass({
           return(
             <div className='tyle-container'>
             <div className="primary">
+            <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
                   <div id='sidebar'>
                         <Infowindow 
                               input={this.state.primaryInput} 
@@ -242,6 +284,7 @@ const Tyle = React.createClass({
             <div id="divider"/>
 
             <div className="secondary">
+            <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
             <div id='sidebar'>
                 <Infowindow 
                     input={this.state.secondaryInput} 
@@ -285,6 +328,8 @@ const Tyle = React.createClass({
 
           return(
             <div className='tyle-container'>
+            <Login display={this.state.primaryLogin}/>
+            <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick}/>
             <div id='sidebar'>
                 <Infowindow 
                     input={this.state.primaryInput} 

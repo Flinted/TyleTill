@@ -17,11 +17,11 @@ const ButtonColumn= React.createClass({
       render(){
         return  (
               <div className='button-column'>
-              <button className='menu-button' onClick={this.onSplitClick}>Toggle Split</button>
-              <button className='menu-button' onClick={this.onTableClick}>Tables</button>
-              <button className='menu-button'>Orders</button>
-              <button className='menu-button'>Log Out</button>
-              <button className='menu-button' onClick={this.onPayClick}>Pay Screen</button>
+              <image className='menu-button' src= '/images/split.png' onClick={this.onSplitClick}/>
+              <image className='menu-button' src= '/images/table.png' onClick={this.onTableClick}/>
+              <image className='menu-button' src= '/images/save.png'/>
+              <image className='menu-button' src= '/images/logout.png'/>
+              <image className='menu-button' src= '/images/pay.png' onClick={this.onPayClick}/>
               </div>
           )
 

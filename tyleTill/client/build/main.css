@@ -39,15 +39,14 @@ body{
   border-right: 3px solid red;
   border-left: 3px solid red;
   background-color: rgba(0,0,0,0.4);
-
 }
 
 
-.primary div:nth-child(4){
+.primary div:nth-child(5){
 margin-right: 0px !important;
 }
 
-.secondary div:nth-child(4){
+.secondary div:nth-child(5){
   margin-right: 0px !important;
 }
 
@@ -76,15 +75,22 @@ margin-right: 0px !important;
   margin-top: 70px;
   float: right;
   width: 51%;
-  height:80%;
+  max-height:80%;
   text-align: center;
   margin-right: 80px;
   margin-right: 5px;
+  display: inline-flex;
+  flex-wrap: wrap;
   overflow-y: scroll;
 }
 
 .item-window-split ul:nth-child(2){
-  width: 160px;
+  width: 285px !important;
+  margin-right: 0px !important;
+  margin-left: 105px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  overflow-y: scroll;
 }
 /*END SPLIT SCREEN*/
 
@@ -109,15 +115,20 @@ margin-right: 0px !important;
   margin-top: 70px;
   float: right;
   width: 70%;
-  height:80%;
+  max-height:80%;
   margin-right: 80px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  overflow-y: scroll;
 }
 
 .item-window-cash-display{
   float: right;
   width: 80%;
-  height:80%;
+  max-height:80%;
   margin-right: 5px;
+  display: inline-flex;
+  flex-wrap: wrap;
 }
 
 .button-column{
@@ -145,7 +156,7 @@ margin-right: 0px !important;
 
 }
 .cash-display{
-  width: 150px;
+  width: 110px;
   height: 100%;
   display: inline-block;
   margin-left: -10px;
@@ -154,7 +165,7 @@ margin-right: 0px !important;
 
 .item-window-split .cash-display{
   position: fixed;
-  margin-left: -160px;
+  /*margin-left: -170px;*/
 }
 
 /*BUTTONS */
@@ -172,7 +183,7 @@ margin-right: 0px !important;
 }
 
 .pay-button{
-    width:140px;
+    width:95px;
     height:70px;
     font-size: 1em;
     color:black;
@@ -197,20 +208,19 @@ margin-right: 0px !important;
   font-size: 1em;
   color:black;
   background-color: #779ECB;
-  margin: 1px 1px 1px 1px;
+  margin: 0px 1px 2px 1px;
   border: 2px solid black;
 }
 
 .item-button{
   text-align: center;
-  width:70px;
-  height:70px;
+  width:90px;
+  height:66px;
   background-color:   #DEA5A4;
   border: 2px solid black;  
-  margin: 0px 2px 4px 2px;
+  margin: 0px 1px 2px 1px;
   list-style: none;
   text-align: center;
-  display: inline-flex;
 }
 
 .subItem-container{
@@ -261,7 +271,7 @@ margin-right: 0px !important;
   display: inline-flex;
 }
 
-.item-button:hover{
+.item-button:hover, .table-taken:hover, .table-free:hover, .menu-button:hover, .menu-item:hover{
   border: 2px solid white;  
 
 }
@@ -271,6 +281,7 @@ margin-right: 0px !important;
   color: black;
   font-size: 0.8em;
   pointer-events: none;
+  word-break: break-all;
   }
 
 /*ORDER WINDOW*/
@@ -319,4 +330,48 @@ margin-left: 5px;
 .order-price{
   float:right;
   pointer-events: none;
+}
+
+/*LOGIN*/
+.login-show{
+  width: 100%;
+  height: 100%;
+  background-color: red;
+
+}
+/*TABLES*/
+.hidden{
+  display: none;
+}
+
+.table-show{
+  z-index:5000;
+  position: absolute;
+  background-color: rgba(0,0,0,0.5);
+  border: 2px solid black;  
+  overflow: scroll;
+  margin-left: 90px;
+  margin-top: 70px;
+  width: 20%;
+  height: 45%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.table-taken, .table-free{
+  width: 70px;
+  height: 70px;
+  border: 2px solid black;  
+  margin: 2px 2px 2px 2px;
+  color: black;
+}
+
+.table-taken{  
+  background-color: #ffb347;
+}
+
+.table-free{
+  background-color: #BDECB6;
 }
