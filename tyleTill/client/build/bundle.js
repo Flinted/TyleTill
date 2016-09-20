@@ -37301,56 +37301,44 @@
 	        this.props.onClick(event.target.value, this.props.markerID);
 	    },
 	    render: function render() {
-	        return (
-	            // <ReactCSSTransitionGroup
-	            //              transitionName="background"
-	            //              transitionAppear={true} 
-	            //              transitionAppearTimeout={500}
-	            //              transitionEnterTimeout={500}
-	            //              transitionLeaveTimeout={500}
-	            // >
+	        return React.createElement(
+	            'div',
+	            { className: 'cash-display' },
 	            React.createElement(
-	                'div',
-	                { className: 'cash-display' },
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: 'discount' },
-	                    'Discount'
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: 'card' },
-	                    'Card'
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: 'mobile' },
-	                    'Mobile Pay'
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: '20' },
-	                    '£20'
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: '10' },
-	                    '£10'
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: '5' },
-	                    '£5'
-	                ),
-	                React.createElement(
-	                    'button',
-	                    { onClick: this.onClick, className: 'pay-button', value: 'cash' },
-	                    'Cash'
-	                )
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: 'discount' },
+	                'Discount'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: 'card' },
+	                'Card'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: 'mobile' },
+	                'Mobile Pay'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: '20' },
+	                '£20'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: '10' },
+	                '£10'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: '5' },
+	                '£5'
+	            ),
+	            React.createElement(
+	                'button',
+	                { onClick: this.onClick, className: 'pay-button', value: 'cash' },
+	                'Cash'
 	            )
-	            // </ReactCSSTransitionGroup>
-	
-	
 	        );
 	    }
 	});
@@ -38365,7 +38353,7 @@
 	            React.createElement(
 	                'h5',
 	                null,
-	                'Input:'
+	                'Input'
 	            ),
 	            React.createElement(
 	                'h5',
@@ -38379,7 +38367,7 @@
 	            React.createElement(
 	                'h5',
 	                null,
-	                'Last Change:'
+	                'Last Change'
 	            ),
 	            React.createElement(
 	                'h5',

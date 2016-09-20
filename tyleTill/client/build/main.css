@@ -62,11 +62,12 @@ body{
 
 .item-window-cash-display{
   float: right;
-  width: 95%;
+  width: 70%;
   max-height:80%;
   overflow-y: scroll;
   display: inline-flex;
   flex-wrap: wrap;
+  padding: 0px 70px 70px 0px;
 }
 
 .button-column{
@@ -146,6 +147,7 @@ body{
   padding:10px 10px 10px 10px;
   font-size: 1em;
   color:black;
+  -webkit-user-select: none;
   background-color: #779ECB;
   margin: 0px 1px 2px 1px;
   border: 2px solid black;
