@@ -39,6 +39,21 @@ prepareItems(items){
   return parsedItems
 },
 
+prepareSubtypes(items){
+    const subtypes = items[0].subtypes
+    let returnArray = []
+    for(let subtype of subtypes){
+        returnArray.push(subtype.name)
+    }
+    return returnArray
+},
+
+
+getTypes(items){
+    console.log(this.getCategories(items).types)
+    return this.getCategories(items).types
+},
+
 getCategories(items){
     console.log(items)
     let divisions = []

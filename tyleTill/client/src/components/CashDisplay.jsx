@@ -10,13 +10,13 @@ const CashDisplay = React.createClass({
 
     render(){
         return(
-        <ReactCSSTransitionGroup
-                     transitionName="background"
-                     transitionAppear={true} 
-                     transitionAppearTimeout={500}
-                     transitionEnterTimeout={500}
-                     transitionLeaveTimeout={500}
-        >
+        // <ReactCSSTransitionGroup
+        //              transitionName="background"
+        //              transitionAppear={true} 
+        //              transitionAppearTimeout={500}
+        //              transitionEnterTimeout={500}
+        //              transitionLeaveTimeout={500}
+        // >
             <div className='cash-display'>
             <button onClick={this.onClick} className="pay-button" value='discount'>Discount</button>
             <button onClick={this.onClick} className="pay-button" value='card'>Card</button>
@@ -26,7 +26,7 @@ const CashDisplay = React.createClass({
             <button onClick={this.onClick} className="pay-button" value='5'>£5</button>
             <button onClick={this.onClick} className="pay-button" value='cash'>Cash</button>
             </div>
-            </ReactCSSTransitionGroup>
+            // </ReactCSSTransitionGroup>
 
 
 

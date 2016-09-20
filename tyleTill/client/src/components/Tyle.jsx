@@ -20,27 +20,35 @@ const Tyle = React.createClass({
   getInitialState(){
     return {
       items: [], 
-      categories: {},
+      categories: [],
       users:[],
+      orders:[],
+      tillTotal:[],
       time:'',
       date:'',
       tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
       primaryDisplayItems:[],
+      primarySubCategories:{},
       primaryLogin: true,
+      primaryChange:'',
       primaryUser: "",
       primaryOrderItems:[{}],
       primaryOrderTotal:0.00,
       primaryInput:'',
       primaryCashDisplay: false,
       primaryTableShow:false,
+      primarySubMenuShow: "hide-sub",
       secondaryUser: "",
       secondaryLogin: true,
+      secondaryChange:'',
       secondaryOrderItems:[{}],
       secondaryDisplayItems:[],
+      secondarySubCategories:{},
       secondaryOrderTotal:0.00,
       secondaryInput:'',
       secondaryCashDisplay: false,
       secondaryTableShow:false,
+      secondarySubMenuShow: "hide-sub",
       split: false
 
     }
@@ -55,14 +63,11 @@ const Tyle = React.createClass({
       users= result
     })
     const APIpromise = runner.run("GET", "http://localhost:5000/api/divisions")
-
     APIpromise.then(function(result){
       const itemManager = new ItemManager
-      const categories = itemManager.getCategories(result)
+      const categories = itemManager.getTypes(result)
       this.clock()
       setInterval(this.clock,60000)
-      console.log(categories)
-      console.log(result)
       const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items)
       this.setState({users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
     }.bind(this), function(err){
@@ -123,10 +128,8 @@ const Tyle = React.createClass({
 
   menuOptionClick(selected, markerID){
       const runner = new APIRunner
-      let url = "http://localhost:5000/api/"
-      if(_.includes(this.state.categories["divisions"], selected)){url += "divisions/find/"+selected}
-      if(_.includes(this.state.categories["types"], selected)){url += "types/find/"+selected}
-      if(_.includes(this.state.categories["subtypes"], selected)){url += "subtypes/find/"+selected}
+      let url = "http://localhost:5000/api/types/find/"+selected
+      console.log(url)
       const promise = runner.run("GET",url)
       promise.then(function(result){
         const itemManager = new ItemManager
@@ -136,6 +139,38 @@ const Tyle = React.createClass({
         }else{
           this.setState({primaryDisplayItems: finalItems})
         }
+      }.bind(this))
+  },
+
+  subMenuOptionClick(selected, markerID){
+          let url = "http://localhost:5000/api/subtypes/find/"+selected
+
+        const runner = new APIRunner
+          const promise = runner.run("GET",url)
+          promise.then(function(result){
+            const itemManager = new ItemManager
+            const finalItems = itemManager.getItems(result)
+            if(markerID===2){
+              this.setState({secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub"})
+            }else{
+              this.setState({primaryDisplayItems: finalItems, primarySubMenuShow: "hide-sub"})
+            }
+          }.bind(this))
+  },
+
+  getSubItems(selected, markerID){
+      this.setState({primarySubMenuShow: "sub"})
+      let url = "http://localhost:5000/api/types/find/"+ selected
+      const apiRunner = new APIRunner
+      const itemManager = new ItemManager
+      apiRunner.run("GET", url).then(function(result){
+        console.log(result[0].subtypes)
+        const subtypes = itemManager.prepareSubtypes(result)
+        if(markerID === 2){
+        this.setState({secondarySubCategories: subtypes, secondarySubMenuShow: "sub"})
+        }else{
+        this.setState({primarySubCategories: subtypes, primarySubMenuShow: "sub"})
+      }
       }.bind(this))
   },
 
@@ -162,7 +197,6 @@ const Tyle = React.createClass({
       },
 
       onSplitClick( markerID){
-        console.log("Splitting")
         if(!this.state.split){
           this.setState({split: true})
         }else{
@@ -199,12 +233,32 @@ const Tyle = React.createClass({
           const newPayment = cashManager.checkPayAmount(selected, input, oldTotal)
           const newOrderArray = orderManager.addPayment(items, newPayment)
           const total = cashManager.total(newOrderArray)
+          if(total <= 0.00){
+            this.cashOff(cashManager, newOrderArray, markerID)
+            return
+          }
           if(markerID === 2){
             this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
           }else{
             this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
           }
       },
+
+
+      cashOff(cashManager, newOrderArray, markerID){
+          console.log("CASH OFF")
+          let newOrders = this.state.orders
+          const entry = cashManager.getOrderInfo(newOrderArray)
+          entry["id"]= newOrders.length
+          newOrders.push(entry)
+          console.log(newOrders)
+          if(markerID=== 2){
+              this.setState({secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput:'', secondaryChange: entry.change, secondaryLogin:true})
+          }else{
+              this.setState({primaryOrderItems:[{}], primaryOrderTotal: 0.00, primaryInput:'', primaryChange: entry.change, primaryLogin:true})
+          }
+      },  
+
 
       onPayToggle(markerID){
           if(markerID === 2){
@@ -241,10 +295,10 @@ const Tyle = React.createClass({
       tableClick(table, markerID){
         let order = this.state.primaryOrderItems  
         if(markerID===2){order = this.state.secondaryOrderItems }
-        const tableManager = new TableManager
+          const tableManager = new TableManager
         const result = tableManager.manageTable(this.state.tables, table, order)
         if(!result){
-            console.log("CANNOT DO THIS!")
+          console.log("CANNOT DO THIS!")
         }else if(result[0] === "tables"){
           if(markerID === 2){
             this.setState({secondaryOrderItems: [{}],secondaryOrderTotal:0.00,tables: result[1]})
@@ -253,9 +307,9 @@ const Tyle = React.createClass({
           }
         }else{
           if(markerID === 2){
-                this.setState({secondaryOrderItems: result[1], tables:result[2]})
+            this.setState({secondaryOrderItems: result[1], tables:result[2]})
           }else{
-                this.setState({primaryOrderItems: result[1], tables:result[2]})
+            this.setState({primaryOrderItems: result[1], tables:result[2]})
           }
         }
 
@@ -275,7 +329,6 @@ const Tyle = React.createClass({
         }else{
           this.setState({primaryUser:"", primaryLogin:true, primaryOrderItems:[{}], primaryOrderTotal:0.00})
         }
-
       },
 
       render(){
@@ -283,7 +336,7 @@ const Tyle = React.createClass({
           return(
             <div className='tyle-container'>
             <div className="primary">
-            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users}/>
+            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users} change={this.state.primaryChange}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
                   <div id='sidebar'>
                         <Infowindow 
@@ -292,6 +345,7 @@ const Tyle = React.createClass({
                               input={this.state.primaryInput} 
                               total={this.state.primaryOrderTotal} 
                               user={this.state.primaryUser}
+                              change={this.state.primaryChange}
                         />
                         <Orderwindow 
                               markerID={1} 
@@ -320,8 +374,15 @@ const Tyle = React.createClass({
                         onLongClick={this.onLongClick}
                     />
                     <MenuTray 
+                        subCategories={this.state.primarySubCategories} 
+                        show={this.state.primarySubMenuShow}
+                        onClick={this.subMenuOptionClick} 
+                        markerID={1}
+                    />
+                    <MenuTray 
                         categories={this.state.categories} 
-                        onClick={this.menuOptionClick} 
+                        onClick={this.menuOptionClick}
+                        onLongClick={this.getSubItems}
                         markerID={1}
                     />
             </div>
@@ -336,7 +397,7 @@ const Tyle = React.createClass({
                       transitionEnterTimeout={500}
                       transitionLeaveTimeout={500}
                    >
-            <Login onLogin={this.onLogin} display={this.state.secondaryLogin} markerID={2} users={this.state.users}/>
+            <Login onLogin={this.onLogin} display={this.state.secondaryLogin} markerID={2} users={this.state.users} change={this.state.secondaryChange}/>
             <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
             <div id='sidebar'>
                 <Infowindow 
@@ -345,6 +406,8 @@ const Tyle = React.createClass({
                     input={this.state.secondaryInput} 
                     total={this.state.secondaryOrderTotal} 
                     user={this.state.secondaryUser}
+                    change={this.state.secondaryChange}
+
                 />
                 <Orderwindow 
                     markerID={2} 
@@ -372,22 +435,28 @@ const Tyle = React.createClass({
                 onClick={this.onItemClick} 
                 onLongClick={this.onLongClick}
             />
-           <MenuTray 
-              categories={this.state.categories} 
-              onClick={this.menuOptionClick} 
-              markerID={2}
-           />
+         <MenuTray 
+             subCategories={this.state.secondarySubCategories} 
+             show={this.state.secondarySubMenuShow}
+             onClick={this.subMenuOptionClick} 
+             markerID={2}
+         />
+         <MenuTray 
+             categories={this.state.categories} 
+             onClick={this.menuOptionClick} 
+             onLongClick={this.getSubItems}
+             markerID={2}
+         />
            </ReactCSSTransitionGroup>
             </div>
                    
-
             </div>
             )
         }else{
 
           return(
             <div className='tyle-container'>
-            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users}/>
+            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users} change={this.state.primaryChange}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick}/>
             <div id='sidebar'>
                 <Infowindow
@@ -396,6 +465,7 @@ const Tyle = React.createClass({
                     input={this.state.primaryInput} 
                     total={this.state.primaryOrderTotal} 
                     user={this.state.primaryUser}
+                    change={this.state.primaryChange}
                 />
                 <Orderwindow 
                     markerID={1} 
@@ -423,8 +493,15 @@ const Tyle = React.createClass({
                 onLongClick={this.onLongClick}
             />
             <MenuTray 
+                subCategories={this.state.primarySubCategories} 
+                show={this.state.primarySubMenuShow}
+                onClick={this.subMenuOptionClick} 
+                markerID={1}
+            />
+            <MenuTray 
                 categories={this.state.categories} 
-                onClick={this.menuOptionClick} 
+                onClick={this.menuOptionClick}
+                onLongClick={this.getSubItems}
                 markerID={1}
             />
             </div>

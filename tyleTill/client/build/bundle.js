@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(184);
+	var ReactDOM = __webpack_require__(159);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19746,48 +19746,56 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Orderwindow = __webpack_require__(159);
-	var Itemwindow = __webpack_require__(163);
-	var Login = __webpack_require__(173);
-	var Infowindow = __webpack_require__(174);
-	var Cashwindow = __webpack_require__(175);
-	var CashManager = __webpack_require__(176);
-	var OrderManager = __webpack_require__(177);
-	var TableManager = __webpack_require__(178);
-	var ItemManager = __webpack_require__(179);
-	var ButtonColumn = __webpack_require__(180);
-	var TableWindow = __webpack_require__(181);
-	var ReactCSSTransitionGroup = __webpack_require__(166);
-	var MenuTray = __webpack_require__(182);
-	var APIRunner = __webpack_require__(183);
-	_ = __webpack_require__(161);
+	var Orderwindow = __webpack_require__(160);
+	var Itemwindow = __webpack_require__(164);
+	var Login = __webpack_require__(175);
+	var Infowindow = __webpack_require__(176);
+	var Cashwindow = __webpack_require__(177);
+	var CashManager = __webpack_require__(178);
+	var OrderManager = __webpack_require__(179);
+	var TableManager = __webpack_require__(180);
+	var ItemManager = __webpack_require__(181);
+	var ButtonColumn = __webpack_require__(182);
+	var TableWindow = __webpack_require__(183);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
+	var MenuTray = __webpack_require__(184);
+	var APIRunner = __webpack_require__(185);
+	_ = __webpack_require__(162);
 	
 	var Tyle = React.createClass({
 	  displayName: 'Tyle',
 	  getInitialState: function getInitialState() {
 	    return {
 	      items: [],
-	      categories: {},
+	      categories: [],
 	      users: [],
+	      orders: [],
+	      tillTotal: [],
 	      time: '',
 	      date: '',
 	      tables: { one: [], two: [], three: [], four: [], five: [], six: [], seven: [], eight: [], nine: [], ten: [] },
 	      primaryDisplayItems: [],
+	      primarySubCategories: {},
 	      primaryLogin: true,
+	      primaryChange: '',
 	      primaryUser: "",
 	      primaryOrderItems: [{}],
 	      primaryOrderTotal: 0.00,
 	      primaryInput: '',
 	      primaryCashDisplay: false,
 	      primaryTableShow: false,
+	      primarySubMenuShow: "hide-sub",
 	      secondaryUser: "",
 	      secondaryLogin: true,
+	      secondaryChange: '',
 	      secondaryOrderItems: [{}],
 	      secondaryDisplayItems: [],
+	      secondarySubCategories: {},
 	      secondaryOrderTotal: 0.00,
 	      secondaryInput: '',
 	      secondaryCashDisplay: false,
 	      secondaryTableShow: false,
+	      secondarySubMenuShow: "hide-sub",
 	      split: false
 	
 	    };
@@ -19801,14 +19809,11 @@
 	      users = result;
 	    });
 	    var APIpromise = runner.run("GET", "http://localhost:5000/api/divisions");
-	
 	    APIpromise.then(function (result) {
 	      var itemManager = new ItemManager();
-	      var categories = itemManager.getCategories(result);
+	      var categories = itemManager.getTypes(result);
 	      this.clock();
 	      setInterval(this.clock, 60000);
-	      console.log(categories);
-	      console.log(result);
 	      var displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items);
 	      this.setState({ users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems });
 	    }.bind(this), function (err) {
@@ -19869,16 +19874,8 @@
 	  },
 	  menuOptionClick: function menuOptionClick(selected, markerID) {
 	    var runner = new APIRunner();
-	    var url = "http://localhost:5000/api/";
-	    if (_.includes(this.state.categories["divisions"], selected)) {
-	      url += "divisions/find/" + selected;
-	    }
-	    if (_.includes(this.state.categories["types"], selected)) {
-	      url += "types/find/" + selected;
-	    }
-	    if (_.includes(this.state.categories["subtypes"], selected)) {
-	      url += "subtypes/find/" + selected;
-	    }
+	    var url = "http://localhost:5000/api/types/find/" + selected;
+	    console.log(url);
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
 	      var itemManager = new ItemManager();
@@ -19887,6 +19884,36 @@
 	        this.setState({ secondaryDisplayItems: finalItems });
 	      } else {
 	        this.setState({ primaryDisplayItems: finalItems });
+	      }
+	    }.bind(this));
+	  },
+	  subMenuOptionClick: function subMenuOptionClick(selected, markerID) {
+	    var url = "http://localhost:5000/api/subtypes/find/" + selected;
+	
+	    var runner = new APIRunner();
+	    var promise = runner.run("GET", url);
+	    promise.then(function (result) {
+	      var itemManager = new ItemManager();
+	      var finalItems = itemManager.getItems(result);
+	      if (markerID === 2) {
+	        this.setState({ secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub" });
+	      } else {
+	        this.setState({ primaryDisplayItems: finalItems, primarySubMenuShow: "hide-sub" });
+	      }
+	    }.bind(this));
+	  },
+	  getSubItems: function getSubItems(selected, markerID) {
+	    this.setState({ primarySubMenuShow: "sub" });
+	    var url = "http://localhost:5000/api/types/find/" + selected;
+	    var apiRunner = new APIRunner();
+	    var itemManager = new ItemManager();
+	    apiRunner.run("GET", url).then(function (result) {
+	      console.log(result[0].subtypes);
+	      var subtypes = itemManager.prepareSubtypes(result);
+	      if (markerID === 2) {
+	        this.setState({ secondarySubCategories: subtypes, secondarySubMenuShow: "sub" });
+	      } else {
+	        this.setState({ primarySubCategories: subtypes, primarySubMenuShow: "sub" });
 	      }
 	    }.bind(this));
 	  },
@@ -19914,7 +19941,6 @@
 	    }
 	  },
 	  onSplitClick: function onSplitClick(markerID) {
-	    console.log("Splitting");
 	    if (!this.state.split) {
 	      this.setState({ split: true });
 	    } else {
@@ -19950,10 +19976,27 @@
 	    var newPayment = cashManager.checkPayAmount(selected, input, oldTotal);
 	    var newOrderArray = orderManager.addPayment(items, newPayment);
 	    var total = cashManager.total(newOrderArray);
+	    if (total <= 0.00) {
+	      this.cashOff(cashManager, newOrderArray, markerID);
+	      return;
+	    }
 	    if (markerID === 2) {
 	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
 	    } else {
 	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
+	    }
+	  },
+	  cashOff: function cashOff(cashManager, newOrderArray, markerID) {
+	    console.log("CASH OFF");
+	    var newOrders = this.state.orders;
+	    var entry = cashManager.getOrderInfo(newOrderArray);
+	    entry["id"] = newOrders.length;
+	    newOrders.push(entry);
+	    console.log(newOrders);
+	    if (markerID === 2) {
+	      this.setState({ secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput: '', secondaryChange: entry.change, secondaryLogin: true });
+	    } else {
+	      this.setState({ primaryOrderItems: [{}], primaryOrderTotal: 0.00, primaryInput: '', primaryChange: entry.change, primaryLogin: true });
 	    }
 	  },
 	  onPayToggle: function onPayToggle(markerID) {
@@ -20031,7 +20074,7 @@
 	        React.createElement(
 	          'div',
 	          { className: 'primary' },
-	          React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users }),
+	          React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
 	          React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	          React.createElement(
 	            'div',
@@ -20041,7 +20084,8 @@
 	              date: this.state.date,
 	              input: this.state.primaryInput,
 	              total: this.state.primaryOrderTotal,
-	              user: this.state.primaryUser
+	              user: this.state.primaryUser,
+	              change: this.state.primaryChange
 	            }),
 	            React.createElement(Orderwindow, {
 	              markerID: 1,
@@ -20070,8 +20114,15 @@
 	            onLongClick: this.onLongClick
 	          }),
 	          React.createElement(MenuTray, {
+	            subCategories: this.state.primarySubCategories,
+	            show: this.state.primarySubMenuShow,
+	            onClick: this.subMenuOptionClick,
+	            markerID: 1
+	          }),
+	          React.createElement(MenuTray, {
 	            categories: this.state.categories,
 	            onClick: this.menuOptionClick,
+	            onLongClick: this.getSubItems,
 	            markerID: 1
 	          })
 	        ),
@@ -20088,7 +20139,7 @@
 	              transitionEnterTimeout: 500,
 	              transitionLeaveTimeout: 500
 	            },
-	            React.createElement(Login, { onLogin: this.onLogin, display: this.state.secondaryLogin, markerID: 2, users: this.state.users }),
+	            React.createElement(Login, { onLogin: this.onLogin, display: this.state.secondaryLogin, markerID: 2, users: this.state.users, change: this.state.secondaryChange }),
 	            React.createElement(TableWindow, { markerID: 2, display: this.state.secondaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	            React.createElement(
 	              'div',
@@ -20098,7 +20149,9 @@
 	                date: this.state.date,
 	                input: this.state.secondaryInput,
 	                total: this.state.secondaryOrderTotal,
-	                user: this.state.secondaryUser
+	                user: this.state.secondaryUser,
+	                change: this.state.secondaryChange
+	
 	              }),
 	              React.createElement(Orderwindow, {
 	                markerID: 2,
@@ -20127,8 +20180,15 @@
 	              onLongClick: this.onLongClick
 	            }),
 	            React.createElement(MenuTray, {
+	              subCategories: this.state.secondarySubCategories,
+	              show: this.state.secondarySubMenuShow,
+	              onClick: this.subMenuOptionClick,
+	              markerID: 2
+	            }),
+	            React.createElement(MenuTray, {
 	              categories: this.state.categories,
 	              onClick: this.menuOptionClick,
+	              onLongClick: this.getSubItems,
 	              markerID: 2
 	            })
 	          )
@@ -20139,7 +20199,7 @@
 	      return React.createElement(
 	        'div',
 	        { className: 'tyle-container' },
-	        React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users }),
+	        React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
 	        React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	        React.createElement(
 	          'div',
@@ -20149,7 +20209,8 @@
 	            date: this.state.date,
 	            input: this.state.primaryInput,
 	            total: this.state.primaryOrderTotal,
-	            user: this.state.primaryUser
+	            user: this.state.primaryUser,
+	            change: this.state.primaryChange
 	          }),
 	          React.createElement(Orderwindow, {
 	            markerID: 1,
@@ -20177,8 +20238,15 @@
 	          onLongClick: this.onLongClick
 	        }),
 	        React.createElement(MenuTray, {
+	          subCategories: this.state.primarySubCategories,
+	          show: this.state.primarySubMenuShow,
+	          onClick: this.subMenuOptionClick,
+	          markerID: 1
+	        }),
+	        React.createElement(MenuTray, {
 	          categories: this.state.categories,
 	          onClick: this.menuOptionClick,
+	          onLongClick: this.getSubItems,
 	          markerID: 1
 	        })
 	      );
@@ -20194,9 +20262,18 @@
 
 	'use strict';
 	
+	module.exports = __webpack_require__(3);
+
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
 	var React = __webpack_require__(1);
-	var OrderRow = __webpack_require__(160);
-	_ = __webpack_require__(161);
+	var OrderRow = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var Orderwindow = React.createClass({
 	  displayName: 'Orderwindow',
@@ -20222,7 +20299,7 @@
 	module.exports = Orderwindow;
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20281,7 +20358,7 @@
 	module.exports = OrderRow;
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -37018,10 +37095,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(162)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(163)(module)))
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -37037,7 +37114,7 @@
 
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37045,8 +37122,8 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
-	var CashDisplay = __webpack_require__(165);
+	var Item = __webpack_require__(165);
+	var CashDisplay = __webpack_require__(167);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
@@ -37090,13 +37167,13 @@
 	module.exports = Itemwindow;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ExpandedItem = __webpack_require__(185);
+	var ExpandedItem = __webpack_require__(166);
 	
 	var Item = React.createClass({
 	  displayName: 'Item',
@@ -37156,13 +37233,67 @@
 	module.exports = Item;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(166);
+	var Item = __webpack_require__(165);
+	
+	var ExpandedItem = React.createClass({
+	    displayName: 'ExpandedItem',
+	    onMouseUp: function onMouseUp(event) {
+	        console.log(event.target);
+	        var arrayRef = this.props.items[event.target.id] || 0;
+	        if (arrayRef != 0) {
+	            arrayRef = arrayRef.size;
+	        }
+	        console.log("Array", arrayRef);
+	        this.props.onMouseUp(event, arrayRef);
+	    },
+	    render: function render() {
+	        var _this = this;
+	
+	        console.log(this.props.items[0].name);
+	
+	        var nodes = this.props.items.map(function (item, index) {
+	            return React.createElement(
+	                'li',
+	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp, onClick: _this.props.onClick },
+	                React.createElement(
+	                    'p',
+	                    null,
+	                    item.name,
+	                    ' (',
+	                    item.sizeDescriptor,
+	                    ')'
+	                )
+	            );
+	        });
+	
+	        return React.createElement(
+	            'div',
+	            { className: 'item-button-expanded' },
+	            React.createElement(
+	                'ul',
+	                { className: 'subItem-container' },
+	                nodes
+	            )
+	        );
+	    }
+	});
+	
+	module.exports = ExpandedItem;
+
+/***/ },
+/* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
 	
 	var CashDisplay = React.createClass({
 	    displayName: 'CashDisplay',
@@ -37170,15 +37301,14 @@
 	        this.props.onClick(event.target.value, this.props.markerID);
 	    },
 	    render: function render() {
-	        return React.createElement(
-	            ReactCSSTransitionGroup,
-	            {
-	                transitionName: 'background',
-	                transitionAppear: true,
-	                transitionAppearTimeout: 500,
-	                transitionEnterTimeout: 500,
-	                transitionLeaveTimeout: 500
-	            },
+	        return (
+	            // <ReactCSSTransitionGroup
+	            //              transitionName="background"
+	            //              transitionAppear={true} 
+	            //              transitionAppearTimeout={500}
+	            //              transitionEnterTimeout={500}
+	            //              transitionLeaveTimeout={500}
+	            // >
 	            React.createElement(
 	                'div',
 	                { className: 'cash-display' },
@@ -37218,6 +37348,9 @@
 	                    'Cash'
 	                )
 	            )
+	            // </ReactCSSTransitionGroup>
+	
+	
 	        );
 	    }
 	});
@@ -37225,13 +37358,13 @@
 	module.exports = CashDisplay;
 
 /***/ },
-/* 166 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(167);
+	module.exports = __webpack_require__(169);
 
 /***/ },
-/* 167 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37252,8 +37385,8 @@
 	
 	var assign = __webpack_require__(39);
 	
-	var ReactTransitionGroup = __webpack_require__(168);
-	var ReactCSSTransitionGroupChild = __webpack_require__(170);
+	var ReactTransitionGroup = __webpack_require__(170);
+	var ReactCSSTransitionGroupChild = __webpack_require__(172);
 	
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -37319,7 +37452,7 @@
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 168 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37336,7 +37469,7 @@
 	'use strict';
 	
 	var React = __webpack_require__(2);
-	var ReactTransitionChildMapping = __webpack_require__(169);
+	var ReactTransitionChildMapping = __webpack_require__(171);
 	
 	var assign = __webpack_require__(39);
 	var emptyFunction = __webpack_require__(15);
@@ -37529,7 +37662,7 @@
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 169 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37632,7 +37765,7 @@
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 170 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37652,8 +37785,8 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	
-	var CSSCore = __webpack_require__(171);
-	var ReactTransitionEvents = __webpack_require__(172);
+	var CSSCore = __webpack_require__(173);
+	var ReactTransitionEvents = __webpack_require__(174);
 	
 	var onlyChild = __webpack_require__(156);
 	
@@ -37802,7 +37935,7 @@
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 171 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -37905,7 +38038,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 172 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38019,7 +38152,7 @@
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 173 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38045,6 +38178,7 @@
 	
 	    if (input.length === 4) {
 	      this.setState({ code: '', displayCode: ["T", "Y", "L", "E"] });
+	      console.log(this.props.users);
 	      var _iteratorNormalCompletion = true;
 	      var _didIteratorError = false;
 	      var _iteratorError = undefined;
@@ -38078,6 +38212,22 @@
 	    if (!this.props.display) {
 	      return React.createElement('div', { className: 'hidden' });
 	    } else {
+	      var info = '';
+	      if (this.props.change) {
+	        info = React.createElement(
+	          'h2',
+	          null,
+	          'Order Complete, last change: ',
+	          (this.props.change * -1).toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	        );
+	      } else {
+	        info = React.createElement(
+	          'h2',
+	          null,
+	          'Please enter your 4 digit pin'
+	        );
+	      }
+	
 	      return React.createElement(
 	        'div',
 	        { className: 'login-show' },
@@ -38179,7 +38329,8 @@
 	            { onClick: this.onClick, className: 'login-button', value: 'C' },
 	            'C'
 	          )
-	        )
+	        ),
+	        info
 	      );
 	    }
 	  }
@@ -38188,7 +38339,7 @@
 	module.exports = Login;
 
 /***/ },
-/* 174 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38214,6 +38365,11 @@
 	            React.createElement(
 	                'h5',
 	                null,
+	                'Input:'
+	            ),
+	            React.createElement(
+	                'h5',
+	                null,
 	                props.input
 	            )
 	        ),
@@ -38223,12 +38379,22 @@
 	            React.createElement(
 	                'h5',
 	                null,
-	                props.date
+	                'Last Change:'
+	            ),
+	            React.createElement(
+	                'h5',
+	                null,
+	                props.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
 	            )
 	        ),
 	        React.createElement(
 	            'div',
 	            null,
+	            React.createElement(
+	                'h5',
+	                null,
+	                props.date
+	            ),
 	            React.createElement(
 	                'h5',
 	                null,
@@ -38245,14 +38411,9 @@
 	};
 	
 	module.exports = Infowindow;
-	
-	// <h6>User: {props.user}</h6>
-	// <h6>Last Order Change: £3.00</h6>
-	// <h6>Table:</h6>
-	// <h5>Input: {props.input} </h5>
 
 /***/ },
-/* 175 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38335,12 +38496,12 @@
 	module.exports = Cashwindow;
 
 /***/ },
-/* 176 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var CashManager = function CashManager() {};
 	
@@ -38350,8 +38511,22 @@
 	        for (var key in order[0]) {
 	            total += order[0][key].total;
 	        }
-	        console.log(total);
 	        return total;
+	    },
+	    getOrderInfo: function getOrderInfo(order) {
+	        var total = 0.00;
+	        var payments = 0.00;
+	        var items = 0;
+	        for (var item in order[0]) {
+	            if (order[0][item].total <= 0) {
+	                payments += parseFloat(order[0][item].total);
+	            } else {
+	                total += parseFloat(order[0][item].total);
+	                items += parseInt(order[0][item].qty);
+	            }
+	        }
+	        var change = total + payments;
+	        return { total: total, payments: payments, items: items, change: change, orderDetail: order };
 	    },
 	    checkPayAmount: function checkPayAmount(selected, input, total) {
 	        var category = null;
@@ -38374,7 +38549,6 @@
 	        }
 	
 	        if (input) {
-	            console.log("input", input);
 	            amount = input * (value || 1);
 	        } else if (value) {
 	            console.log("value present", value);
@@ -38391,12 +38565,12 @@
 	module.exports = CashManager;
 
 /***/ },
-/* 177 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var OrderManager = function OrderManager() {};
 	
@@ -38434,12 +38608,6 @@
 	        return returnArray;
 	    },
 	    addPayment: function addPayment(orderItems, payment) {
-	        // if(orderItems[0][payment.name]){
-	        //     payment["name"] = orderItems[0][payment.name].name+ 1
-	        // }
-	        // orderItems[0][payment.name] = payment
-	        // return orderItems
-	
 	        var itemsObject = orderItems[0];
 	        var ref = payment.name;
 	        var oldTotal = 0;
@@ -38458,7 +38626,7 @@
 	module.exports = OrderManager;
 
 /***/ },
-/* 178 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38493,94 +38661,128 @@
 	module.exports = TableManager;
 
 /***/ },
-/* 179 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var ItemManager = function ItemManager() {};
 	
 	ItemManager.prototype = {
-	      getItems: function getItems(result) {
-	            var items = [];
-	            if (result[0].types) {
-	                  result[0].types.forEach(function (type) {
-	                        type.subtypes.forEach(function (subtype) {
-	                              items = items.concat(subtype.items);
-	                        });
-	                  });
-	            }
-	            if (result[0].subtypes) {
-	                  result[0].subtypes.forEach(function (subtype) {
-	                        items = items.concat(subtype.items);
-	                  });
-	            }
-	            if (!result[0].types && !result[0].subtypes) {
-	                  items = result[0].items;
-	            }
+	    getItems: function getItems(result) {
+	        var items = [];
+	        if (result[0].types) {
+	            result[0].types.forEach(function (type) {
+	                type.subtypes.forEach(function (subtype) {
+	                    items = items.concat(subtype.items);
+	                });
+	            });
+	        }
+	        if (result[0].subtypes) {
+	            result[0].subtypes.forEach(function (subtype) {
+	                items = items.concat(subtype.items);
+	            });
+	        }
+	        if (!result[0].types && !result[0].subtypes) {
+	            items = result[0].items;
+	        }
 	
-	            var finalItems = this.prepareItems(items);
-	            return finalItems;
-	      },
-	      prepareItems: function prepareItems(items) {
-	            var parsedItems = [];
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
+	        var finalItems = this.prepareItems(items);
+	        return finalItems;
+	    },
+	    prepareItems: function prepareItems(items) {
+	        var parsedItems = [];
+	        var _iteratorNormalCompletion = true;
+	        var _didIteratorError = false;
+	        var _iteratorError = undefined;
 	
+	        try {
+	            for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                var item = _step.value;
+	
+	                var parseItem = item;
+	                parseItem.sizes = JSON.parse(item.sizes);
+	                parseItem.prices = JSON.parse(item.prices);
+	                parsedItems.push(parseItem);
+	            }
+	        } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	        } finally {
 	            try {
-	                  for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                        var item = _step.value;
-	
-	                        var parseItem = item;
-	                        parseItem.sizes = JSON.parse(item.sizes);
-	                        parseItem.prices = JSON.parse(item.prices);
-	                        parsedItems.push(parseItem);
-	                  }
-	            } catch (err) {
-	                  _didIteratorError = true;
-	                  _iteratorError = err;
+	                if (!_iteratorNormalCompletion && _iterator.return) {
+	                    _iterator.return();
+	                }
 	            } finally {
-	                  try {
-	                        if (!_iteratorNormalCompletion && _iterator.return) {
-	                              _iterator.return();
-	                        }
-	                  } finally {
-	                        if (_didIteratorError) {
-	                              throw _iteratorError;
-	                        }
-	                  }
+	                if (_didIteratorError) {
+	                    throw _iteratorError;
+	                }
 	            }
+	        }
 	
-	            return parsedItems;
-	      },
-	      getCategories: function getCategories(items) {
-	            console.log(items);
-	            var divisions = [];
-	            var types = [];
-	            var subtypes = [];
-	            for (var a in items) {
-	                  divisions.push(items[a].name);
-	                  for (var b in items[a].types) {
-	                        types.push(items[a].types[b].name);
-	                        for (var c in items[a].types[b].subtypes) {
-	                              subtypes.push(items[a].types[b].subtypes[c].name);
-	                        }
-	                  }
+	        return parsedItems;
+	    },
+	    prepareSubtypes: function prepareSubtypes(items) {
+	        var subtypes = items[0].subtypes;
+	        var returnArray = [];
+	        var _iteratorNormalCompletion2 = true;
+	        var _didIteratorError2 = false;
+	        var _iteratorError2 = undefined;
+	
+	        try {
+	            for (var _iterator2 = subtypes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	                var subtype = _step2.value;
+	
+	                returnArray.push(subtype.name);
 	            }
+	        } catch (err) {
+	            _didIteratorError2 = true;
+	            _iteratorError2 = err;
+	        } finally {
+	            try {
+	                if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                    _iterator2.return();
+	                }
+	            } finally {
+	                if (_didIteratorError2) {
+	                    throw _iteratorError2;
+	                }
+	            }
+	        }
 	
-	            var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	            console.log("divisions", categories);
-	            return categories;
-	      }
+	        return returnArray;
+	    },
+	    getTypes: function getTypes(items) {
+	        console.log(this.getCategories(items).types);
+	        return this.getCategories(items).types;
+	    },
+	    getCategories: function getCategories(items) {
+	        console.log(items);
+	        var divisions = [];
+	        var types = [];
+	        var subtypes = [];
+	        for (var a in items) {
+	            divisions.push(items[a].name);
+	            for (var b in items[a].types) {
+	                types.push(items[a].types[b].name);
+	                for (var c in items[a].types[b].subtypes) {
+	                    subtypes.push(items[a].types[b].subtypes[c].name);
+	                }
+	            }
+	        }
+	
+	        var categories = { divisions: divisions, types: types, subtypes: subtypes };
+	        console.log("divisions", categories);
+	        return categories;
+	    }
 	};
 	
 	module.exports = ItemManager;
 
 /***/ },
-/* 180 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38617,13 +38819,13 @@
 	module.exports = ButtonColumn;
 
 /***/ },
-/* 181 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(166);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
 	
 	var TableWindow = React.createClass({
 	  displayName: 'TableWindow',
@@ -38678,65 +38880,114 @@
 	module.exports = TableWindow;
 
 /***/ },
-/* 182 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
 	
 	var MenuTray = React.createClass({
 	  displayName: 'MenuTray',
 	  onClick: function onClick(event) {
+	    console.log(event.target.value);
 	    this.props.onClick(event.target.value, this.props.markerID);
+	  },
+	  getInitialState: function getInitialState() {
+	    return { target: '', timer: null };
+	  },
+	  startTimer: function startTimer(event) {
+	    console.log("down");
+	    this.setState({ target: event.target.value });
+	    this.state.timer = setTimeout(this.getSubItems, 200);
+	  },
+	  stopTimer: function stopTimer(event) {
+	    console.log("up");
+	    clearInterval(this.state.timer);
+	    this.onClick(event);
+	  },
+	  getSubItems: function getSubItems() {
+	    this.props.onLongClick(this.state.target, this.props.markerID);
 	  },
 	  render: function render() {
 	
-	    var buttons = [];
-	    var categories = this.props.categories;
-	    for (var key in categories) {
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
+	    if (this.props.show === "sub") {
 	
-	      try {
-	        for (var _iterator = categories[key][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var item = _step.value;
+	      var subButtons = [];
+	      var categories = this.props.subCategories;
+	      console.log("SUB MENU", categories);
+	      for (var item in categories) {
+	        var button = React.createElement(
+	          'button',
+	          { className: 'sub-menu-item', onClick: this.stopTimer, key: item, value: categories[item] },
+	          React.createElement(
+	            'p',
+	            null,
+	            categories[item]
+	          )
+	        );
+	        subButtons.push(button);
+	      }
+	      return React.createElement(
+	        'div',
+	        { className: 'sub-menu-tray' },
+	        subButtons
+	      );
+	    } else if (this.props.show === "hide-sub") {
+	      return React.createElement('div', { className: 'hidden' });
+	    } else {
+	      var buttons = [];
+	      var _categories = this.props.categories;
+	      console.log(_categories);
+	      if (_categories) {
+	        var _iteratorNormalCompletion = true;
+	        var _didIteratorError = false;
+	        var _iteratorError = undefined;
 	
-	          var button = React.createElement(
-	            'button',
-	            { className: 'menu-item', onClick: this.onClick, key: item, value: item },
-	            item
-	          );
-	          buttons.push(button);
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
+	          for (var _iterator = _categories[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	            var _item = _step.value;
+	
+	            var _button = React.createElement(
+	              'button',
+	              { className: 'menu-item', onMouseDown: this.startTimer, onMouseUp: this.stopTimer, key: _item, value: _item },
+	              React.createElement(
+	                'p',
+	                null,
+	                _item
+	              )
+	            );
+	            buttons.push(_button);
 	          }
+	        } catch (err) {
+	          _didIteratorError = true;
+	          _iteratorError = err;
 	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
+	          try {
+	            if (!_iteratorNormalCompletion && _iterator.return) {
+	              _iterator.return();
+	            }
+	          } finally {
+	            if (_didIteratorError) {
+	              throw _iteratorError;
+	            }
 	          }
 	        }
 	      }
+	      return React.createElement(
+	        'div',
+	        { className: 'menu-tray' },
+	        buttons
+	      );
 	    }
-	    return React.createElement(
-	      'div',
-	      { className: 'menu-tray' },
-	      buttons
-	    );
 	  }
 	});
 	
 	module.exports = MenuTray;
 
 /***/ },
-/* 183 */
+/* 185 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -38799,69 +39050,6 @@
 	};
 	
 	module.exports = APIRunner;
-
-/***/ },
-/* 184 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	module.exports = __webpack_require__(3);
-
-
-/***/ },
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
-	
-	var ExpandedItem = React.createClass({
-	    displayName: 'ExpandedItem',
-	    onMouseUp: function onMouseUp(event) {
-	        console.log(event.target);
-	        var arrayRef = this.props.items[event.target.id] || 0;
-	        if (arrayRef != 0) {
-	            arrayRef = arrayRef.size;
-	        }
-	        console.log("Array", arrayRef);
-	        this.props.onMouseUp(event, arrayRef);
-	    },
-	    render: function render() {
-	        var _this = this;
-	
-	        console.log(this.props.items[0].name);
-	
-	        var nodes = this.props.items.map(function (item, index) {
-	            return React.createElement(
-	                'li',
-	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp, onClick: _this.props.onClick },
-	                React.createElement(
-	                    'p',
-	                    null,
-	                    item.name,
-	                    ' (',
-	                    item.sizeDescriptor,
-	                    ')'
-	                )
-	            );
-	        });
-	
-	        return React.createElement(
-	            'div',
-	            { className: 'item-button-expanded' },
-	            React.createElement(
-	                'ul',
-	                { className: 'subItem-container' },
-	                nodes
-	            )
-	        );
-	    }
-	});
-	
-	module.exports = ExpandedItem;
 
 /***/ }
 /******/ ]);

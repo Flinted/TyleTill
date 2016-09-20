@@ -11,8 +11,23 @@ total(order, index){
     for(let key in order[0]){
         total += order[0][key].total
     }
-    console.log(total)
     return total
+},
+
+getOrderInfo(order){
+      let total = 0.00
+      let payments = 0.00
+      let items = 0
+      for(let item in order[0]){
+        if( order[0][item].total <=0){
+            payments += parseFloat(order[0][item].total)
+        }else{
+            total += parseFloat(order[0][item].total)
+            items += parseInt(order[0][item].qty)
+        }
+      }
+      const change= total + payments
+      return {total: total, payments: payments, items: items, change: change, orderDetail:order}
 },
 
 checkPayAmount(selected, input, total){
@@ -36,7 +51,6 @@ checkPayAmount(selected, input, total){
     }
     
     if(input){
-      console.log("input", input)
         amount = input * (value || 1)
     }else if(value){
         console.log("value present", value)

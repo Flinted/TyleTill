@@ -1,0 +1,31 @@
+.table-show{
+  z-index:9500;
+  position: absolute;
+  background-color: rgba(0,0,0,0.5);
+  border: 2px solid black;  
+  overflow: scroll;
+  margin-left: 90px;
+  margin-top: 70px;
+  width: 20%;
+  height: 45%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.table-taken, .table-free{
+  width: 70px;
+  height: 70px;
+  border: 2px solid black;  
+  margin: 2px 2px 2px 2px;
+  color: black;
+}
+
+.table-taken{  
+  background-color: #ffb347;
+}
+
+.table-free{
+  background-color: #BDECB6;
+}

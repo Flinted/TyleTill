@@ -1,0 +1,17 @@
+.background-appear {
+  opacity: 0.01;
+}
+
+.background-appear.background-appear-active {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.background-appear {
+  opacity: 0.01;
+}
+
+.background-appear.background-appear-active {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}

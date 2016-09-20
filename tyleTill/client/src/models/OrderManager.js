@@ -37,12 +37,6 @@ OrderManager.prototype = {
     },
 
     addPayment(orderItems, payment){
-        // if(orderItems[0][payment.name]){
-        //     payment["name"] = orderItems[0][payment.name].name+ 1
-        // }
-        // orderItems[0][payment.name] = payment
-        // return orderItems
-
         let itemsObject = orderItems[0]
         const ref = payment.name
         let oldTotal = 0

@@ -19,6 +19,7 @@ const Login = React.createClass({
       
       if(input.length === 4){
         this.setState({code: '', displayCode:["T","Y","L","E"]})
+        console.log(this.props.users)
         for(let user of this.props.users){
           if(parseInt(input) === user.code){
             this.props.onLogin(user, this.props.markerID)
@@ -32,6 +33,13 @@ const Login = React.createClass({
     if(!this.props.display){
       return(<div className='hidden'/>)
     }else{
+        let info=''
+      if(this.props.change){
+        info= <h2>Order Complete, last change: {(this.props.change * -1).toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</h2>
+      }else{
+        info = <h2>Please enter your 4 digit pin</h2>
+      }  
+
       return(
           <div className='login-show'>
           <div id="logo">
@@ -53,6 +61,7 @@ const Login = React.createClass({
           <button onClick={this.onClick}className="login-button" value="0">0</button>
           <button onClick={this.onClick}className="login-button" value="C">C</button>
           </div>
+          {info}
           </div>
         )
     }

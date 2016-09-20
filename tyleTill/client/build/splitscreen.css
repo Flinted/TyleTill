@@ -1,0 +1,48 @@
+/*SPLIT SCREEN*/
+.primary div:nth-child(6), .primary div:nth-child(7),.secondary div:nth-child(7), .secondary div:nth-child(6){
+margin-right: 0px !important;
+}
+
+.primary, .secondary{
+  width: 49%;
+  height: 100%;
+  float:left;
+}
+
+#divider{
+  height:100%;
+  width: 1%;
+  margin-left: 49%;
+  position: absolute;
+  background-color: black;
+}
+
+.secondary{
+  /*width: 49%;
+  height: 100%;*/
+  float: right !important;
+
+}
+
+.item-window-split{
+  margin-top: 70px;
+  float: right;
+  width: 51%;
+  max-height:80%;
+  text-align: center;
+  margin-right: 80px;
+  margin-right: 5px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+}
+
+.item-window-split ul:nth-child(2){
+  width: 285px !important;
+  margin-right: 0px !important;
+  margin-left: 105px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+}
+/*END SPLIT SCREEN*/
