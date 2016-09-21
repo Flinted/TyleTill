@@ -4,9 +4,9 @@ _ = require('lodash')
 const CashManager = ()=> {}
 
 
-CashManager.prototype = {
+// CashManager.prototype = {
 
-total(order, index){
+CashManager.total=function(order, index){
     let total = 0.00
     for(let key in order[0]){
         total += order[0][key].total
@@ -14,7 +14,7 @@ total(order, index){
     return total
 },
 
-getOrderInfo(order, user){
+CashManager.getOrderInfo=function(order, user){
       let total = 0.00
       let payments = 0.00
       let items = 0
@@ -33,7 +33,7 @@ getOrderInfo(order, user){
       return {user:user, time: time, total: total, payments: payments, items: items, change: change, orderDetail:order}
 },
 
-checkPayAmount(selected, input, total){
+CashManager.checkPayAmount=function(selected, input, total){
     let category = null
     let amount = null
     let value = null
@@ -65,7 +65,7 @@ checkPayAmount(selected, input, total){
 
     return {id: Date.now(), name: category, qty: qty || 1, total: -amount}
     }
-}
+// }
 
 
 

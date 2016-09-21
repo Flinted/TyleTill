@@ -19813,11 +19813,11 @@
 	    });
 	    var APIpromise = runner.run("GET", "http://localhost:5000/api/divisions");
 	    APIpromise.then(function (result) {
-	      var itemManager = new ItemManager();
-	      var categories = itemManager.getTypes(result);
+	      // const itemManager = new ItemManager
+	      var categories = ItemManager.getTypes(result);
 	      this.clock();
 	      setInterval(this.clock, 60000);
-	      var displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items);
+	      var displayItems = ItemManager.prepareItems(result[0].types[0].subtypes[0].items);
 	      this.setState({ users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems });
 	    }.bind(this), function (err) {
 	      console.log(err);
@@ -19847,10 +19847,10 @@
 	    if (markerID === 2) {
 	      item = this.state.secondaryDisplayItems[event.target.value];
 	    }
-	    var ordermanager = new OrderManager();
-	    var newOrderArray = ordermanager.addItem(currentOrder, item, input, arrayRef);
-	    var cashmanager = new CashManager();
-	    var total = cashmanager.total(newOrderArray);
+	    // const ordermanager = new OrderManager
+	    var newOrderArray = OrderManager.addItem(currentOrder, item, input, arrayRef);
+	    // const cashmanager = new CashManager
+	    var total = CashManager.total(newOrderArray);
 	    if (markerID === 2) {
 	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
 	    } else {
@@ -19865,10 +19865,10 @@
 	      currentOrder = this.state.secondaryOrderItems;
 	      input = this.state.secondaryInput;
 	    }
-	    var ordermanager = new OrderManager();
-	    var newOrderArray = ordermanager.removeItem(currentOrder, key, input);
-	    var cashmanager = new CashManager();
-	    var total = cashmanager.total(newOrderArray);
+	    // const ordermanager = new OrderManager
+	    var newOrderArray = OrderManager.removeItem(currentOrder, key, input);
+	    // const cashmanager = new CashManager
+	    var total = CashManager.total(newOrderArray);
 	    if (markerID === 2) {
 	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
 	    } else {
@@ -19881,8 +19881,8 @@
 	    console.log(url);
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
-	      var itemManager = new ItemManager();
-	      var finalItems = itemManager.getItems(result);
+	      // const itemManager = new ItemManager
+	      var finalItems = ItemManager.getItems(result);
 	      if (markerID === 2) {
 	        this.setState({ secondaryDisplayItems: finalItems });
 	      } else {
@@ -19896,8 +19896,8 @@
 	    var runner = new APIRunner();
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
-	      var itemManager = new ItemManager();
-	      var finalItems = itemManager.getItems(result);
+	      // const itemManager = new ItemManager
+	      var finalItems = ItemManager.getItems(result);
 	      if (markerID === 2) {
 	        this.setState({ secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub" });
 	      } else {
@@ -19909,10 +19909,11 @@
 	    this.setState({ primarySubMenuShow: "sub" });
 	    var url = "http://localhost:5000/api/types/find/" + selected;
 	    var apiRunner = new APIRunner();
-	    var itemManager = new ItemManager();
+	    // const itemManager = new ItemManager
 	    apiRunner.run("GET", url).then(function (result) {
 	      console.log(result[0].subtypes);
-	      var subtypes = itemManager.prepareSubtypes(result);
+	      var subtypes = ItemManager.prepareSubtypes(result);
+	
 	      if (markerID === 2) {
 	        this.setState({ secondarySubCategories: subtypes, secondarySubMenuShow: "sub" });
 	      } else {
@@ -20010,13 +20011,13 @@
 	      oldTotal = this.state.secondaryOrderTotal;
 	      items = this.state.secondaryOrderItems;
 	    }
-	    var cashManager = new CashManager();
-	    var orderManager = new OrderManager();
-	    var newPayment = cashManager.checkPayAmount(selected, input, oldTotal);
-	    var newOrderArray = orderManager.addPayment(items, newPayment);
-	    var total = cashManager.total(newOrderArray);
+	    // const cashManager = new CashManager
+	    // const orderManager = new OrderManager
+	    var newPayment = CashManager.checkPayAmount(selected, input, oldTotal);
+	    var newOrderArray = OrderManager.addPayment(items, newPayment);
+	    var total = CashManager.total(newOrderArray);
 	    if (total <= 0.00) {
-	      this.cashOff(cashManager, newOrderArray, markerID);
+	      this.cashOff(newOrderArray, markerID);
 	      return;
 	    }
 	    if (markerID === 2) {
@@ -20025,14 +20026,14 @@
 	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
 	    }
 	  },
-	  cashOff: function cashOff(cashManager, newOrderArray, markerID) {
+	  cashOff: function cashOff(newOrderArray, markerID) {
 	    console.log("CASH OFF");
 	    var newOrders = this.state.orders;
 	    var user = this.state.primaryUser;
 	    if (markerID === 2) {
 	      user = this.state.secondaryUser;
 	    }
-	    var entry = cashManager.getOrderInfo(newOrderArray, user);
+	    var entry = CashManager.getOrderInfo(newOrderArray, user);
 	    entry["id"] = newOrders.length;
 	    newOrders.push(entry);
 	    console.log(newOrders);
@@ -20077,8 +20078,8 @@
 	    if (markerID === 2) {
 	      order = this.state.secondaryOrderItems;
 	    }
-	    var tableManager = new TableManager();
-	    var result = tableManager.manageTable(this.state.tables, table, order);
+	    // const tableManager = new TableManager
+	    var result = TableManager.manageTable(this.state.tables, table, order);
 	    if (!result) {
 	      console.log("CANNOT DO THIS!");
 	    } else if (result[0] === "tables") {
@@ -38558,65 +38559,65 @@
 	
 	var CashManager = function CashManager() {};
 	
-	CashManager.prototype = {
-	    total: function total(order, index) {
-	        var total = 0.00;
-	        for (var key in order[0]) {
-	            total += order[0][key].total;
-	        }
-	        return total;
-	    },
-	    getOrderInfo: function getOrderInfo(order, user) {
-	        var total = 0.00;
-	        var payments = 0.00;
-	        var items = 0;
-	        for (var item in order[0]) {
-	            if (order[0][item].total <= 0) {
-	                payments += parseFloat(order[0][item].total);
-	            } else {
-	                total += parseFloat(order[0][item].total);
-	                items += parseInt(order[0][item].qty);
-	            }
-	        }
-	        var change = total + payments;
-	        payments = payments * -1;
-	        change = change * -1;
-	        var time = new Date();
-	        return { user: user, time: time, total: total, payments: payments, items: items, change: change, orderDetail: order };
-	    },
-	    checkPayAmount: function checkPayAmount(selected, input, total) {
-	        var category = null;
-	        var amount = null;
-	        var value = null;
-	        var qty = null;
-	        switch (selected) {
-	            case "mobile":
-	            case "card":
-	            case "discount":
-	            case "cash":
-	                category = selected;
-	                break;
-	            default:
-	                category = "cash(" + selected + ")";
-	                value = parseInt(selected);
-	                qty = input;
-	                console.log("value", value);
-	                break;
-	        }
+	// CashManager.prototype = {
 	
-	        if (input) {
-	            amount = input * (value || 1);
-	        } else if (value) {
-	            console.log("value present", value);
-	            amount = value;
-	        } else {
-	            console.log("amountisTotal", total);
-	            amount = total;
-	        }
-	
-	        return { id: Date.now(), name: category, qty: qty || 1, total: -amount };
+	CashManager.total = function (order, index) {
+	    var total = 0.00;
+	    for (var key in order[0]) {
+	        total += order[0][key].total;
 	    }
+	    return total;
+	}, CashManager.getOrderInfo = function (order, user) {
+	    var total = 0.00;
+	    var payments = 0.00;
+	    var items = 0;
+	    for (var item in order[0]) {
+	        if (order[0][item].total <= 0) {
+	            payments += parseFloat(order[0][item].total);
+	        } else {
+	            total += parseFloat(order[0][item].total);
+	            items += parseInt(order[0][item].qty);
+	        }
+	    }
+	    var change = total + payments;
+	    payments = payments * -1;
+	    change = change * -1;
+	    var time = new Date();
+	    return { user: user, time: time, total: total, payments: payments, items: items, change: change, orderDetail: order };
+	}, CashManager.checkPayAmount = function (selected, input, total) {
+	    var category = null;
+	    var amount = null;
+	    var value = null;
+	    var qty = null;
+	    switch (selected) {
+	        case "mobile":
+	        case "card":
+	        case "discount":
+	        case "cash":
+	            category = selected;
+	            break;
+	        default:
+	            category = "cash(" + selected + ")";
+	            value = parseInt(selected);
+	            qty = input;
+	            console.log("value", value);
+	            break;
+	    }
+	
+	    if (input) {
+	        amount = input * (value || 1);
+	    } else if (value) {
+	        console.log("value present", value);
+	        amount = value;
+	    } else {
+	        console.log("amountisTotal", total);
+	        amount = total;
+	    }
+	
+	    return { id: Date.now(), name: category, qty: qty || 1, total: -amount };
 	};
+	// }
+	
 	
 	module.exports = CashManager;
 
@@ -38630,22 +38631,20 @@
 	
 	var OrderManager = function OrderManager() {};
 	
-	OrderManager.prototype = {
-	  addItem: function addItem(orderItems, newItem, input, arrayRef) {
+	OrderManager.addItem = function (orderItems, newItem, input, arrayRef) {
 	    var itemsObject = orderItems[0];
 	    var sizeRef = parseInt(arrayRef) || 0;
 	    var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
 	    var price = newItem.prices[sizeRef];
 	    var qty = parseInt(input) || 1;
 	    if (itemsObject[ref]) {
-	      qty = itemsObject[ref].qty + (parseInt(input) || 1);
+	        qty = itemsObject[ref].qty + (parseInt(input) || 1);
 	    }
 	    var total = parseFloat(price * qty);
 	    itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
 	    var returnArray = [itemsObject];
 	    return returnArray;
-	  },
-	  removeItem: function removeItem(orderItems, key, input) {
+	}, OrderManager.removeItem = function (orderItems, key, input) {
 	    var itemsObject = orderItems[0];
 	    console.log(input);
 	    var currentTotal = parseFloat(itemsObject[key].total);
@@ -38654,29 +38653,27 @@
 	    var qty = origQty - (parseInt(input) || 1);
 	    var id = itemsObject[key].id;
 	    if (qty < 1) {
-	      delete itemsObject[key];
-	      var _returnArray = [itemsObject];
-	      return _returnArray;
+	        delete itemsObject[key];
+	        var _returnArray = [itemsObject];
+	        return _returnArray;
 	    }
 	    var total = parseFloat(price * qty);
 	    itemsObject[key] = { id: id, name: key, qty: qty, total: total };
 	    var returnArray = [itemsObject];
 	    return returnArray;
-	  },
-	  addPayment: function addPayment(orderItems, payment) {
+	}, OrderManager.addPayment = function (orderItems, payment) {
 	    var itemsObject = orderItems[0];
 	    var ref = payment.name;
 	    var oldTotal = 0;
 	    var qty = parseInt(payment.qty);
 	    if (itemsObject[ref]) {
-	      qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
-	      oldTotal = itemsObject[ref].total;
+	        qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
+	        oldTotal = itemsObject[ref].total;
 	    }
 	    var total = parseFloat(payment.total + oldTotal);
 	    itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
 	    var returnArray = [itemsObject];
 	    return returnArray;
-	  }
 	};
 	
 	module.exports = OrderManager;
@@ -38691,23 +38688,20 @@
 	
 	var TableManager = function TableManager() {};
 	
-	TableManager.prototype = {
-	  manageTable: function manageTable(tables, table, order) {
+	TableManager.manageTable = function (tables, table, order) {
 	
-	    if (!tables[table].length > 0 && Object.keys(order[0]).length > 0) {
-	      console.log("assign order to table");
-	      tables[table] = order;
-	      return ["tables", tables];
-	    }
-	    if (tables[table].length > 0 && !Object.keys(order[0]).length > 0) {
-	      console.log("assign table to order");
-	      order = tables[table];
-	      tables[table] = [];
-	      return ["order", order, tables];
-	    }
-	
-	    return false;
+	  if (!tables[table].length > 0 && Object.keys(order[0]).length > 0) {
+	    console.log("assign order to table");
+	    tables[table] = order;
+	    return ["tables", tables];
 	  }
+	  if (tables[table].length > 0 && !Object.keys(order[0]).length > 0) {
+	    console.log("assign table to order");
+	    order = tables[table];
+	    tables[table] = [];
+	    return ["order", order, tables];
+	  }
+	  return false;
 	};
 	
 	module.exports = TableManager;
@@ -38722,110 +38716,108 @@
 	
 	var ItemManager = function ItemManager() {};
 	
-	ItemManager.prototype = {
-	    getItems: function getItems(result) {
-	        var items = [];
-	        if (result[0].types) {
-	            result[0].types.forEach(function (type) {
-	                type.subtypes.forEach(function (subtype) {
-	                    items = items.concat(subtype.items);
-	                });
-	            });
-	        }
-	        if (result[0].subtypes) {
-	            result[0].subtypes.forEach(function (subtype) {
+	// ItemManager.prototype={
+	
+	ItemManager.getItems = function (result) {
+	    var items = [];
+	    if (result[0].types) {
+	        result[0].types.forEach(function (type) {
+	            type.subtypes.forEach(function (subtype) {
 	                items = items.concat(subtype.items);
 	            });
-	        }
-	        if (!result[0].types && !result[0].subtypes) {
-	            items = result[0].items;
-	        }
-	
-	        var finalItems = this.prepareItems(items);
-	        return finalItems;
-	    },
-	    prepareItems: function prepareItems(items) {
-	        var parsedItems = [];
-	        var _iteratorNormalCompletion = true;
-	        var _didIteratorError = false;
-	        var _iteratorError = undefined;
-	
-	        try {
-	            for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                var item = _step.value;
-	
-	                var parseItem = item;
-	                parseItem.sizes = JSON.parse(item.sizes);
-	                parseItem.prices = JSON.parse(item.prices);
-	                parsedItems.push(parseItem);
-	            }
-	        } catch (err) {
-	            _didIteratorError = true;
-	            _iteratorError = err;
-	        } finally {
-	            try {
-	                if (!_iteratorNormalCompletion && _iterator.return) {
-	                    _iterator.return();
-	                }
-	            } finally {
-	                if (_didIteratorError) {
-	                    throw _iteratorError;
-	                }
-	            }
-	        }
-	
-	        return parsedItems;
-	    },
-	    prepareSubtypes: function prepareSubtypes(items) {
-	        var subtypes = items[0].subtypes;
-	        var returnArray = [];
-	        var _iteratorNormalCompletion2 = true;
-	        var _didIteratorError2 = false;
-	        var _iteratorError2 = undefined;
-	
-	        try {
-	            for (var _iterator2 = subtypes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	                var subtype = _step2.value;
-	
-	                returnArray.push(subtype.name);
-	            }
-	        } catch (err) {
-	            _didIteratorError2 = true;
-	            _iteratorError2 = err;
-	        } finally {
-	            try {
-	                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	                    _iterator2.return();
-	                }
-	            } finally {
-	                if (_didIteratorError2) {
-	                    throw _iteratorError2;
-	                }
-	            }
-	        }
-	
-	        return returnArray;
-	    },
-	    getTypes: function getTypes(items) {
-	        return this.getCategories(items).types;
-	    },
-	    getCategories: function getCategories(items) {
-	        var divisions = [];
-	        var types = [];
-	        var subtypes = [];
-	        for (var a in items) {
-	            divisions.push(items[a].name);
-	            for (var b in items[a].types) {
-	                types.push(items[a].types[b].name);
-	                for (var c in items[a].types[b].subtypes) {
-	                    subtypes.push(items[a].types[b].subtypes[c].name);
-	                }
-	            }
-	        }
-	        var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	        return categories;
+	        });
 	    }
+	    if (result[0].subtypes) {
+	        result[0].subtypes.forEach(function (subtype) {
+	            items = items.concat(subtype.items);
+	        });
+	    }
+	    if (!result[0].types && !result[0].subtypes) {
+	        items = result[0].items;
+	    }
+	
+	    var finalItems = this.prepareItems(items);
+	    return finalItems;
+	}, ItemManager.prepareItems = function (items) {
+	    var parsedItems = [];
+	    var _iteratorNormalCompletion = true;
+	    var _didIteratorError = false;
+	    var _iteratorError = undefined;
+	
+	    try {
+	        for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	            var item = _step.value;
+	
+	            var parseItem = item;
+	            parseItem.sizes = JSON.parse(item.sizes);
+	            parseItem.prices = JSON.parse(item.prices);
+	            parsedItems.push(parseItem);
+	        }
+	    } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	    } finally {
+	        try {
+	            if (!_iteratorNormalCompletion && _iterator.return) {
+	                _iterator.return();
+	            }
+	        } finally {
+	            if (_didIteratorError) {
+	                throw _iteratorError;
+	            }
+	        }
+	    }
+	
+	    return parsedItems;
+	}, ItemManager.prepareSubtypes = function (items) {
+	    var subtypes = items[0].subtypes;
+	    var returnArray = [];
+	    var _iteratorNormalCompletion2 = true;
+	    var _didIteratorError2 = false;
+	    var _iteratorError2 = undefined;
+	
+	    try {
+	        for (var _iterator2 = subtypes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	            var subtype = _step2.value;
+	
+	            returnArray.push(subtype.name);
+	        }
+	    } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	    } finally {
+	        try {
+	            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	                _iterator2.return();
+	            }
+	        } finally {
+	            if (_didIteratorError2) {
+	                throw _iteratorError2;
+	            }
+	        }
+	    }
+	
+	    return returnArray;
+	}, ItemManager.getTypes = function (items) {
+	    return this.getCategories(items).types;
+	}, ItemManager.getCategories = function (items) {
+	    var divisions = [];
+	    var types = [];
+	    var subtypes = [];
+	    for (var a in items) {
+	        divisions.push(items[a].name);
+	        for (var b in items[a].types) {
+	            types.push(items[a].types[b].name);
+	            for (var c in items[a].types[b].subtypes) {
+	                subtypes.push(items[a].types[b].subtypes[c].name);
+	            }
+	        }
+	    }
+	    var categories = { divisions: divisions, types: types, subtypes: subtypes };
+	    return categories;
 	};
+	
+	// }
 	
 	module.exports = ItemManager;
 

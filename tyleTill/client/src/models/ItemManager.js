@@ -3,9 +3,9 @@ _ = require('lodash')
 
 const ItemManager = ()=> {}
 
-ItemManager.prototype={
+// ItemManager.prototype={
 
-getItems(result){
+ItemManager.getItems=function(result){
   let items = []
   if(result[0].types){
         result[0].types.forEach(function(type){
@@ -28,7 +28,7 @@ return finalItems
 },
 
 
-prepareItems(items){
+ItemManager.prepareItems=function(items){
   let parsedItems =[]
   for(let item of items){
     let parseItem = item
@@ -39,7 +39,7 @@ prepareItems(items){
   return parsedItems
 },
 
-prepareSubtypes(items){
+ItemManager.prepareSubtypes=function(items){
     const subtypes = items[0].subtypes
     let returnArray = []
     for(let subtype of subtypes){
@@ -49,11 +49,11 @@ prepareSubtypes(items){
 },
 
 
-getTypes(items){
+ItemManager.getTypes=function(items){
     return this.getCategories(items).types
 },
 
-getCategories(items){
+ItemManager.getCategories=function(items){
     let divisions = []
     let types =[]
     let subtypes =[]
@@ -70,6 +70,6 @@ getCategories(items){
     return categories  
 }
 
-}
+// }
 
 module.exports = ItemManager

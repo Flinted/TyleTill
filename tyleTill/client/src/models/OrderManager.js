@@ -2,9 +2,7 @@ _ = require('lodash')
 
 const OrderManager = ()=> {}
 
-OrderManager.prototype = {
-
-  addItem(orderItems, newItem, input, arrayRef){
+  OrderManager.addItem= function(orderItems, newItem, input, arrayRef){
       let itemsObject = orderItems[0]
       const sizeRef = parseInt(arrayRef) || 0
       const ref = newItem.name+"("+newItem.sizes[sizeRef] +")"
@@ -17,7 +15,7 @@ OrderManager.prototype = {
       return returnArray
       },
 
-    removeItem(orderItems, key, input){
+    OrderManager.removeItem= function(orderItems, key, input){
         let itemsObject = orderItems[0]
         console.log(input)
         const currentTotal = parseFloat(itemsObject[key].total)
@@ -36,7 +34,7 @@ OrderManager.prototype = {
         return returnArray
     },
 
-    addPayment(orderItems, payment){
+    OrderManager.addPayment= function(orderItems, payment){
         let itemsObject = orderItems[0]
         const ref = payment.name
         let oldTotal = 0
@@ -50,8 +48,6 @@ OrderManager.prototype = {
         const returnArray= [itemsObject]
         return returnArray
     }
-
-  }
 
 
 module.exports =OrderManager

@@ -17,7 +17,6 @@ render(){
               <p>payment:{order.payments.toLocaleString('en-GB', {style:'currency', currency:'GBP'})} change: {order.change.toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</p></div>
               </li>
             ))}
-
       </ul>
     )
 

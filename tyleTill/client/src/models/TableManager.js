@@ -2,9 +2,8 @@ const React = require('react')
 
 const TableManager = () => {}
 
-TableManager.prototype ={
 
-manageTable(tables, table, order){
+ TableManager.manageTable = function(tables, table, order){
 
   if(!tables[table].length >0  && Object.keys(order[0]).length>0){
     console.log("assign order to table")
@@ -17,13 +16,7 @@ manageTable(tables, table, order){
     tables[table]=[]
     return ["order", order, tables]
     }
-
-
     return false
-}
-
-
-
 }
 
 module.exports = TableManager

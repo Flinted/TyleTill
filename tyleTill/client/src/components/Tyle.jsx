@@ -67,11 +67,11 @@ const Tyle = React.createClass({
     })
     const APIpromise = runner.run("GET", "http://localhost:5000/api/divisions")
     APIpromise.then(function(result){
-      const itemManager = new ItemManager
-      const categories = itemManager.getTypes(result)
+      // const itemManager = new ItemManager
+      const categories = ItemManager.getTypes(result)
       this.clock()
       setInterval(this.clock,60000)
-      const displayItems = itemManager.prepareItems(result[0].types[0].subtypes[0].items)
+      const displayItems = ItemManager.prepareItems(result[0].types[0].subtypes[0].items)
       this.setState({users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
     }.bind(this), function(err){
       console.log(err)
@@ -99,10 +99,10 @@ const Tyle = React.createClass({
     }
     let item = this.state.primaryDisplayItems[event.target.value]
     if(markerID === 2){item = this.state.secondaryDisplayItems[event.target.value]}
-    const ordermanager = new OrderManager
-    let newOrderArray = ordermanager.addItem(currentOrder, item, input, arrayRef)
-    const cashmanager = new CashManager
-    const total = cashmanager.total(newOrderArray)
+    // const ordermanager = new OrderManager
+    let newOrderArray = OrderManager.addItem(currentOrder, item, input, arrayRef)
+    // const cashmanager = new CashManager
+    const total = CashManager.total(newOrderArray)
     if(markerID === 2){
       this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
     }else{
@@ -118,10 +118,10 @@ const Tyle = React.createClass({
       currentOrder = this.state.secondaryOrderItems
       input = this.state.secondaryInput
     }
-    const ordermanager = new OrderManager
-    let newOrderArray = ordermanager.removeItem(currentOrder, key, input)
-    const cashmanager = new CashManager
-    const total = cashmanager.total(newOrderArray)
+    // const ordermanager = new OrderManager
+    let newOrderArray = OrderManager.removeItem(currentOrder, key, input)
+    // const cashmanager = new CashManager
+    const total = CashManager.total(newOrderArray)
     if(markerID === 2){
       this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: ''})
     }else{
@@ -135,8 +135,8 @@ const Tyle = React.createClass({
       console.log(url)
       const promise = runner.run("GET",url)
       promise.then(function(result){
-        const itemManager = new ItemManager
-        const finalItems = itemManager.getItems(result)
+        // const itemManager = new ItemManager
+        const finalItems = ItemManager.getItems(result)
         if(markerID===2){
           this.setState({secondaryDisplayItems: finalItems})
         }else{
@@ -148,11 +148,11 @@ const Tyle = React.createClass({
   subMenuOptionClick(selected, markerID){
           let url = "http://localhost:5000/api/subtypes/find/"+selected
 
-        const runner = new APIRunner
+          const runner = new APIRunner
           const promise = runner.run("GET",url)
           promise.then(function(result){
-            const itemManager = new ItemManager
-            const finalItems = itemManager.getItems(result)
+            // const itemManager = new ItemManager
+            const finalItems = ItemManager.getItems(result)
             if(markerID===2){
               this.setState({secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub"})
             }else{
@@ -165,10 +165,11 @@ const Tyle = React.createClass({
       this.setState({primarySubMenuShow: "sub"})
       let url = "http://localhost:5000/api/types/find/"+ selected
       const apiRunner = new APIRunner
-      const itemManager = new ItemManager
+      // const itemManager = new ItemManager
       apiRunner.run("GET", url).then(function(result){
         console.log(result[0].subtypes)
-        const subtypes = itemManager.prepareSubtypes(result)
+        const subtypes = ItemManager.prepareSubtypes(result)
+
         if(markerID === 2){
         this.setState({secondarySubCategories: subtypes, secondarySubMenuShow: "sub"})
         }else{
@@ -268,13 +269,13 @@ const Tyle = React.createClass({
             oldTotal = this.state.secondaryOrderTotal
             items = this.state.secondaryOrderItems
           }
-          const cashManager = new CashManager
-          const orderManager = new OrderManager
-          const newPayment = cashManager.checkPayAmount(selected, input, oldTotal)
-          const newOrderArray = orderManager.addPayment(items, newPayment)
-          const total = cashManager.total(newOrderArray)
+          // const cashManager = new CashManager
+          // const orderManager = new OrderManager
+          const newPayment = CashManager.checkPayAmount(selected, input, oldTotal)
+          const newOrderArray = OrderManager.addPayment(items, newPayment)
+          const total = CashManager.total(newOrderArray)
           if(total <= 0.00){
-            this.cashOff(cashManager, newOrderArray, markerID)
+            this.cashOff(newOrderArray, markerID)
             return
           }
           if(markerID === 2){
@@ -285,12 +286,12 @@ const Tyle = React.createClass({
       },
 
 
-      cashOff(cashManager, newOrderArray, markerID){
+      cashOff(newOrderArray, markerID){
           console.log("CASH OFF")
           let newOrders = this.state.orders
           let user = this.state.primaryUser
           if(markerID===2){user = this.state.secondaryUser}
-          const entry = cashManager.getOrderInfo(newOrderArray,user)
+          const entry = CashManager.getOrderInfo(newOrderArray,user)
           entry["id"]= newOrders.length
           newOrders.push(entry)
           console.log(newOrders)
@@ -337,8 +338,8 @@ const Tyle = React.createClass({
       tableClick(table, markerID){
         let order = this.state.primaryOrderItems  
         if(markerID===2){order = this.state.secondaryOrderItems }
-          const tableManager = new TableManager
-        const result = tableManager.manageTable(this.state.tables, table, order)
+          // const tableManager = new TableManager
+        const result = TableManager.manageTable(this.state.tables, table, order)
         if(!result){
           console.log("CANNOT DO THIS!")
         }else if(result[0] === "tables"){
