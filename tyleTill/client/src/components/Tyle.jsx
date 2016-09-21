@@ -367,9 +367,9 @@ const Tyle = React.createClass({
 
       logout(markerID){
         if(markerID === 2){
-          this.setState({secondaryUser: "", secondaryLogin:true, secondaryOrderItems:[{}], secondaryOrderTotal:0.00})
+          this.setState({secondaryCashDisplay: false,secondaryTableShow: false, secondaryOrderShow:'hidden', secondaryUser: "", secondaryLogin:true, secondaryOrderItems:[{}], secondaryOrderTotal:0.00})
         }else{
-          this.setState({primaryUser:"", primaryLogin:true, primaryOrderItems:[{}], primaryOrderTotal:0.00})
+          this.setState({primaryCashDisplay: false,primaryTableShow: false, primaryOrderShow:'hidden', primaryUser:"", primaryLogin:true, primaryOrderItems:[{}], primaryOrderTotal:0.00})
         }
       },
 

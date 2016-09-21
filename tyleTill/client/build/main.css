@@ -10,7 +10,7 @@ html{
   background-repeat: repeat;
   -webkit-user-select: none;
 
-  /*background-color: black;*/
+  background-color: black;
   height: 100%;
   width:100%;
 }
@@ -247,7 +247,7 @@ body{
 }
 
 
-.item-button:hover, .table-taken:hover, .table-free:hover, .pay-button:hover,.menu-button:hover, .menu-item:hover, .login-button:hover, .order-selector li:hover{
+.item-button:hover, .table-taken:hover, .table-free:hover, .pay-button:hover,.menu-button:hover, .menu-item:hover, .login-button:hover, .order-selector li:hover, .quick-cash:hover{
   border: 2px solid white;  
 }
 
