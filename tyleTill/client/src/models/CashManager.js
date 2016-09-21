@@ -14,7 +14,7 @@ total(order, index){
     return total
 },
 
-getOrderInfo(order){
+getOrderInfo(order, user){
       let total = 0.00
       let payments = 0.00
       let items = 0
@@ -26,8 +26,11 @@ getOrderInfo(order){
             items += parseInt(order[0][item].qty)
         }
       }
-      const change= total + payments
-      return {total: total, payments: payments, items: items, change: change, orderDetail:order}
+      let change= total + payments 
+      payments = payments * -1
+      change = change * -1
+      const time = new Date()
+      return {user:user, time: time, total: total, payments: payments, items: items, change: change, orderDetail:order}
 },
 
 checkPayAmount(selected, input, total){

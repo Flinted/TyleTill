@@ -24,7 +24,6 @@
 }
 
 .info-window h6, .info-window h5{
-  line-height: 48px;
   margin:0px;
   color: black;
 }
@@ -42,12 +41,18 @@
   vertical-align: top;
 }
 
-.info-window div:nth-child(4) h5{
-line-height: 24px !important;
+/*.info-window div:nth-child(4) h5{
+line-height: 15px !important;
 color: black !important;
-}
+}*/
 
-.info-window div:nth-child(3) h5, .info-window div:nth-child(2) h5{
+/*.info-window div:nth-child(1) h5, .info-window div:nth-child(4) h5, .info-window div:nth-child(3) h5, .info-window div:nth-child(2) h5{
+line-height: 15px !important;
+color: black !important;
+font-size: 0.7em;
+}*/
+
+.info-window h5{
 line-height: 15px !important;
 color: black !important;
 font-size: 0.7em;

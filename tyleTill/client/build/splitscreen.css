@@ -21,28 +21,53 @@ margin-right: 0px !important;
   /*width: 49%;
   height: 100%;*/
   float: right !important;
-
 }
 
 .item-window-split{
   margin-top: 70px;
   float: right;
-  width: 51%;
-  max-height:80%;
+  width: 31%;
+  max-height:550px;
   text-align: center;
+  margin-top: 0px !important;
   margin-right: 80px;
   margin-right: 5px;
   display: inline-flex;
+  padding: 70px 55px 70px 70px !important;
   flex-wrap: wrap;
   overflow-y: scroll;
 }
 
-.item-window-split ul:nth-child(2){
+.item-window-split ul:nth-child(3){
   width: 285px !important;
   margin-right: 0px !important;
   margin-left: 105px;
   display: inline-flex;
   flex-wrap: wrap;
+  overflow-y: scroll;
+}
+
+.primary .holder .cash-display, .secondary .holder .cash-display{
+  margin-left: -10px;
+  position: absolute;
+}
+
+.primary .holder, .secondary .holder{
+  width:340px;
+  display: inline-flex;
+  position: absolute;
+  padding:0px;
+  padding-top: 70px !important;
+  float:right;
+}
+
+.primary .holder .item-window-cash-display, .secondary .holder .item-window-cash-display{
+  width: 300px !important;
+  /*max-height: 80% !important;*/
+  margin-left: 30px !important;
+  padding-left: 70px;
+  padding-right: 40px;
+  padding-bottom: 70px;
   overflow-y: scroll;
 }
 /*END SPLIT SCREEN*/

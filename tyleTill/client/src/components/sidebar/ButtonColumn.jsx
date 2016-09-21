@@ -17,12 +17,16 @@ const ButtonColumn= React.createClass({
         this.props.logout(this.props.markerID)
       },
 
+      onOrderToggle(){
+        this.props.orderToggle(this.props.markerID)
+      },
+
       render(){
         return  (
               <div className='button-column'>
               <image className='menu-button' src= '/images/split.png' onClick={this.onSplitClick}/>
               <image className='menu-button' src= '/images/table.png' onClick={this.onTableClick}/>
-              <image className='menu-button' src= '/images/save.png'/>
+              <image className='menu-button' src= '/images/save.png' onClick={this.onOrderToggle}/>
               <image className='menu-button' src= '/images/logout.png' onClick={this.onLogout}/>
               <image className='menu-button' src= '/images/pay.png' onClick={this.onPayClick}/>
               </div>

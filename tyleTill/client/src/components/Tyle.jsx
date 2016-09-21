@@ -8,8 +8,9 @@ const CashManager = require('../models/CashManager')
 const OrderManager = require('../models/OrderManager')
 const TableManager = require('../models/TableManager')
 const ItemManager = require('../models/ItemManager')
-const ButtonColumn =require('./ButtonColumn')
+const ButtonColumn =require('./sidebar/ButtonColumn')
 const TableWindow =require('./TableWindow')
+const OrderSelector =require('./OrderSelector')
 const ReactCSSTransitionGroup=require('react-addons-css-transition-group') 
 const MenuTray = require('./MenuTray')
 const APIRunner = require('../models/APIRunner')
@@ -29,6 +30,7 @@ const Tyle = React.createClass({
       tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
       primaryDisplayItems:[],
       primarySubCategories:{},
+      primaryOrderShow:'hidden',
       primaryLogin: true,
       primaryChange:'',
       primaryUser: "",
@@ -44,6 +46,7 @@ const Tyle = React.createClass({
       secondaryOrderItems:[{}],
       secondaryDisplayItems:[],
       secondarySubCategories:{},
+      secondaryOrderShow:'hidden',
       secondaryOrderTotal:0.00,
       secondaryInput:'',
       secondaryCashDisplay: false,
@@ -54,7 +57,7 @@ const Tyle = React.createClass({
     }
   },
 
-  componentDidMount(){
+  componentWillMount(){
     console.log("attempting api call")
     let users= null
     const runner = new APIRunner
@@ -219,6 +222,10 @@ const Tyle = React.createClass({
         }
       },
 
+      onOrderToggle(markerID){
+          this.setState({primaryOrderShow: 'order-selector'})
+      },
+
       onPayClick(selected, markerID){
           let input = this.state.primaryInput
           let oldTotal = this.state.primaryOrderTotal
@@ -248,7 +255,9 @@ const Tyle = React.createClass({
       cashOff(cashManager, newOrderArray, markerID){
           console.log("CASH OFF")
           let newOrders = this.state.orders
-          const entry = cashManager.getOrderInfo(newOrderArray)
+          let user = this.state.primaryUser
+          if(markerID===2){user = this.state.secondaryUser}
+          const entry = cashManager.getOrderInfo(newOrderArray,user)
           entry["id"]= newOrders.length
           newOrders.push(entry)
           console.log(newOrders)
@@ -337,6 +346,7 @@ const Tyle = React.createClass({
             <div className='tyle-container'>
             <div className="primary">
             <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users} change={this.state.primaryChange}/>
+            <OrderSelector orders={this.state.orders}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
                   <div id='sidebar'>
                         <Infowindow 
@@ -398,6 +408,7 @@ const Tyle = React.createClass({
                       transitionLeaveTimeout={500}
                    >
             <Login onLogin={this.onLogin} display={this.state.secondaryLogin} markerID={2} users={this.state.users} change={this.state.secondaryChange}/>
+            <OrderSelector orders={this.state.orders}/>
             <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
             <div id='sidebar'>
                 <Infowindow 
@@ -457,6 +468,7 @@ const Tyle = React.createClass({
           return(
             <div className='tyle-container'>
             <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users} change={this.state.primaryChange}/>
+            <OrderSelector orders={this.state.orders} class={this.state.primaryOrderShow} markerID={1}/>
             <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick}/>
             <div id='sidebar'>
                 <Infowindow
@@ -478,6 +490,7 @@ const Tyle = React.createClass({
             </div>
             <ButtonColumn
                 markerID={1}
+                orderToggle= {this.onOrderToggle}
                 tableToggle={this.onTableToggle}
                 splitClick= {this.onSplitClick}
                 payToggle={this.onPayToggle}
