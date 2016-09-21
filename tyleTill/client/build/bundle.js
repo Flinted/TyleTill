@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(159);
+	var ReactDOM = __webpack_require__(185);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19746,21 +19746,21 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Orderwindow = __webpack_require__(160);
-	var Itemwindow = __webpack_require__(164);
-	var Login = __webpack_require__(175);
-	var Infowindow = __webpack_require__(176);
-	var Cashwindow = __webpack_require__(177);
-	var CashManager = __webpack_require__(178);
-	var OrderManager = __webpack_require__(179);
-	var TableManager = __webpack_require__(180);
-	var ItemManager = __webpack_require__(181);
-	var ButtonColumn = __webpack_require__(182);
-	var TableWindow = __webpack_require__(183);
-	var ReactCSSTransitionGroup = __webpack_require__(168);
-	var MenuTray = __webpack_require__(184);
-	var APIRunner = __webpack_require__(185);
-	_ = __webpack_require__(162);
+	var Orderwindow = __webpack_require__(159);
+	var Itemwindow = __webpack_require__(163);
+	var Login = __webpack_require__(174);
+	var Infowindow = __webpack_require__(175);
+	var Cashwindow = __webpack_require__(176);
+	var CashManager = __webpack_require__(177);
+	var OrderManager = __webpack_require__(178);
+	var TableManager = __webpack_require__(179);
+	var ItemManager = __webpack_require__(180);
+	var ButtonColumn = __webpack_require__(181);
+	var TableWindow = __webpack_require__(182);
+	var ReactCSSTransitionGroup = __webpack_require__(167);
+	var MenuTray = __webpack_require__(183);
+	var APIRunner = __webpack_require__(184);
+	_ = __webpack_require__(161);
 	
 	var Tyle = React.createClass({
 	  displayName: 'Tyle',
@@ -20262,18 +20262,9 @@
 
 	'use strict';
 	
-	module.exports = __webpack_require__(3);
-
-
-/***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
 	var React = __webpack_require__(1);
-	var OrderRow = __webpack_require__(161);
-	_ = __webpack_require__(162);
+	var OrderRow = __webpack_require__(160);
+	_ = __webpack_require__(161);
 	
 	var Orderwindow = React.createClass({
 	  displayName: 'Orderwindow',
@@ -20299,7 +20290,7 @@
 	module.exports = Orderwindow;
 
 /***/ },
-/* 161 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20358,7 +20349,7 @@
 	module.exports = OrderRow;
 
 /***/ },
-/* 162 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -37095,10 +37086,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(163)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(162)(module)))
 
 /***/ },
-/* 163 */
+/* 162 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -37114,7 +37105,7 @@
 
 
 /***/ },
-/* 164 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37122,8 +37113,8 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(165);
-	var CashDisplay = __webpack_require__(167);
+	var Item = __webpack_require__(164);
+	var CashDisplay = __webpack_require__(166);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
@@ -37167,13 +37158,13 @@
 	module.exports = Itemwindow;
 
 /***/ },
-/* 165 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ExpandedItem = __webpack_require__(166);
+	var ExpandedItem = __webpack_require__(165);
 	
 	var Item = React.createClass({
 	  displayName: 'Item',
@@ -37233,13 +37224,13 @@
 	module.exports = Item;
 
 /***/ },
-/* 166 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(165);
+	var Item = __webpack_require__(164);
 	
 	var ExpandedItem = React.createClass({
 	    displayName: 'ExpandedItem',
@@ -37287,13 +37278,13 @@
 	module.exports = ExpandedItem;
 
 /***/ },
-/* 167 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(168);
+	var ReactCSSTransitionGroup = __webpack_require__(167);
 	
 	var CashDisplay = React.createClass({
 	    displayName: 'CashDisplay',
@@ -37346,13 +37337,13 @@
 	module.exports = CashDisplay;
 
 /***/ },
-/* 168 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(169);
+	module.exports = __webpack_require__(168);
 
 /***/ },
-/* 169 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37373,8 +37364,8 @@
 	
 	var assign = __webpack_require__(39);
 	
-	var ReactTransitionGroup = __webpack_require__(170);
-	var ReactCSSTransitionGroupChild = __webpack_require__(172);
+	var ReactTransitionGroup = __webpack_require__(169);
+	var ReactCSSTransitionGroupChild = __webpack_require__(171);
 	
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -37440,7 +37431,7 @@
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 170 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37457,7 +37448,7 @@
 	'use strict';
 	
 	var React = __webpack_require__(2);
-	var ReactTransitionChildMapping = __webpack_require__(171);
+	var ReactTransitionChildMapping = __webpack_require__(170);
 	
 	var assign = __webpack_require__(39);
 	var emptyFunction = __webpack_require__(15);
@@ -37650,7 +37641,7 @@
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 171 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37753,7 +37744,7 @@
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 172 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37773,8 +37764,8 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	
-	var CSSCore = __webpack_require__(173);
-	var ReactTransitionEvents = __webpack_require__(174);
+	var CSSCore = __webpack_require__(172);
+	var ReactTransitionEvents = __webpack_require__(173);
 	
 	var onlyChild = __webpack_require__(156);
 	
@@ -37923,7 +37914,7 @@
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 173 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -38026,7 +38017,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 174 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38140,7 +38131,7 @@
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 175 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38327,7 +38318,7 @@
 	module.exports = Login;
 
 /***/ },
-/* 176 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38401,7 +38392,7 @@
 	module.exports = Infowindow;
 
 /***/ },
-/* 177 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38484,12 +38475,12 @@
 	module.exports = Cashwindow;
 
 /***/ },
-/* 178 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(162);
+	_ = __webpack_require__(161);
 	
 	var CashManager = function CashManager() {};
 	
@@ -38553,12 +38544,12 @@
 	module.exports = CashManager;
 
 /***/ },
-/* 179 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(162);
+	_ = __webpack_require__(161);
 	
 	var OrderManager = function OrderManager() {};
 	
@@ -38614,7 +38605,7 @@
 	module.exports = OrderManager;
 
 /***/ },
-/* 180 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38649,12 +38640,12 @@
 	module.exports = TableManager;
 
 /***/ },
-/* 181 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(162);
+	_ = __webpack_require__(161);
 	
 	var ItemManager = function ItemManager() {};
 	
@@ -38770,7 +38761,7 @@
 	module.exports = ItemManager;
 
 /***/ },
-/* 182 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38807,13 +38798,13 @@
 	module.exports = ButtonColumn;
 
 /***/ },
-/* 183 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(168);
+	var ReactCSSTransitionGroup = __webpack_require__(167);
 	
 	var TableWindow = React.createClass({
 	  displayName: 'TableWindow',
@@ -38868,13 +38859,13 @@
 	module.exports = TableWindow;
 
 /***/ },
-/* 184 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(168);
+	var ReactCSSTransitionGroup = __webpack_require__(167);
 	
 	var MenuTray = React.createClass({
 	  displayName: 'MenuTray',
@@ -38975,7 +38966,7 @@
 	module.exports = MenuTray;
 
 /***/ },
-/* 185 */
+/* 184 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -39038,6 +39029,15 @@
 	};
 	
 	module.exports = APIRunner;
+
+/***/ },
+/* 185 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	module.exports = __webpack_require__(3);
+
 
 /***/ }
 /******/ ]);
