@@ -1,10 +1,10 @@
 _ = require('lodash')
 
 
-const CashManager = ()=> {}
+const CashManager = function(){
 
+}
 
-// CashManager.prototype = {
 
 CashManager.total=function(order, index){
     let total = 0.00
@@ -15,22 +15,22 @@ CashManager.total=function(order, index){
 },
 
 CashManager.getOrderInfo=function(order, user){
-      let total = 0.00
-      let payments = 0.00
-      let items = 0
-      for(let item in order[0]){
-        if( order[0][item].total <=0){
-            payments += parseFloat(order[0][item].total)
-        }else{
-            total += parseFloat(order[0][item].total)
-            items += parseInt(order[0][item].qty)
-        }
-      }
-      let change= total + payments 
-      payments = payments * -1
-      change = change * -1
-      const time = new Date()
-      return {user:user, time: time, total: total, payments: payments, items: items, change: change, orderDetail:order}
+  let total = 0.00
+  let payments = 0.00
+  let items = 0
+  for(let item in order[0]){
+    if( order[0][item].total <=0){
+        payments += parseFloat(order[0][item].total)
+    }else{
+        total += parseFloat(order[0][item].total)
+        items += parseInt(order[0][item].qty)
+    }
+}
+let change= total + payments 
+payments = payments * -1
+change = change * -1
+const time = new Date()
+return {user:user, time: time, total: total, payments: payments, items: items, change: change, orderDetail:order}
 },
 
 CashManager.checkPayAmount=function(selected, input, total){
@@ -43,14 +43,14 @@ CashManager.checkPayAmount=function(selected, input, total){
         case "card":
         case "discount":
         case "cash":
-            category = selected
-            break
+        category = selected
+        break
         default:
-            category= "cash(" + selected + ")"
-            value = parseInt(selected)
-            qty = input
-            console.log("value", value)
-            break
+        category= "cash(" + selected + ")"
+        value = parseInt(selected)
+        qty = input
+        console.log("value", value)
+        break
     }
     
     if(input){
@@ -64,7 +64,7 @@ CashManager.checkPayAmount=function(selected, input, total){
     }
 
     return {id: Date.now(), name: category, qty: qty || 1, total: -amount}
-    }
+}
 // }
 
 

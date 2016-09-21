@@ -1,9 +1,11 @@
 const React = require('react')
 
-const TableManager = () => {}
+const TableManager = function(){
+
+}
 
 
- TableManager.manageTable = function(tables, table, order){
+TableManager.manageTable = function(tables, table, order){
 
   if(!tables[table].length >0  && Object.keys(order[0]).length>0){
     console.log("assign order to table")
@@ -15,8 +17,8 @@ const TableManager = () => {}
     order = tables[table]
     tables[table]=[]
     return ["order", order, tables]
-    }
-    return false
+  }
+  return false
 }
 
 module.exports = TableManager

@@ -99,9 +99,7 @@ const Tyle = React.createClass({
     }
     let item = this.state.primaryDisplayItems[event.target.value]
     if(markerID === 2){item = this.state.secondaryDisplayItems[event.target.value]}
-    // const ordermanager = new OrderManager
     let newOrderArray = OrderManager.addItem(currentOrder, item, input, arrayRef)
-    // const cashmanager = new CashManager
     const total = CashManager.total(newOrderArray)
     if(markerID === 2){
       this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
@@ -118,9 +116,7 @@ const Tyle = React.createClass({
       currentOrder = this.state.secondaryOrderItems
       input = this.state.secondaryInput
     }
-    // const ordermanager = new OrderManager
     let newOrderArray = OrderManager.removeItem(currentOrder, key, input)
-    // const cashmanager = new CashManager
     const total = CashManager.total(newOrderArray)
     if(markerID === 2){
       this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: ''})
@@ -135,7 +131,6 @@ const Tyle = React.createClass({
       console.log(url)
       const promise = runner.run("GET",url)
       promise.then(function(result){
-        // const itemManager = new ItemManager
         const finalItems = ItemManager.getItems(result)
         if(markerID===2){
           this.setState({secondaryDisplayItems: finalItems})
@@ -151,7 +146,6 @@ const Tyle = React.createClass({
           const runner = new APIRunner
           const promise = runner.run("GET",url)
           promise.then(function(result){
-            // const itemManager = new ItemManager
             const finalItems = ItemManager.getItems(result)
             if(markerID===2){
               this.setState({secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub"})
@@ -165,7 +159,6 @@ const Tyle = React.createClass({
       this.setState({primarySubMenuShow: "sub"})
       let url = "http://localhost:5000/api/types/find/"+ selected
       const apiRunner = new APIRunner
-      // const itemManager = new ItemManager
       apiRunner.run("GET", url).then(function(result){
         console.log(result[0].subtypes)
         const subtypes = ItemManager.prepareSubtypes(result)
@@ -269,8 +262,6 @@ const Tyle = React.createClass({
             oldTotal = this.state.secondaryOrderTotal
             items = this.state.secondaryOrderItems
           }
-          // const cashManager = new CashManager
-          // const orderManager = new OrderManager
           const newPayment = CashManager.checkPayAmount(selected, input, oldTotal)
           const newOrderArray = OrderManager.addPayment(items, newPayment)
           const total = CashManager.total(newOrderArray)
@@ -338,7 +329,6 @@ const Tyle = React.createClass({
       tableClick(table, markerID){
         let order = this.state.primaryOrderItems  
         if(markerID===2){order = this.state.secondaryOrderItems }
-          // const tableManager = new TableManager
         const result = TableManager.manageTable(this.state.tables, table, order)
         if(!result){
           console.log("CANNOT DO THIS!")

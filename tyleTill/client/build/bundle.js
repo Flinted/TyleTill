@@ -19847,9 +19847,7 @@
 	    if (markerID === 2) {
 	      item = this.state.secondaryDisplayItems[event.target.value];
 	    }
-	    // const ordermanager = new OrderManager
 	    var newOrderArray = OrderManager.addItem(currentOrder, item, input, arrayRef);
-	    // const cashmanager = new CashManager
 	    var total = CashManager.total(newOrderArray);
 	    if (markerID === 2) {
 	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
@@ -19865,9 +19863,7 @@
 	      currentOrder = this.state.secondaryOrderItems;
 	      input = this.state.secondaryInput;
 	    }
-	    // const ordermanager = new OrderManager
 	    var newOrderArray = OrderManager.removeItem(currentOrder, key, input);
-	    // const cashmanager = new CashManager
 	    var total = CashManager.total(newOrderArray);
 	    if (markerID === 2) {
 	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
@@ -19881,7 +19877,6 @@
 	    console.log(url);
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
-	      // const itemManager = new ItemManager
 	      var finalItems = ItemManager.getItems(result);
 	      if (markerID === 2) {
 	        this.setState({ secondaryDisplayItems: finalItems });
@@ -19896,7 +19891,6 @@
 	    var runner = new APIRunner();
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
-	      // const itemManager = new ItemManager
 	      var finalItems = ItemManager.getItems(result);
 	      if (markerID === 2) {
 	        this.setState({ secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub" });
@@ -19909,7 +19903,6 @@
 	    this.setState({ primarySubMenuShow: "sub" });
 	    var url = "http://localhost:5000/api/types/find/" + selected;
 	    var apiRunner = new APIRunner();
-	    // const itemManager = new ItemManager
 	    apiRunner.run("GET", url).then(function (result) {
 	      console.log(result[0].subtypes);
 	      var subtypes = ItemManager.prepareSubtypes(result);
@@ -20011,8 +20004,6 @@
 	      oldTotal = this.state.secondaryOrderTotal;
 	      items = this.state.secondaryOrderItems;
 	    }
-	    // const cashManager = new CashManager
-	    // const orderManager = new OrderManager
 	    var newPayment = CashManager.checkPayAmount(selected, input, oldTotal);
 	    var newOrderArray = OrderManager.addPayment(items, newPayment);
 	    var total = CashManager.total(newOrderArray);
@@ -20078,7 +20069,6 @@
 	    if (markerID === 2) {
 	      order = this.state.secondaryOrderItems;
 	    }
-	    // const tableManager = new TableManager
 	    var result = TableManager.manageTable(this.state.tables, table, order);
 	    if (!result) {
 	      console.log("CANNOT DO THIS!");
@@ -38559,8 +38549,6 @@
 	
 	var CashManager = function CashManager() {};
 	
-	// CashManager.prototype = {
-	
 	CashManager.total = function (order, index) {
 	    var total = 0.00;
 	    for (var key in order[0]) {
@@ -38632,48 +38620,48 @@
 	var OrderManager = function OrderManager() {};
 	
 	OrderManager.addItem = function (orderItems, newItem, input, arrayRef) {
-	    var itemsObject = orderItems[0];
-	    var sizeRef = parseInt(arrayRef) || 0;
-	    var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
-	    var price = newItem.prices[sizeRef];
-	    var qty = parseInt(input) || 1;
-	    if (itemsObject[ref]) {
-	        qty = itemsObject[ref].qty + (parseInt(input) || 1);
-	    }
-	    var total = parseFloat(price * qty);
-	    itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
-	    var returnArray = [itemsObject];
-	    return returnArray;
+	  var itemsObject = orderItems[0];
+	  var sizeRef = parseInt(arrayRef) || 0;
+	  var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
+	  var price = newItem.prices[sizeRef];
+	  var qty = parseInt(input) || 1;
+	  if (itemsObject[ref]) {
+	    qty = itemsObject[ref].qty + (parseInt(input) || 1);
+	  }
+	  var total = parseFloat(price * qty);
+	  itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
+	  var returnArray = [itemsObject];
+	  return returnArray;
 	}, OrderManager.removeItem = function (orderItems, key, input) {
-	    var itemsObject = orderItems[0];
-	    console.log(input);
-	    var currentTotal = parseFloat(itemsObject[key].total);
-	    var origQty = itemsObject[key].qty;
-	    var price = currentTotal / origQty;
-	    var qty = origQty - (parseInt(input) || 1);
-	    var id = itemsObject[key].id;
-	    if (qty < 1) {
-	        delete itemsObject[key];
-	        var _returnArray = [itemsObject];
-	        return _returnArray;
-	    }
-	    var total = parseFloat(price * qty);
-	    itemsObject[key] = { id: id, name: key, qty: qty, total: total };
-	    var returnArray = [itemsObject];
-	    return returnArray;
+	  var itemsObject = orderItems[0];
+	  console.log(input);
+	  var currentTotal = parseFloat(itemsObject[key].total);
+	  var origQty = itemsObject[key].qty;
+	  var price = currentTotal / origQty;
+	  var qty = origQty - (parseInt(input) || 1);
+	  var id = itemsObject[key].id;
+	  if (qty < 1) {
+	    delete itemsObject[key];
+	    var _returnArray = [itemsObject];
+	    return _returnArray;
+	  }
+	  var total = parseFloat(price * qty);
+	  itemsObject[key] = { id: id, name: key, qty: qty, total: total };
+	  var returnArray = [itemsObject];
+	  return returnArray;
 	}, OrderManager.addPayment = function (orderItems, payment) {
-	    var itemsObject = orderItems[0];
-	    var ref = payment.name;
-	    var oldTotal = 0;
-	    var qty = parseInt(payment.qty);
-	    if (itemsObject[ref]) {
-	        qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
-	        oldTotal = itemsObject[ref].total;
-	    }
-	    var total = parseFloat(payment.total + oldTotal);
-	    itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
-	    var returnArray = [itemsObject];
-	    return returnArray;
+	  var itemsObject = orderItems[0];
+	  var ref = payment.name;
+	  var oldTotal = 0;
+	  var qty = parseInt(payment.qty);
+	  if (itemsObject[ref]) {
+	    qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
+	    oldTotal = itemsObject[ref].total;
+	  }
+	  var total = parseFloat(payment.total + oldTotal);
+	  itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
+	  var returnArray = [itemsObject];
+	  return returnArray;
 	};
 	
 	module.exports = OrderManager;
@@ -38716,108 +38704,104 @@
 	
 	var ItemManager = function ItemManager() {};
 	
-	// ItemManager.prototype={
-	
 	ItemManager.getItems = function (result) {
-	    var items = [];
-	    if (result[0].types) {
-	        result[0].types.forEach(function (type) {
-	            type.subtypes.forEach(function (subtype) {
-	                items = items.concat(subtype.items);
-	            });
-	        });
-	    }
-	    if (result[0].subtypes) {
-	        result[0].subtypes.forEach(function (subtype) {
-	            items = items.concat(subtype.items);
-	        });
-	    }
-	    if (!result[0].types && !result[0].subtypes) {
-	        items = result[0].items;
-	    }
+	  var items = [];
+	  if (result[0].types) {
+	    result[0].types.forEach(function (type) {
+	      type.subtypes.forEach(function (subtype) {
+	        items = items.concat(subtype.items);
+	      });
+	    });
+	  }
+	  if (result[0].subtypes) {
+	    result[0].subtypes.forEach(function (subtype) {
+	      items = items.concat(subtype.items);
+	    });
+	  }
+	  if (!result[0].types && !result[0].subtypes) {
+	    items = result[0].items;
+	  }
 	
-	    var finalItems = this.prepareItems(items);
-	    return finalItems;
+	  var finalItems = this.prepareItems(items);
+	  return finalItems;
 	}, ItemManager.prepareItems = function (items) {
-	    var parsedItems = [];
-	    var _iteratorNormalCompletion = true;
-	    var _didIteratorError = false;
-	    var _iteratorError = undefined;
+	  var parsedItems = [];
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
 	
-	    try {
-	        for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	            var item = _step.value;
+	  try {
+	    for (var _iterator = items[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var item = _step.value;
 	
-	            var parseItem = item;
-	            parseItem.sizes = JSON.parse(item.sizes);
-	            parseItem.prices = JSON.parse(item.prices);
-	            parsedItems.push(parseItem);
-	        }
-	    } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	    } finally {
-	        try {
-	            if (!_iteratorNormalCompletion && _iterator.return) {
-	                _iterator.return();
-	            }
-	        } finally {
-	            if (_didIteratorError) {
-	                throw _iteratorError;
-	            }
-	        }
+	      var parseItem = item;
+	      parseItem.sizes = JSON.parse(item.sizes);
+	      parseItem.prices = JSON.parse(item.prices);
+	      parsedItems.push(parseItem);
 	    }
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator.return) {
+	        _iterator.return();
+	      }
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
+	      }
+	    }
+	  }
 	
-	    return parsedItems;
+	  return parsedItems;
 	}, ItemManager.prepareSubtypes = function (items) {
-	    var subtypes = items[0].subtypes;
-	    var returnArray = [];
-	    var _iteratorNormalCompletion2 = true;
-	    var _didIteratorError2 = false;
-	    var _iteratorError2 = undefined;
+	  var subtypes = items[0].subtypes;
+	  var returnArray = [];
+	  var _iteratorNormalCompletion2 = true;
+	  var _didIteratorError2 = false;
+	  var _iteratorError2 = undefined;
 	
+	  try {
+	    for (var _iterator2 = subtypes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	      var subtype = _step2.value;
+	
+	      returnArray.push(subtype.name);
+	    }
+	  } catch (err) {
+	    _didIteratorError2 = true;
+	    _iteratorError2 = err;
+	  } finally {
 	    try {
-	        for (var _iterator2 = subtypes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	            var subtype = _step2.value;
-	
-	            returnArray.push(subtype.name);
-	        }
-	    } catch (err) {
-	        _didIteratorError2 = true;
-	        _iteratorError2 = err;
+	      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	        _iterator2.return();
+	      }
 	    } finally {
-	        try {
-	            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	                _iterator2.return();
-	            }
-	        } finally {
-	            if (_didIteratorError2) {
-	                throw _iteratorError2;
-	            }
-	        }
+	      if (_didIteratorError2) {
+	        throw _iteratorError2;
+	      }
 	    }
+	  }
 	
-	    return returnArray;
+	  return returnArray;
 	}, ItemManager.getTypes = function (items) {
-	    return this.getCategories(items).types;
+	  return this.getCategories(items).types;
 	}, ItemManager.getCategories = function (items) {
-	    var divisions = [];
-	    var types = [];
-	    var subtypes = [];
-	    for (var a in items) {
-	        divisions.push(items[a].name);
-	        for (var b in items[a].types) {
-	            types.push(items[a].types[b].name);
-	            for (var c in items[a].types[b].subtypes) {
-	                subtypes.push(items[a].types[b].subtypes[c].name);
-	            }
-	        }
+	  var divisions = [];
+	  var types = [];
+	  var subtypes = [];
+	  for (var a in items) {
+	    divisions.push(items[a].name);
+	    for (var b in items[a].types) {
+	      types.push(items[a].types[b].name);
+	      for (var c in items[a].types[b].subtypes) {
+	        subtypes.push(items[a].types[b].subtypes[c].name);
+	      }
 	    }
-	    var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	    return categories;
+	  }
+	  var categories = { divisions: divisions, types: types, subtypes: subtypes };
+	  return categories;
 	};
-	
-	// }
 	
 	module.exports = ItemManager;
 
