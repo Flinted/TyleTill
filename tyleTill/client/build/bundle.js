@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(185);
+	var ReactDOM = __webpack_require__(159);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19746,22 +19746,22 @@
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Orderwindow = __webpack_require__(159);
-	var Itemwindow = __webpack_require__(163);
-	var Login = __webpack_require__(174);
-	var Infowindow = __webpack_require__(175);
-	var Cashwindow = __webpack_require__(176);
-	var CashManager = __webpack_require__(177);
-	var OrderManager = __webpack_require__(178);
-	var TableManager = __webpack_require__(179);
-	var ItemManager = __webpack_require__(180);
-	var ButtonColumn = __webpack_require__(186);
-	var TableWindow = __webpack_require__(182);
-	var OrderSelector = __webpack_require__(187);
-	var ReactCSSTransitionGroup = __webpack_require__(167);
-	var MenuTray = __webpack_require__(183);
-	var APIRunner = __webpack_require__(184);
-	_ = __webpack_require__(161);
+	var Orderwindow = __webpack_require__(160);
+	var Itemwindow = __webpack_require__(164);
+	var Login = __webpack_require__(175);
+	var Infowindow = __webpack_require__(176);
+	var Cashwindow = __webpack_require__(177);
+	var CashManager = __webpack_require__(178);
+	var OrderManager = __webpack_require__(179);
+	var TableManager = __webpack_require__(180);
+	var ItemManager = __webpack_require__(181);
+	var ButtonColumn = __webpack_require__(182);
+	var TableWindow = __webpack_require__(183);
+	var OrderSelector = __webpack_require__(184);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
+	var MenuTray = __webpack_require__(185);
+	var APIRunner = __webpack_require__(186);
+	_ = __webpack_require__(162);
 	
 	var Tyle = React.createClass({
 	  displayName: 'Tyle',
@@ -19774,38 +19774,26 @@
 	      tillTotal: [],
 	      time: '',
 	      date: '',
-	      tables: { one: [], two: [], three: [], four: [], five: [], six: [], seven: [], eight: [], nine: [], ten: [] },
-	      primaryDisplayItems: [],
-	      primarySubCategories: {},
-	      primaryOrderShow: 'hidden',
-	      primaryLogin: true,
-	      primaryChange: '',
-	      primaryUser: "",
-	      primaryOrderItems: [{}],
-	      primaryOrderTotal: 0.00,
-	      primaryInput: '',
-	      primaryCashDisplay: false,
-	      primaryTableShow: false,
-	      primarySubMenuShow: "hide-sub",
-	      secondaryUser: "",
-	      secondaryLogin: true,
-	      secondaryChange: '',
-	      secondaryOrderItems: [{}],
-	      secondaryDisplayItems: [],
-	      secondarySubCategories: {},
-	      secondaryOrderShow: 'hidden',
-	      secondaryOrderTotal: 0.00,
-	      secondaryInput: '',
-	      secondaryCashDisplay: false,
-	      secondaryTableShow: false,
-	      secondarySubMenuShow: "hide-sub",
+	      tables: { one: [], two: [], three: [], four: [], five: [], six: [], seven: [], eight: [], nine: [], ten: [], eleven: [], twelve: [], thirteen: [], fourteen: [], fifteen: [] },
+	      displayItems: [[], []],
+	      subCategories: [{}, {}],
+	      orderShow: ['hidden', 'hidden'],
+	      login: [true, true],
+	      change: ['', ''],
+	      user: ['', ''],
+	      orderItems: [[{}], [{}]],
+	      orderTotal: [0.00, 0.00],
+	      input: ['', ''],
+	      cashDisplay: [false, false],
+	      tableShow: [false, false],
+	      subMenuShow: ['hide-sub', 'hide-sub'],
 	      split: false
-	
 	    };
 	  },
 	  componentWillMount: function componentWillMount() {
 	    console.log("attempting api call");
 	    var users = null;
+	    this.clock();
 	    var runner = new APIRunner();
 	
 	    runner.run("GET", "http://localhost:5000/api/users").then(function (result) {
@@ -19813,17 +19801,22 @@
 	    });
 	    var APIpromise = runner.run("GET", "http://localhost:5000/api/divisions");
 	    APIpromise.then(function (result) {
-	      // const itemManager = new ItemManager
+	      var state = this.state;
 	      var categories = ItemManager.getTypes(result);
-	      this.clock();
 	      setInterval(this.clock, 60000);
 	      var displayItems = ItemManager.prepareItems(result[0].types[0].subtypes[0].items);
-	      this.setState({ users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems });
+	      state.users = users;
+	      state.categories = categories;
+	      state.items = result;
+	      state.displayItems[0] = displayItems;
+	      state.displayItems[1] = displayItems;
+	      this.setState(state);
 	    }.bind(this), function (err) {
 	      console.log(err);
 	    });
 	  },
 	  clock: function clock() {
+	    console.log("clock");
 	    var newTime = new Date();
 	    var month = newTime.getUTCMonth() + 1;
 	    var day = newTime.getUTCDate();
@@ -19837,39 +19830,29 @@
 	    this.setState({ time: displayTime, date: displayDate });
 	  },
 	  onItemClick: function onItemClick(event, markerID, arrayRef) {
-	    var currentOrder = this.state.primaryOrderItems;
-	    var input = this.state.primaryInput;
-	    if (markerID === 2) {
-	      currentOrder = this.state.secondaryOrderItems;
-	      input = this.state.secondaryInput;
-	    }
-	    var item = this.state.primaryDisplayItems[event.target.value];
-	    if (markerID === 2) {
-	      item = this.state.secondaryDisplayItems[event.target.value];
-	    }
+	    var state = this.state;
+	    var currentOrder = this.state.orderItems[markerID];
+	    var input = this.state.input[markerID];
+	    var item = this.state.displayItems[markerID][event.target.value];
 	    var newOrderArray = OrderManager.addItem(currentOrder, item, input, arrayRef);
 	    var total = CashManager.total(newOrderArray);
-	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
-	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
-	    }
+	    state.orderItems[markerID] = newOrderArray;
+	    state.orderTotal[markerID] = total;
+	    state.input[markerID] = '';
+	
+	    this.setState(state);
 	  },
 	  onOrderRowClick: function onOrderRowClick(key, markerID) {
+	    var state = this.state;
 	    var items = null;
-	    var currentOrder = this.state.primaryOrderItems;
-	    var input = this.state.primaryInput;
-	    if (markerID === 2) {
-	      currentOrder = this.state.secondaryOrderItems;
-	      input = this.state.secondaryInput;
-	    }
+	    var currentOrder = this.state.orderItems[markerID];
+	    var input = this.state.input[markerID];
 	    var newOrderArray = OrderManager.removeItem(currentOrder, key, input);
 	    var total = CashManager.total(newOrderArray);
-	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
-	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
-	    }
+	    state.orderItems[markerID] = newOrderArray;
+	    state.orderTotal[markerID] = total;
+	    state.input[markerID] = '';
+	    this.setState(state);
 	  },
 	  menuOptionClick: function menuOptionClick(selected, markerID) {
 	    var runner = new APIRunner();
@@ -19877,48 +19860,38 @@
 	    console.log(url);
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
+	      var state = this.state;
 	      var finalItems = ItemManager.getItems(result);
-	      if (markerID === 2) {
-	        this.setState({ secondaryDisplayItems: finalItems });
-	      } else {
-	        this.setState({ primaryDisplayItems: finalItems });
-	      }
+	      state.displayItems[markerID] = finalItems;
+	      this.setState(state);
 	    }.bind(this));
 	  },
 	  subMenuOptionClick: function subMenuOptionClick(selected, markerID) {
 	    var url = "http://localhost:5000/api/subtypes/find/" + selected;
-	
 	    var runner = new APIRunner();
 	    var promise = runner.run("GET", url);
 	    promise.then(function (result) {
+	      var state = this.state;
 	      var finalItems = ItemManager.getItems(result);
-	      if (markerID === 2) {
-	        this.setState({ secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub" });
-	      } else {
-	        this.setState({ primaryDisplayItems: finalItems, primarySubMenuShow: "hide-sub" });
-	      }
+	      state.displayItems[markerID] = finalItems;
+	      state.subMenuShow[markerID] = 'hide-sub';
+	      this.setState(state);
 	    }.bind(this));
 	  },
 	  getSubItems: function getSubItems(selected, markerID) {
-	    this.setState({ primarySubMenuShow: "sub" });
+	    var state = this.state;
 	    var url = "http://localhost:5000/api/types/find/" + selected;
 	    var apiRunner = new APIRunner();
 	    apiRunner.run("GET", url).then(function (result) {
-	      console.log(result[0].subtypes);
 	      var subtypes = ItemManager.prepareSubtypes(result);
-	
-	      if (markerID === 2) {
-	        this.setState({ secondarySubCategories: subtypes, secondarySubMenuShow: "sub" });
-	      } else {
-	        this.setState({ primarySubCategories: subtypes, primarySubMenuShow: "sub" });
-	      }
+	      state.subCategories[markerID] = subtypes;
+	      state.subMenuShow[markerID] = 'sub';
+	      this.setState(state);
 	    }.bind(this));
 	  },
 	  cashButtonClick: function cashButtonClick(input, markerID) {
-	    var newInput = this.state.primaryInput;
-	    if (markerID === 2) {
-	      newInput = this.state.secondaryInput;
-	    }
+	    var state = this.state;
+	    var newInput = this.state.input[markerID];
 	    switch (input) {
 	      case '.':
 	        newInput += ".";
@@ -19931,79 +19904,67 @@
 	          newInput += input;
 	        }
 	    }
-	    if (markerID === 2) {
-	      this.setState({ secondaryInput: newInput });
-	    } else {
-	      this.setState({ primaryInput: newInput });
-	    }
+	    state.input[markerID] = newInput;
+	    this.setState(state);
 	  },
 	  onSplitClick: function onSplitClick(markerID) {
+	    var state = this.state;
 	    if (!this.state.split) {
 	      this.setState({ split: true });
 	    } else {
-	      if (markerID === 2) {
-	        this.setState({ split: false,
-	          primaryOrderItems: this.state.secondaryOrderItems,
-	          primaryOrderTotal: this.state.secondaryOrderTotal,
-	          primaryUser: this.state.secondaryUser,
-	          primaryCashDisplay: this.state.secondaryCashDisplay,
-	          primaryDisplayItems: this.state.secondaryDisplayItems,
-	          secondaryOrderItems: [{}],
-	          secondaryOrderTotal: 0,
-	          secondaryUser: '',
-	          secondaryCashDisplay: false,
-	          secondaryLogin: true,
-	          secondaryOrderShow: 'hidden'
-	        });
+	      if (markerID === 1) {
+	        state.split = false;
+	        state.orderItems[0] = state.orderItems[1];
+	        state.orderTotal[0] = state.orderTotal[1];
+	        state.user[0] = this.state.user[1];
+	        state.cashDisplay[0] = state.cashDisplay[1];
+	        state.displayItems[0] = state.displayItems[1];
+	        state.orderItems[1] = [{}];
+	        state.orderTotal[1] = 0;
+	        state.user[1] = '';
+	        state.cashDisplay[1] = false;
+	        state.login[1] = true;
+	        state.login[0] = false;
+	        state.orderShow[1] = 'hidden';
 	      } else {
-	        this.setState({ split: false, secondaryLogin: true, secondaryOrderShow: 'hidden' });
+	        state.split = false;
+	        state.login[1] = true;
+	        state.orderShow[1] = 'hidden';
+	        state.orderItems[1] = [{}];
+	        state.orderTotal[1] = 0;
+	        state.user[1] = '';
 	      }
+	      this.setState(state);
 	    }
 	  },
 	  onOrderToggle: function onOrderToggle(markerID) {
+	    var state = this.state;
 	    console.log("orderToggle");
-	
-	    if (markerID === 2) {
-	      if (this.state.secondaryOrderShow === 'hidden') {
-	        this.setState({ secondaryOrderShow: 'order-selector' });
-	      } else {
-	        this.setState({ secondaryOrderShow: 'hidden' });
-	      }
+	    if (this.state.orderShow[markerID] === 'hidden') {
+	      state.orderShow[markerID] = 'order-selector';
+	      state.tableShow[markerID] = false;
 	    } else {
-	      if (this.state.primaryOrderShow === 'hidden') {
-	        this.setState({ primaryOrderShow: 'order-selector' });
-	      } else {
-	        this.setState({ primaryOrderShow: 'hidden' });
-	      }
+	      state.orderShow[markerID] = 'hidden';
 	    }
+	    this.setState(state);
 	  },
 	  orderSelect: function orderSelect(order, markerID) {
-	    console.log("Order Selected:", order);
-	    var currentOrder = this.state.primaryOrderItems;
-	    if (markerID === 2) {
-	      currentOrder = this.state.secondaryOrderItems;
-	    }
+	    var state = this.state;
+	    var currentOrder = this.state.orderItems[markerID];
 	    var archivedOrder = this.state.orders[order];
-	
 	    if (!Object.keys(currentOrder[0]).length > 0) {
-	      if (markerID === 2) {
-	        this.setState({ secondaryOrderItems: archivedOrder.orderDetail, secondaryOrderShow: 'hidden' });
-	      } else {
-	        this.setState({ primaryOrderItems: archivedOrder.orderDetail, primaryOrderShow: 'hidden' });
-	      }
+	      state.orderItems[markerID] = archivedOrder.orderDetail;
+	      state.orderShow[markerID] = 'hidden';
+	      this.setState(state);
 	    } else {
 	      console.log("ITEMS IN ORDER, CANCELLED");
 	    }
 	  },
 	  onPayClick: function onPayClick(selected, markerID) {
-	    var input = this.state.primaryInput;
-	    var oldTotal = this.state.primaryOrderTotal;
-	    var items = this.state.primaryOrderItems;
-	    if (markerID === 2) {
-	      input = this.state.secondaryInput;
-	      oldTotal = this.state.secondaryOrderTotal;
-	      items = this.state.secondaryOrderItems;
-	    }
+	    var state = this.state;
+	    var input = this.state.input[markerID];
+	    var oldTotal = this.state.orderTotal[markerID];
+	    var items = this.state.orderItems[markerID];
 	    var newPayment = CashManager.checkPayAmount(selected, input, oldTotal);
 	    var newOrderArray = OrderManager.addPayment(items, newPayment);
 	    var total = CashManager.total(newOrderArray);
@@ -20011,94 +19972,81 @@
 	      this.cashOff(newOrderArray, markerID);
 	      return;
 	    }
-	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: '' });
-	    } else {
-	      this.setState({ primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput: '' });
-	    }
+	    state.orderItems[markerID] = newOrderArray;
+	    state.orderTotal[markerID] = total;
+	    state.input[markerID] = '';
+	    this.setState(state);
 	  },
 	  cashOff: function cashOff(newOrderArray, markerID) {
+	    var state = this.state;
 	    console.log("CASH OFF");
 	    var newOrders = this.state.orders;
-	    var user = this.state.primaryUser;
-	    if (markerID === 2) {
-	      user = this.state.secondaryUser;
-	    }
+	    var user = this.state.user[markerID];
 	    var entry = CashManager.getOrderInfo(newOrderArray, user);
 	    entry["id"] = newOrders.length;
 	    newOrders.push(entry);
-	    console.log(newOrders);
-	    if (markerID === 2) {
-	      this.setState({ secondaryCashDisplay: false, secondaryTableShow: false, secondaryOrderShow: 'hidden', secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput: '', secondaryChange: entry.change, secondaryLogin: true });
-	    } else {
-	      this.setState({ primaryCashDisplay: false, primaryTableShow: false, primaryOrderShow: 'hidden', primaryOrderItems: [{}], primaryOrderTotal: 0.00, primaryInput: '', primaryChange: entry.change, primaryLogin: true });
-	    }
+	    state.orders = newOrders;
+	    state.cashDisplay[markerID] = false;
+	    state.tableShow[markerID] = false;
+	    state.orderShow[markerID] = 'hidden';
+	    state.orderItems[markerID] = [{}];
+	    state.orderTotal[markerID] = 0.00;
+	    state.input[markerID] = '';
+	    state.change[markerID] = entry.change;
+	    state.login[markerID] = true;
+	    this.setState(state);
 	  },
 	  onPayToggle: function onPayToggle(markerID) {
-	    if (markerID === 2) {
-	      if (this.state.secondaryCashDisplay) {
-	        this.setState({ secondaryCashDisplay: false });
-	      } else {
-	        this.setState({ secondaryCashDisplay: true });
-	      }
+	    var state = this.state;
+	    if (this.state.cashDisplay[markerID]) {
+	      state.cashDisplay[markerID] = false;
 	    } else {
-	      if (this.state.primaryCashDisplay) {
-	        this.setState({ primaryCashDisplay: false });
-	      } else {
-	        this.setState({ primaryCashDisplay: true });
-	      }
+	      state.cashDisplay[markerID] = true;
 	    }
+	    this.setState(state);
 	  },
 	  onTableToggle: function onTableToggle(markerID) {
-	    if (markerID === 2) {
-	      if (this.state.secondaryTableShow) {
-	        this.setState({ secondaryTableShow: false });
-	      } else {
-	        this.setState({ secondaryTableShow: true });
-	      }
+	    var state = this.state;
+	    if (this.state.tableShow[markerID]) {
+	      state.tableShow[markerID] = false;
 	    } else {
-	      if (this.state.primaryTableShow) {
-	        this.setState({ primaryTableShow: false });
-	      } else {
-	        this.setState({ primaryTableShow: true });
-	      }
+	      state.tableShow[markerID] = true;
+	      state.orderShow[markerID] = 'hidden';
 	    }
+	    this.setState(state);
 	  },
 	  tableClick: function tableClick(table, markerID) {
-	    var order = this.state.primaryOrderItems;
-	    if (markerID === 2) {
-	      order = this.state.secondaryOrderItems;
-	    }
+	    var state = this.state;
+	    var order = this.state.orderItems[markerID];
 	    var result = TableManager.manageTable(this.state.tables, table, order);
 	    if (!result) {
 	      console.log("CANNOT DO THIS!");
 	    } else if (result[0] === "tables") {
-	      if (markerID === 2) {
-	        this.setState({ secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, tables: result[1] });
-	      } else {
-	        this.setState({ primaryOrderItems: [{}], primaryOrderTotal: 0.00, tables: result[1] });
-	      }
+	      state.orderItems[markerID] = [{}];
+	      state.orderTotal[markerID] = 0.00;
+	      state.tables = result[1];
 	    } else {
-	      if (markerID === 2) {
-	        this.setState({ secondaryOrderItems: result[1], tables: result[2] });
-	      } else {
-	        this.setState({ primaryOrderItems: result[1], tables: result[2] });
-	      }
+	      state.orderItems[markerID] = result[1];
+	      state.tables = result[2];
 	    }
+	    this.setState(state);
 	  },
 	  onLogin: function onLogin(user, markerID) {
-	    if (markerID === 2) {
-	      this.setState({ secondaryUser: user.name, secondaryLogin: false });
-	    } else {
-	      this.setState({ primaryUser: user.name, primaryLogin: false });
-	    }
+	    var state = this.state;
+	    state.user[markerID] = user.name;
+	    state.login[markerID] = false;
+	    this.setState(state);
 	  },
 	  logout: function logout(markerID) {
-	    if (markerID === 2) {
-	      this.setState({ secondaryCashDisplay: false, secondaryTableShow: false, secondaryOrderShow: 'hidden', secondaryUser: "", secondaryLogin: true, secondaryOrderItems: [{}], secondaryOrderTotal: 0.00 });
-	    } else {
-	      this.setState({ primaryCashDisplay: false, primaryTableShow: false, primaryOrderShow: 'hidden', primaryUser: "", primaryLogin: true, primaryOrderItems: [{}], primaryOrderTotal: 0.00 });
-	    }
+	    var state = this.state;
+	    state.cashDisplay[markerID] = false;
+	    state.tableShow[markerID] = false;
+	    state.orderShow[markerID] = 'hidden';
+	    state.user[markerID] = '';
+	    state.login[markerID] = true;
+	    state.orderItems[markerID] = [{}];
+	    state.orderTotal[markerID] = 0.00;
+	    this.setState(state);
 	  },
 	  render: function render() {
 	    if (this.state.split) {
@@ -20108,32 +20056,32 @@
 	        React.createElement(
 	          'div',
 	          { className: 'primary' },
-	          React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
-	          React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, onClick: this.orderSelect, markerID: 1 }),
-	          React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
+	          React.createElement(Login, { onLogin: this.onLogin, display: this.state.login[0], markerID: 0, users: this.state.users, change: this.state.change[0] }),
+	          React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.orderShow[0], onClick: this.orderSelect, markerID: 0 }),
+	          React.createElement(TableWindow, { markerID: 0, display: this.state.tableShow[0], tables: this.state.tables, onClick: this.tableClick }),
 	          React.createElement(
 	            'div',
 	            { id: 'sidebar' },
 	            React.createElement(Infowindow, {
 	              time: this.state.time,
 	              date: this.state.date,
-	              input: this.state.primaryInput,
-	              total: this.state.primaryOrderTotal,
-	              user: this.state.primaryUser,
-	              change: this.state.primaryChange
+	              input: this.state.input[0],
+	              total: this.state.orderTotal[0],
+	              user: this.state.user[0],
+	              change: this.state.change[0]
 	            }),
 	            React.createElement(Orderwindow, {
-	              markerID: 1,
-	              items: this.state.primaryOrderItems,
+	              markerID: 0,
+	              items: this.state.orderItems[0],
 	              onClick: this.onOrderRowClick
 	            }),
 	            React.createElement(Cashwindow, {
-	              markerID: 1,
+	              markerID: 0,
 	              onClick: this.cashButtonClick
 	            })
 	          ),
 	          React.createElement(ButtonColumn, {
-	            markerID: 1,
+	            markerID: 0,
 	            tableToggle: this.onTableToggle,
 	            orderToggle: this.onOrderToggle,
 	            cashClick: this.onPayClick,
@@ -20142,25 +20090,25 @@
 	            logout: this.logout
 	          }),
 	          React.createElement(Itemwindow, {
-	            markerID: 1,
+	            markerID: 0,
 	            'class': 'item-window-split',
 	            onPayClick: this.onPayClick,
-	            cashDisplay: this.state.primaryCashDisplay,
-	            items: this.state.primaryDisplayItems,
+	            cashDisplay: this.state.cashDisplay[0],
+	            items: this.state.displayItems[0],
 	            onClick: this.onItemClick,
 	            onLongClick: this.onLongClick
 	          }),
 	          React.createElement(MenuTray, {
-	            subCategories: this.state.primarySubCategories,
-	            show: this.state.primarySubMenuShow,
+	            subCategories: this.state.subCategories[0],
+	            show: this.state.subMenuShow[0],
 	            onClick: this.subMenuOptionClick,
-	            markerID: 1
+	            markerID: 0
 	          }),
 	          React.createElement(MenuTray, {
 	            categories: this.state.categories,
 	            onClick: this.menuOptionClick,
 	            onLongClick: this.getSubItems,
-	            markerID: 1
+	            markerID: 0
 	          })
 	        ),
 	        React.createElement('div', { id: 'divider' }),
@@ -20176,33 +20124,32 @@
 	              transitionEnterTimeout: 500,
 	              transitionLeaveTimeout: 500
 	            },
-	            React.createElement(Login, { onLogin: this.onLogin, display: this.state.secondaryLogin, markerID: 2, users: this.state.users, change: this.state.secondaryChange }),
-	            React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.secondaryOrderShow, onClick: this.orderSelect, markerID: 2 }),
-	            React.createElement(TableWindow, { markerID: 2, display: this.state.secondaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
+	            React.createElement(Login, { onLogin: this.onLogin, display: this.state.login[1], markerID: 1, users: this.state.users, change: this.state.change[1] }),
+	            React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.orderShow[1], onClick: this.orderSelect, markerID: 1 }),
+	            React.createElement(TableWindow, { markerID: 1, display: this.state.tableShow[1], tables: this.state.tables, onClick: this.tableClick }),
 	            React.createElement(
 	              'div',
 	              { id: 'sidebar' },
 	              React.createElement(Infowindow, {
 	                time: this.state.time,
 	                date: this.state.date,
-	                input: this.state.secondaryInput,
-	                total: this.state.secondaryOrderTotal,
-	                user: this.state.secondaryUser,
-	                change: this.state.secondaryChange
-	
+	                input: this.state.input[1],
+	                total: this.state.orderTotal[1],
+	                user: this.state.user[1],
+	                change: this.state.change[1]
 	              }),
 	              React.createElement(Orderwindow, {
-	                markerID: 2,
-	                items: this.state.secondaryOrderItems,
+	                markerID: 1,
+	                items: this.state.orderItems[1],
 	                onClick: this.onOrderRowClick
 	              }),
 	              React.createElement(Cashwindow, {
-	                markerID: 2,
+	                markerID: 1,
 	                onClick: this.cashButtonClick
 	              })
 	            ),
 	            React.createElement(ButtonColumn, {
-	              markerID: 2,
+	              markerID: 1,
 	              tableToggle: this.onTableToggle,
 	              orderToggle: this.onOrderToggle,
 	              cashClick: this.onPayClick,
@@ -20211,25 +20158,25 @@
 	              logout: this.logout
 	            }),
 	            React.createElement(Itemwindow, {
-	              markerID: 2,
-	              onPayClick: this.onPayClick,
-	              cashDisplay: this.state.secondaryCashDisplay,
+	              markerID: 1,
 	              'class': 'item-window-split',
-	              items: this.state.secondaryDisplayItems,
+	              onPayClick: this.onPayClick,
+	              cashDisplay: this.state.cashDisplay[1],
+	              items: this.state.displayItems[1],
 	              onClick: this.onItemClick,
 	              onLongClick: this.onLongClick
 	            }),
 	            React.createElement(MenuTray, {
-	              subCategories: this.state.secondarySubCategories,
-	              show: this.state.secondarySubMenuShow,
+	              subCategories: this.state.subCategories[1],
+	              show: this.state.subMenuShow[1],
 	              onClick: this.subMenuOptionClick,
-	              markerID: 2
+	              markerID: 1
 	            }),
 	            React.createElement(MenuTray, {
 	              categories: this.state.categories,
 	              onClick: this.menuOptionClick,
 	              onLongClick: this.getSubItems,
-	              markerID: 2
+	              markerID: 1
 	            })
 	          )
 	        )
@@ -20239,59 +20186,61 @@
 	      return React.createElement(
 	        'div',
 	        { className: 'tyle-container' },
-	        React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
-	        React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, onClick: this.orderSelect, markerID: 1 }),
-	        React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
+	        React.createElement(Login, { onLogin: this.onLogin, display: this.state.login[0], markerID: 0, users: this.state.users, change: this.state.change[0] }),
+	        React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.orderShow[0], onClick: this.orderSelect, markerID: 0 }),
+	        React.createElement(TableWindow, { markerID: 0, display: this.state.tableShow[0], tables: this.state.tables, onClick: this.tableClick }),
 	        React.createElement(
 	          'div',
 	          { id: 'sidebar' },
 	          React.createElement(Infowindow, {
 	            time: this.state.time,
 	            date: this.state.date,
-	            input: this.state.primaryInput,
-	            total: this.state.primaryOrderTotal,
-	            user: this.state.primaryUser,
-	            change: this.state.primaryChange
+	            input: this.state.input[0],
+	            total: this.state.orderTotal[0],
+	            user: this.state.user[0],
+	            change: this.state.change[0]
 	          }),
 	          React.createElement(Orderwindow, {
-	            markerID: 1,
-	            items: this.state.primaryOrderItems,
+	            markerID: 0,
+	            items: this.state.orderItems[0],
 	            onClick: this.onOrderRowClick
 	          }),
 	          React.createElement(Cashwindow, {
-	            markerID: 1,
-	            onClick: this.cashButtonClick })
+	            markerID: 0,
+	            onClick: this.cashButtonClick
+	          })
 	        ),
 	        React.createElement(ButtonColumn, {
-	          markerID: 1,
+	          markerID: 0,
+	          tableToggle: this.onTableToggle,
 	          orderToggle: this.onOrderToggle,
 	          cashClick: this.onPayClick,
-	          tableToggle: this.onTableToggle,
 	          splitClick: this.onSplitClick,
 	          payToggle: this.onPayToggle,
 	          logout: this.logout
 	        }),
 	        React.createElement(Itemwindow, {
-	          markerID: 1,
-	          onPayClick: this.onPayClick,
-	          cashDisplay: this.state.primaryCashDisplay,
+	          markerID: 0,
 	          'class': 'item-window',
-	          items: this.state.primaryDisplayItems,
+	          onPayClick: this.onPayClick,
+	          cashDisplay: this.state.cashDisplay[0],
+	          items: this.state.displayItems[0],
 	          onClick: this.onItemClick,
 	          onLongClick: this.onLongClick
 	        }),
 	        React.createElement(MenuTray, {
-	          subCategories: this.state.primarySubCategories,
-	          show: this.state.primarySubMenuShow,
+	          subCategories: this.state.subCategories[0],
+	          show: this.state.subMenuShow[0],
 	          onClick: this.subMenuOptionClick,
-	          markerID: 1
+	          markerID: 0
 	        }),
 	        React.createElement(MenuTray, {
 	          categories: this.state.categories,
 	          onClick: this.menuOptionClick,
 	          onLongClick: this.getSubItems,
-	          markerID: 1
-	        })
+	          markerID: 0
+	        }),
+	        '            '
 	      );
 	    }
 	  }
@@ -20305,9 +20254,18 @@
 
 	'use strict';
 	
+	module.exports = __webpack_require__(3);
+
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
 	var React = __webpack_require__(1);
-	var OrderRow = __webpack_require__(160);
-	_ = __webpack_require__(161);
+	var OrderRow = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var Orderwindow = React.createClass({
 	  displayName: 'Orderwindow',
@@ -20333,7 +20291,7 @@
 	module.exports = Orderwindow;
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20392,7 +20350,7 @@
 	module.exports = OrderRow;
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -37129,10 +37087,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(162)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(163)(module)))
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -37148,7 +37106,7 @@
 
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37156,8 +37114,8 @@
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
-	var CashDisplay = __webpack_require__(166);
+	var Item = __webpack_require__(165);
+	var CashDisplay = __webpack_require__(167);
 	
 	var Itemwindow = React.createClass({
 	  displayName: 'Itemwindow',
@@ -37201,13 +37159,13 @@
 	module.exports = Itemwindow;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ExpandedItem = __webpack_require__(165);
+	var ExpandedItem = __webpack_require__(166);
 	
 	var Item = React.createClass({
 	  displayName: 'Item',
@@ -37274,13 +37232,13 @@
 	module.exports = Item;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var Item = __webpack_require__(164);
+	var Item = __webpack_require__(165);
 	
 	var ExpandedItem = React.createClass({
 	    displayName: 'ExpandedItem',
@@ -37333,13 +37291,13 @@
 	module.exports = ExpandedItem;
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(167);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
 	
 	var CashDisplay = React.createClass({
 	    displayName: 'CashDisplay',
@@ -37392,13 +37350,13 @@
 	module.exports = CashDisplay;
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(168);
+	module.exports = __webpack_require__(169);
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37419,8 +37377,8 @@
 	
 	var assign = __webpack_require__(39);
 	
-	var ReactTransitionGroup = __webpack_require__(169);
-	var ReactCSSTransitionGroupChild = __webpack_require__(171);
+	var ReactTransitionGroup = __webpack_require__(170);
+	var ReactCSSTransitionGroupChild = __webpack_require__(172);
 	
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -37486,7 +37444,7 @@
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37503,7 +37461,7 @@
 	'use strict';
 	
 	var React = __webpack_require__(2);
-	var ReactTransitionChildMapping = __webpack_require__(170);
+	var ReactTransitionChildMapping = __webpack_require__(171);
 	
 	var assign = __webpack_require__(39);
 	var emptyFunction = __webpack_require__(15);
@@ -37696,7 +37654,7 @@
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37799,7 +37757,7 @@
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 171 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -37819,8 +37777,8 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	
-	var CSSCore = __webpack_require__(172);
-	var ReactTransitionEvents = __webpack_require__(173);
+	var CSSCore = __webpack_require__(173);
+	var ReactTransitionEvents = __webpack_require__(174);
 	
 	var onlyChild = __webpack_require__(156);
 	
@@ -37969,7 +37927,7 @@
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 172 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -38072,7 +38030,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 173 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -38186,7 +38144,7 @@
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 174 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38373,7 +38331,7 @@
 	module.exports = Login;
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38457,7 +38415,7 @@
 	module.exports = Infowindow;
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38540,12 +38498,12 @@
 	module.exports = Cashwindow;
 
 /***/ },
-/* 177 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var CashManager = function CashManager() {};
 	
@@ -38610,16 +38568,17 @@
 	module.exports = CashManager;
 
 /***/ },
-/* 178 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	_ = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var OrderManager = function OrderManager() {};
 	
 	OrderManager.addItem = function (orderItems, newItem, input, arrayRef) {
+	  console.log(newItem);
 	  var itemsObject = orderItems[0];
 	  var sizeRef = parseInt(arrayRef) || 0;
 	  var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
@@ -38667,7 +38626,7 @@
 	module.exports = OrderManager;
 
 /***/ },
-/* 179 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38695,12 +38654,12 @@
 	module.exports = TableManager;
 
 /***/ },
-/* 180 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	_ = __webpack_require__(161);
+	_ = __webpack_require__(162);
 	
 	var ItemManager = function ItemManager() {};
 	
@@ -38806,14 +38765,61 @@
 	module.exports = ItemManager;
 
 /***/ },
-/* 181 */,
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(167);
+	
+	var ButtonColumn = React.createClass({
+	  displayName: 'ButtonColumn',
+	  onPayClick: function onPayClick() {
+	    this.props.payToggle(this.props.markerID);
+	  },
+	  onSplitClick: function onSplitClick() {
+	    this.props.splitClick(this.props.markerID);
+	  },
+	  onTableClick: function onTableClick() {
+	    this.props.tableToggle(this.props.markerID);
+	  },
+	  onLogout: function onLogout() {
+	    this.props.logout(this.props.markerID);
+	  },
+	  onOrderToggle: function onOrderToggle() {
+	    this.props.orderToggle(this.props.markerID);
+	  },
+	  onCashClick: function onCashClick() {
+	    this.props.cashClick('cash', this.props.markerID);
+	  },
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'button-column' },
+	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/save.png', onClick: this.onOrderToggle }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick }),
+	      React.createElement(
+	        'button',
+	        { className: 'quick-cash', value: 'cash', onClick: this.onCashClick },
+	        'QUICK CASH'
+	      )
+	    );
+	  }
+	});
+	
+	module.exports = ButtonColumn;
+
+/***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
 	
 	var TableWindow = React.createClass({
 	  displayName: 'TableWindow',
@@ -38868,13 +38874,78 @@
 	module.exports = TableWindow;
 
 /***/ },
-/* 183 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	var React = __webpack_require__(1);
-	var ReactCSSTransitionGroup = __webpack_require__(167);
+	
+	var OrderSelector = React.createClass({
+	    displayName: 'OrderSelector',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event.target.value, this.props.markerID);
+	    },
+	    render: function render() {
+	        var _this = this;
+	
+	        return React.createElement(
+	            'ul',
+	            { className: this.props.class },
+	            this.props.orders.map(function (order, index) {
+	                return React.createElement(
+	                    'li',
+	                    { key: index, value: index, onClick: _this.onClick },
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-info' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            '(',
+	                            order.id + 1,
+	                            ')',
+	                            order.user,
+	                            ':  ',
+	                            order.time.toLocaleString('en-gb')
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-detail' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'items: ',
+	                            order.items,
+	                            ' total: ',
+	                            order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'payment:',
+	                            order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
+	                            ' change: ',
+	                            order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        )
+	                    )
+	                );
+	            })
+	        );
+	    }
+	});
+	
+	module.exports = OrderSelector;
+
+/***/ },
+/* 185 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	var ReactCSSTransitionGroup = __webpack_require__(168);
 	
 	var MenuTray = React.createClass({
 	  displayName: 'MenuTray',
@@ -38970,7 +39041,7 @@
 	module.exports = MenuTray;
 
 /***/ },
-/* 184 */
+/* 186 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -39033,128 +39104,6 @@
 	};
 	
 	module.exports = APIRunner;
-
-/***/ },
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	module.exports = __webpack_require__(3);
-
-
-/***/ },
-/* 186 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var ButtonColumn = React.createClass({
-	  displayName: 'ButtonColumn',
-	  onPayClick: function onPayClick() {
-	    this.props.payToggle(this.props.markerID);
-	  },
-	  onSplitClick: function onSplitClick() {
-	    this.props.splitClick(this.props.markerID);
-	  },
-	  onTableClick: function onTableClick() {
-	    this.props.tableToggle(this.props.markerID);
-	  },
-	  onLogout: function onLogout() {
-	    this.props.logout(this.props.markerID);
-	  },
-	  onOrderToggle: function onOrderToggle() {
-	    this.props.orderToggle(this.props.markerID);
-	  },
-	  onCashClick: function onCashClick() {
-	    this.props.cashClick('cash', this.props.markerID);
-	  },
-	  render: function render() {
-	    return React.createElement(
-	      'div',
-	      { className: 'button-column' },
-	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/save.png', onClick: this.onOrderToggle }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick }),
-	      React.createElement(
-	        'button',
-	        { className: 'quick-cash', value: 'cash', onClick: this.onCashClick },
-	        'QUICK CASH'
-	      )
-	    );
-	  }
-	});
-	
-	module.exports = ButtonColumn;
-
-/***/ },
-/* 187 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var OrderSelector = React.createClass({
-	    displayName: 'OrderSelector',
-	    onClick: function onClick(event) {
-	        this.props.onClick(event.target.value, this.props.markerID);
-	    },
-	    render: function render() {
-	        var _this = this;
-	
-	        return React.createElement(
-	            'ul',
-	            { className: this.props.class },
-	            this.props.orders.map(function (order, index) {
-	                return React.createElement(
-	                    'li',
-	                    { key: index, value: index, onClick: _this.onClick },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'order-info' },
-	                        React.createElement(
-	                            'p',
-	                            null,
-	                            '(',
-	                            order.id + 1,
-	                            ')',
-	                            order.user,
-	                            ':  ',
-	                            order.time.toLocaleString('en-gb')
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'order-detail' },
-	                        React.createElement(
-	                            'p',
-	                            null,
-	                            'items: ',
-	                            order.items,
-	                            ' total: ',
-	                            order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	                        ),
-	                        React.createElement(
-	                            'p',
-	                            null,
-	                            'payment:',
-	                            order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
-	                            ' change: ',
-	                            order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	                        )
-	                    )
-	                );
-	            })
-	        );
-	    }
-	});
-	
-	module.exports = OrderSelector;
 
 /***/ }
 /******/ ]);

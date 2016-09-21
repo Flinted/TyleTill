@@ -15,7 +15,8 @@ const Orderwindow= React.createClass({
     
     
 
-    return(<div className='order-window'>
+    return(
+      <div className='order-window'>
       <ul id='order-list'>
       {orderNodes}
       </ul>

@@ -5,6 +5,7 @@ const OrderManager = function(){
 }
 
 OrderManager.addItem= function(orderItems, newItem, input, arrayRef){
+  console.log(newItem)
   let itemsObject = orderItems[0]
   const sizeRef = parseInt(arrayRef) || 0
   const ref = newItem.name+"("+newItem.sizes[sizeRef] +")"
