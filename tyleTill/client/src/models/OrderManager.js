@@ -50,7 +50,8 @@ OrderManager.prototype = {
         const returnArray= [itemsObject]
         return returnArray
     }
-}
+
+  }
 
 
 module.exports =OrderManager

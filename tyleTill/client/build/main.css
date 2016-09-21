@@ -216,7 +216,7 @@ body{
 }
 
 
-.item-button:hover, .table-taken:hover, .table-free:hover, .pay-button:hover,.menu-button:hover, .menu-item:hover, .login-button:hover{
+.item-button:hover, .table-taken:hover, .table-free:hover, .pay-button:hover,.menu-button:hover, .menu-item:hover, .login-button:hover, .order-selector li:hover{
   border: 2px solid white;  
 }
 
@@ -235,17 +235,29 @@ body{
 
 .order-selector{
   position: absolute;
-  width: 500px;
+  width: 300px;
   height:500px;
-  margin-left: 500px;
-  border: 2px solid red;
+  z-index: 12000;
+  margin-top: 70px;
+  margin-left: 300px;
+  background-color: rgba(0,0,0,0.4);
   overflow-y: scroll;
 }
 
 .order-selector li{
   height: 80px;
-  border: 2px solid blue;
+  margin: 5px 5px 5px 5px;
+  border: 2px solid black;
+  background-color: #AEC6CF;
+  text-align: center;
+  color:black !important;
 }
+
+.order-selector li div p, .order-selector li div{
+  pointer-events: none;
+  -webkit-user-select: none;
+}
+
 
 
 

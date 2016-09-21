@@ -19966,7 +19966,39 @@
 	    }
 	  },
 	  onOrderToggle: function onOrderToggle(markerID) {
-	    this.setState({ primaryOrderShow: 'order-selector' });
+	    console.log("orderToggle");
+	
+	    if (markerID === 2) {
+	      if (this.state.secondaryOrderShow === 'hidden') {
+	        this.setState({ secondaryOrderShow: 'order-selector' });
+	      } else {
+	        this.setState({ secondaryOrderShow: 'hidden' });
+	      }
+	    } else {
+	      if (this.state.primaryOrderShow === 'hidden') {
+	        this.setState({ primaryOrderShow: 'order-selector' });
+	      } else {
+	        this.setState({ primaryOrderShow: 'hidden' });
+	      }
+	    }
+	  },
+	  orderSelect: function orderSelect(order, markerID) {
+	    console.log("Order Selected:", order);
+	    var currentOrder = this.state.primaryOrderItems;
+	    if (markerID === 2) {
+	      currentOrder = this.state.secondaryOrderItems;
+	    }
+	    var archivedOrder = this.state.orders[order];
+	
+	    if (!Object.keys(currentOrder[0]).length > 0) {
+	      if (markerID === 2) {
+	        this.setState({ secondaryOrderItems: archivedOrder.orderDetail });
+	      } else {
+	        this.setState({ primaryOrderItems: archivedOrder.orderDetail });
+	      }
+	    } else {
+	      console.log("ITEMS IN ORDER, CANCELLED");
+	    }
 	  },
 	  onPayClick: function onPayClick(selected, markerID) {
 	    var input = this.state.primaryInput;
@@ -20004,9 +20036,9 @@
 	    newOrders.push(entry);
 	    console.log(newOrders);
 	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput: '', secondaryChange: entry.change, secondaryLogin: true });
+	      this.setState({ secondaryCashDisplay: false, secondaryTableShow: false, secondaryOrderShow: 'hidden', secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput: '', secondaryChange: entry.change, secondaryLogin: true });
 	    } else {
-	      this.setState({ primaryOrderItems: [{}], primaryOrderTotal: 0.00, primaryInput: '', primaryChange: entry.change, primaryLogin: true });
+	      this.setState({ primaryCashDisplay: false, primaryTableShow: false, primaryOrderShow: 'hidden', primaryOrderItems: [{}], primaryOrderTotal: 0.00, primaryInput: '', primaryChange: entry.change, primaryLogin: true });
 	    }
 	  },
 	  onPayToggle: function onPayToggle(markerID) {
@@ -20085,7 +20117,7 @@
 	          'div',
 	          { className: 'primary' },
 	          React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
-	          React.createElement(OrderSelector, { orders: this.state.orders }),
+	          React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, onClick: this.orderSelect, markerID: 1 }),
 	          React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	          React.createElement(
 	            'div',
@@ -20111,6 +20143,7 @@
 	          React.createElement(ButtonColumn, {
 	            markerID: 1,
 	            tableToggle: this.onTableToggle,
+	            orderToggle: this.onOrderToggle,
 	            splitClick: this.onSplitClick,
 	            payToggle: this.onPayToggle,
 	            logout: this.logout
@@ -20151,7 +20184,7 @@
 	              transitionLeaveTimeout: 500
 	            },
 	            React.createElement(Login, { onLogin: this.onLogin, display: this.state.secondaryLogin, markerID: 2, users: this.state.users, change: this.state.secondaryChange }),
-	            React.createElement(OrderSelector, { orders: this.state.orders }),
+	            React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.secondaryOrderShow, onClick: this.orderSelect, markerID: 2 }),
 	            React.createElement(TableWindow, { markerID: 2, display: this.state.secondaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	            React.createElement(
 	              'div',
@@ -20178,6 +20211,7 @@
 	            React.createElement(ButtonColumn, {
 	              markerID: 2,
 	              tableToggle: this.onTableToggle,
+	              orderToggle: this.onOrderToggle,
 	              splitClick: this.onSplitClick,
 	              payToggle: this.onPayToggle,
 	              logout: this.logout
@@ -20212,7 +20246,7 @@
 	        'div',
 	        { className: 'tyle-container' },
 	        React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
-	        React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, markerID: 1 }),
+	        React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, onClick: this.orderSelect, markerID: 1 }),
 	        React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	        React.createElement(
 	          'div',
@@ -38581,52 +38615,52 @@
 	var OrderManager = function OrderManager() {};
 	
 	OrderManager.prototype = {
-	    addItem: function addItem(orderItems, newItem, input, arrayRef) {
-	        var itemsObject = orderItems[0];
-	        var sizeRef = parseInt(arrayRef) || 0;
-	        var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
-	        var price = newItem.prices[sizeRef];
-	        var qty = parseInt(input) || 1;
-	        if (itemsObject[ref]) {
-	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    removeItem: function removeItem(orderItems, key, input) {
-	        var itemsObject = orderItems[0];
-	        console.log(input);
-	        var currentTotal = parseFloat(itemsObject[key].total);
-	        var origQty = itemsObject[key].qty;
-	        var price = currentTotal / origQty;
-	        var qty = origQty - (parseInt(input) || 1);
-	        var id = itemsObject[key].id;
-	        if (qty < 1) {
-	            delete itemsObject[key];
-	            var _returnArray = [itemsObject];
-	            return _returnArray;
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    addPayment: function addPayment(orderItems, payment) {
-	        var itemsObject = orderItems[0];
-	        var ref = payment.name;
-	        var oldTotal = 0;
-	        var qty = parseInt(payment.qty);
-	        if (itemsObject[ref]) {
-	            qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
-	            oldTotal = itemsObject[ref].total;
-	        }
-	        var total = parseFloat(payment.total + oldTotal);
-	        itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
+	  addItem: function addItem(orderItems, newItem, input, arrayRef) {
+	    var itemsObject = orderItems[0];
+	    var sizeRef = parseInt(arrayRef) || 0;
+	    var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
+	    var price = newItem.prices[sizeRef];
+	    var qty = parseInt(input) || 1;
+	    if (itemsObject[ref]) {
+	      qty = itemsObject[ref].qty + (parseInt(input) || 1);
 	    }
+	    var total = parseFloat(price * qty);
+	    itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
+	    var returnArray = [itemsObject];
+	    return returnArray;
+	  },
+	  removeItem: function removeItem(orderItems, key, input) {
+	    var itemsObject = orderItems[0];
+	    console.log(input);
+	    var currentTotal = parseFloat(itemsObject[key].total);
+	    var origQty = itemsObject[key].qty;
+	    var price = currentTotal / origQty;
+	    var qty = origQty - (parseInt(input) || 1);
+	    var id = itemsObject[key].id;
+	    if (qty < 1) {
+	      delete itemsObject[key];
+	      var _returnArray = [itemsObject];
+	      return _returnArray;
+	    }
+	    var total = parseFloat(price * qty);
+	    itemsObject[key] = { id: id, name: key, qty: qty, total: total };
+	    var returnArray = [itemsObject];
+	    return returnArray;
+	  },
+	  addPayment: function addPayment(orderItems, payment) {
+	    var itemsObject = orderItems[0];
+	    var ref = payment.name;
+	    var oldTotal = 0;
+	    var qty = parseInt(payment.qty);
+	    if (itemsObject[ref]) {
+	      qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
+	      oldTotal = itemsObject[ref].total;
+	    }
+	    var total = parseFloat(payment.total + oldTotal);
+	    itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
+	    var returnArray = [itemsObject];
+	    return returnArray;
+	  }
 	};
 	
 	module.exports = OrderManager;
@@ -38643,10 +38677,6 @@
 	
 	TableManager.prototype = {
 	  manageTable: function manageTable(tables, table, order) {
-	    console.log("table", tables[table]);
-	    console.log("order", Object.keys(order[0]));
-	    console.log(tables[table] == !Object.keys(order[0]));
-	    console.log(tables[table].length);
 	
 	    if (!tables[table].length > 0 && Object.keys(order[0]).length > 0) {
 	      console.log("assign order to table");
@@ -39078,37 +39108,57 @@
 	
 	var React = __webpack_require__(1);
 	
-	var OrderSelector = function OrderSelector(props) {
-	    return React.createElement(
-	        'ul',
-	        { className: props.class },
-	        props.orders.map(function (order, index) {
-	            return React.createElement(
-	                'li',
-	                { key: index, value: index },
-	                React.createElement(
-	                    'div',
-	                    { className: 'order-info' },
-	                    order.user,
-	                    ':  ',
-	                    order.time.toLocaleString('en-gb')
-	                ),
-	                React.createElement(
-	                    'div',
-	                    { className: 'order-detail' },
-	                    'items: ',
-	                    order.items,
-	                    ' total: ',
-	                    order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
-	                    ' payment:',
-	                    order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
-	                    ' change: ',
-	                    order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	                )
-	            );
-	        })
-	    );
-	};
+	var OrderSelector = React.createClass({
+	    displayName: 'OrderSelector',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event.target.value, this.props.markerID);
+	    },
+	    render: function render() {
+	        var _this = this;
+	
+	        return React.createElement(
+	            'ul',
+	            { className: this.props.class },
+	            this.props.orders.map(function (order, index) {
+	                return React.createElement(
+	                    'li',
+	                    { key: index, value: index, onClick: _this.onClick },
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-info' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            order.user,
+	                            ':  ',
+	                            order.time.toLocaleString('en-gb')
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-detail' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'items: ',
+	                            order.items,
+	                            ' total: ',
+	                            order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'payment:',
+	                            order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
+	                            ' change: ',
+	                            order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        )
+	                    )
+	                );
+	            })
+	        );
+	    }
+	});
 	
 	module.exports = OrderSelector;
 
