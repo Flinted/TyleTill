@@ -1,5 +1,5 @@
 /*SPLIT SCREEN*/
-.primary div:nth-child(6), .primary div:nth-child(7),.secondary div:nth-child(7), .secondary div:nth-child(6){
+.primary div:nth-child(7), .primary div:nth-child(8),.secondary div:nth-child(7), .secondary div:nth-child(8){
 margin-right: 0px !important;
 }
 
@@ -48,7 +48,7 @@ margin-right: 0px !important;
 }
 
 .primary .holder .cash-display, .secondary .holder .cash-display{
-  margin-left: -10px;
+  margin-left: -5px;
   position: absolute;
 }
 

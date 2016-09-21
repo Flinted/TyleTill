@@ -19958,10 +19958,11 @@
 	          secondaryOrderTotal: 0,
 	          secondaryUser: '',
 	          secondaryCashDisplay: false,
-	          secondaryLogin: true
+	          secondaryLogin: true,
+	          secondaryOrderShow: 'hidden'
 	        });
 	      } else {
-	        this.setState({ split: false, secondaryLogin: true });
+	        this.setState({ split: false, secondaryLogin: true, secondaryOrderShow: 'hidden' });
 	      }
 	    }
 	  },
@@ -19992,9 +19993,9 @@
 	
 	    if (!Object.keys(currentOrder[0]).length > 0) {
 	      if (markerID === 2) {
-	        this.setState({ secondaryOrderItems: archivedOrder.orderDetail });
+	        this.setState({ secondaryOrderItems: archivedOrder.orderDetail, secondaryOrderShow: 'hidden' });
 	      } else {
-	        this.setState({ primaryOrderItems: archivedOrder.orderDetail });
+	        this.setState({ primaryOrderItems: archivedOrder.orderDetail, primaryOrderShow: 'hidden' });
 	      }
 	    } else {
 	      console.log("ITEMS IN ORDER, CANCELLED");
@@ -20144,6 +20145,7 @@
 	            markerID: 1,
 	            tableToggle: this.onTableToggle,
 	            orderToggle: this.onOrderToggle,
+	            cashClick: this.onPayClick,
 	            splitClick: this.onSplitClick,
 	            payToggle: this.onPayToggle,
 	            logout: this.logout
@@ -20212,6 +20214,7 @@
 	              markerID: 2,
 	              tableToggle: this.onTableToggle,
 	              orderToggle: this.onOrderToggle,
+	              cashClick: this.onPayClick,
 	              splitClick: this.onSplitClick,
 	              payToggle: this.onPayToggle,
 	              logout: this.logout
@@ -20271,6 +20274,7 @@
 	        React.createElement(ButtonColumn, {
 	          markerID: 1,
 	          orderToggle: this.onOrderToggle,
+	          cashClick: this.onPayClick,
 	          tableToggle: this.onTableToggle,
 	          splitClick: this.onSplitClick,
 	          payToggle: this.onPayToggle,
@@ -37217,20 +37221,24 @@
 	var Item = React.createClass({
 	  displayName: 'Item',
 	  getInitialState: function getInitialState() {
-	    return { expanded: false, timer: null, linkItems: [] };
+	    return { expanded: false, timer: null, hidetimer: null, linkItems: [] };
 	  },
-	  checkSubItem: function checkSubItem() {},
 	  startTimer: function startTimer() {
-	    console.log("down");
+	    clearInterval(this.state.hidetimer);
 	    this.state.timer = setTimeout(this.toggleExpanded, 200);
+	    this.state.hidetimer = setTimeout(this.hideItem, 1500);
 	  },
 	  stopTimer: function stopTimer(event, arrayRef) {
-	    console.log("up");
 	    clearInterval(this.state.timer);
 	    if (this.state.expanded) {
 	      this.toggleExpanded();
 	    }
 	    this.onClick(event, arrayRef);
+	  },
+	  hideItem: function hideItem() {
+	    if (this.state.expanded) {
+	      this.setState({ expanded: false });
+	    }
 	  },
 	  toggleExpanded: function toggleExpanded() {
 	    if (this.state.expanded) {
@@ -37242,14 +37250,17 @@
 	  },
 	  getLinks: function getLinks() {
 	    var sizes = this.props.sizes;
-	    var itemArray = [{ name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: this.props.name, value: this.props.index, size: "0", sizeDescriptor: sizes[0] }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }];
-	    console.log(sizes);
+	    var itemArray = [{ name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: this.props.name, value: this.props.index, size: "0", sizeDescriptor: sizes[0] }, { name: "", size: '', sizeDescriptor: "" }];
 	    for (var size in sizes) {
 	      itemArray[size] = { name: this.props.name, sizeDescriptor: sizes[size], value: this.props.index, size: size };
 	    }
 	    return itemArray;
 	  },
 	  onClick: function onClick(event, arrayRef) {
+	    console.log("CLICK VALUE:", event.target.value);
+	    if (event.target.value === -1) {
+	      return;
+	    }
 	    this.props.onClick(event, this.props.markerID, arrayRef);
 	  },
 	  render: function render() {
@@ -37264,7 +37275,7 @@
 	        )
 	      );
 	    } else {
-	      return React.createElement(ExpandedItem, { value: this.props.index, onClick: this.checkSubItem, items: this.state.linkItems, name: this.props.name, markerID: this.props.markerID, onMouseUp: this.stopTimer });
+	      return React.createElement(ExpandedItem, { value: this.props.index, items: this.state.linkItems, name: this.props.name, markerID: this.props.markerID, onMouseUp: this.stopTimer });
 	    }
 	  }
 	});
@@ -37283,30 +37294,26 @@
 	var ExpandedItem = React.createClass({
 	    displayName: 'ExpandedItem',
 	    onMouseUp: function onMouseUp(event) {
-	        console.log(event.target);
+	        console.log("EXPANDED ITEM CLICK:", event.target);
 	        var arrayRef = this.props.items[event.target.id] || 0;
 	        if (arrayRef != 0) {
 	            arrayRef = arrayRef.size;
 	        }
-	        console.log("Array", arrayRef);
 	        this.props.onMouseUp(event, arrayRef);
 	    },
 	    render: function render() {
 	        var _this = this;
 	
-	        console.log(this.props.items[0].name);
-	
 	        var nodes = this.props.items.map(function (item, index) {
 	            return React.createElement(
 	                'li',
-	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp, onClick: _this.props.onClick },
+	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp },
 	                React.createElement(
 	                    'p',
 	                    null,
 	                    item.name,
-	                    ' (',
-	                    item.sizeDescriptor,
-	                    ')'
+	                    '  ',
+	                    item.sizeDescriptor
 	                )
 	            );
 	        });
@@ -37317,7 +37324,16 @@
 	            React.createElement(
 	                'ul',
 	                { className: 'subItem-container' },
-	                nodes
+	                nodes,
+	                React.createElement(
+	                    'li',
+	                    { className: 'exit', value: '-1', markerID: this.props.markerID, onMouseUp: this.onMouseUp },
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'EXIT'
+	                    )
+	                )
 	            )
 	        );
 	    }
@@ -38700,7 +38716,7 @@
 /* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	_ = __webpack_require__(161);
 	
@@ -38791,11 +38807,9 @@
 	        return returnArray;
 	    },
 	    getTypes: function getTypes(items) {
-	        console.log(this.getCategories(items).types);
 	        return this.getCategories(items).types;
 	    },
 	    getCategories: function getCategories(items) {
-	        console.log(items);
 	        var divisions = [];
 	        var types = [];
 	        var subtypes = [];
@@ -38808,9 +38822,7 @@
 	                }
 	            }
 	        }
-	
 	        var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	        console.log("divisions", categories);
 	        return categories;
 	    }
 	};
@@ -38891,19 +38903,16 @@
 	var MenuTray = React.createClass({
 	  displayName: 'MenuTray',
 	  onClick: function onClick(event) {
-	    console.log(event.target.value);
 	    this.props.onClick(event.target.value, this.props.markerID);
 	  },
 	  getInitialState: function getInitialState() {
 	    return { target: '', timer: null };
 	  },
 	  startTimer: function startTimer(event) {
-	    console.log("down");
 	    this.setState({ target: event.target.value });
 	    this.state.timer = setTimeout(this.getSubItems, 200);
 	  },
 	  stopTimer: function stopTimer(event) {
-	    console.log("up");
 	    clearInterval(this.state.timer);
 	    this.onClick(event);
 	  },
@@ -38916,7 +38925,6 @@
 	
 	      var subButtons = [];
 	      var categories = this.props.subCategories;
-	      console.log("SUB MENU", categories);
 	      for (var item in categories) {
 	        var button = React.createElement(
 	          'button',
@@ -38939,7 +38947,6 @@
 	    } else {
 	      var buttons = [];
 	      var _categories = this.props.categories;
-	      console.log(_categories);
 	      if (_categories) {
 	        var _iteratorNormalCompletion = true;
 	        var _didIteratorError = false;
@@ -39085,6 +39092,9 @@
 	  onOrderToggle: function onOrderToggle() {
 	    this.props.orderToggle(this.props.markerID);
 	  },
+	  onCashClick: function onCashClick() {
+	    this.props.cashClick('cash', this.props.markerID);
+	  },
 	  render: function render() {
 	    return React.createElement(
 	      'div',
@@ -39093,7 +39103,12 @@
 	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
 	      React.createElement('image', { className: 'menu-button', src: '/images/save.png', onClick: this.onOrderToggle }),
 	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick })
+	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick }),
+	      React.createElement(
+	        'button',
+	        { className: 'quick-cash', value: 'cash', onClick: this.onCashClick },
+	        'QUICK CASH'
+	      )
 	    );
 	  }
 	});
@@ -39129,6 +39144,9 @@
 	                        React.createElement(
 	                            'p',
 	                            null,
+	                            '(',
+	                            order.id + 1,
+	                            ')',
 	                            order.user,
 	                            ':  ',
 	                            order.time.toLocaleString('en-gb')

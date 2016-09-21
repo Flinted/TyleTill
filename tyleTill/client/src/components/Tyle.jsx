@@ -214,10 +214,11 @@ const Tyle = React.createClass({
               secondaryOrderTotal: 0,
               secondaryUser: '',
               secondaryCashDisplay: false,
-              secondaryLogin: true
+              secondaryLogin: true,
+              secondaryOrderShow:'hidden'
             })
           }else{
-            this.setState({split:false, secondaryLogin: true})
+            this.setState({split:false, secondaryLogin: true, secondaryOrderShow:'hidden'})
           }
         }
       },
@@ -249,9 +250,9 @@ const Tyle = React.createClass({
 
           if(!Object.keys(currentOrder[0]).length>0){
               if(markerID === 2){
-                this.setState({secondaryOrderItems: archivedOrder.orderDetail})
+                this.setState({secondaryOrderItems: archivedOrder.orderDetail, secondaryOrderShow: 'hidden'})
               }else{
-                this.setState({primaryOrderItems: archivedOrder.orderDetail})
+                this.setState({primaryOrderItems: archivedOrder.orderDetail, primaryOrderShow: 'hidden'})
               } 
           }else{
               console.log("ITEMS IN ORDER, CANCELLED")
@@ -403,6 +404,7 @@ const Tyle = React.createClass({
                         markerID={1}
                         tableToggle={this.onTableToggle}
                         orderToggle= {this.onOrderToggle}
+                        cashClick={this.onPayClick}
                         splitClick= {this.onSplitClick}                    
                         payToggle={this.onPayToggle} 
                         logout={this.logout}
@@ -467,6 +469,7 @@ const Tyle = React.createClass({
                 markerID={2}
                 tableToggle={this.onTableToggle}
                 orderToggle= {this.onOrderToggle}
+                cashClick={this.onPayClick}
                 splitClick= {this.onSplitClick}
                 payToggle={this.onPayToggle} 
                 logout={this.logout}
@@ -525,6 +528,7 @@ const Tyle = React.createClass({
             <ButtonColumn
                 markerID={1}
                 orderToggle= {this.onOrderToggle}
+                cashClick={this.onPayClick}
                 tableToggle={this.onTableToggle}
                 splitClick= {this.onSplitClick}
                 payToggle={this.onPayToggle}

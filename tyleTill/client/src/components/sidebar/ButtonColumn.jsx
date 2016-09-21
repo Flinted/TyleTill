@@ -21,6 +21,10 @@ const ButtonColumn= React.createClass({
         this.props.orderToggle(this.props.markerID)
       },
 
+      onCashClick(){
+        this.props.cashClick('cash', this.props.markerID)
+      },
+
       render(){
         return  (
               <div className='button-column'>
@@ -29,6 +33,7 @@ const ButtonColumn= React.createClass({
               <image className='menu-button' src= '/images/save.png' onClick={this.onOrderToggle}/>
               <image className='menu-button' src= '/images/logout.png' onClick={this.onLogout}/>
               <image className='menu-button' src= '/images/pay.png' onClick={this.onPayClick}/>
+              <button className='quick-cash' value='cash' onClick={this.onCashClick}>QUICK CASH</button>
               </div>
           )
 
