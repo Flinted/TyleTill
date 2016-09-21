@@ -19755,8 +19755,9 @@
 	var OrderManager = __webpack_require__(178);
 	var TableManager = __webpack_require__(179);
 	var ItemManager = __webpack_require__(180);
-	var ButtonColumn = __webpack_require__(181);
+	var ButtonColumn = __webpack_require__(186);
 	var TableWindow = __webpack_require__(182);
+	var OrderSelector = __webpack_require__(187);
 	var ReactCSSTransitionGroup = __webpack_require__(167);
 	var MenuTray = __webpack_require__(183);
 	var APIRunner = __webpack_require__(184);
@@ -19776,6 +19777,7 @@
 	      tables: { one: [], two: [], three: [], four: [], five: [], six: [], seven: [], eight: [], nine: [], ten: [] },
 	      primaryDisplayItems: [],
 	      primarySubCategories: {},
+	      primaryOrderShow: 'hidden',
 	      primaryLogin: true,
 	      primaryChange: '',
 	      primaryUser: "",
@@ -19791,6 +19793,7 @@
 	      secondaryOrderItems: [{}],
 	      secondaryDisplayItems: [],
 	      secondarySubCategories: {},
+	      secondaryOrderShow: 'hidden',
 	      secondaryOrderTotal: 0.00,
 	      secondaryInput: '',
 	      secondaryCashDisplay: false,
@@ -19800,7 +19803,7 @@
 	
 	    };
 	  },
-	  componentDidMount: function componentDidMount() {
+	  componentWillMount: function componentWillMount() {
 	    console.log("attempting api call");
 	    var users = null;
 	    var runner = new APIRunner();
@@ -19955,11 +19958,47 @@
 	          secondaryOrderTotal: 0,
 	          secondaryUser: '',
 	          secondaryCashDisplay: false,
-	          secondaryLogin: true
+	          secondaryLogin: true,
+	          secondaryOrderShow: 'hidden'
 	        });
 	      } else {
-	        this.setState({ split: false, secondaryLogin: true });
+	        this.setState({ split: false, secondaryLogin: true, secondaryOrderShow: 'hidden' });
 	      }
+	    }
+	  },
+	  onOrderToggle: function onOrderToggle(markerID) {
+	    console.log("orderToggle");
+	
+	    if (markerID === 2) {
+	      if (this.state.secondaryOrderShow === 'hidden') {
+	        this.setState({ secondaryOrderShow: 'order-selector' });
+	      } else {
+	        this.setState({ secondaryOrderShow: 'hidden' });
+	      }
+	    } else {
+	      if (this.state.primaryOrderShow === 'hidden') {
+	        this.setState({ primaryOrderShow: 'order-selector' });
+	      } else {
+	        this.setState({ primaryOrderShow: 'hidden' });
+	      }
+	    }
+	  },
+	  orderSelect: function orderSelect(order, markerID) {
+	    console.log("Order Selected:", order);
+	    var currentOrder = this.state.primaryOrderItems;
+	    if (markerID === 2) {
+	      currentOrder = this.state.secondaryOrderItems;
+	    }
+	    var archivedOrder = this.state.orders[order];
+	
+	    if (!Object.keys(currentOrder[0]).length > 0) {
+	      if (markerID === 2) {
+	        this.setState({ secondaryOrderItems: archivedOrder.orderDetail, secondaryOrderShow: 'hidden' });
+	      } else {
+	        this.setState({ primaryOrderItems: archivedOrder.orderDetail, primaryOrderShow: 'hidden' });
+	      }
+	    } else {
+	      console.log("ITEMS IN ORDER, CANCELLED");
 	    }
 	  },
 	  onPayClick: function onPayClick(selected, markerID) {
@@ -19989,14 +20028,18 @@
 	  cashOff: function cashOff(cashManager, newOrderArray, markerID) {
 	    console.log("CASH OFF");
 	    var newOrders = this.state.orders;
-	    var entry = cashManager.getOrderInfo(newOrderArray);
+	    var user = this.state.primaryUser;
+	    if (markerID === 2) {
+	      user = this.state.secondaryUser;
+	    }
+	    var entry = cashManager.getOrderInfo(newOrderArray, user);
 	    entry["id"] = newOrders.length;
 	    newOrders.push(entry);
 	    console.log(newOrders);
 	    if (markerID === 2) {
-	      this.setState({ secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput: '', secondaryChange: entry.change, secondaryLogin: true });
+	      this.setState({ secondaryCashDisplay: false, secondaryTableShow: false, secondaryOrderShow: 'hidden', secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput: '', secondaryChange: entry.change, secondaryLogin: true });
 	    } else {
-	      this.setState({ primaryOrderItems: [{}], primaryOrderTotal: 0.00, primaryInput: '', primaryChange: entry.change, primaryLogin: true });
+	      this.setState({ primaryCashDisplay: false, primaryTableShow: false, primaryOrderShow: 'hidden', primaryOrderItems: [{}], primaryOrderTotal: 0.00, primaryInput: '', primaryChange: entry.change, primaryLogin: true });
 	    }
 	  },
 	  onPayToggle: function onPayToggle(markerID) {
@@ -20075,6 +20118,7 @@
 	          'div',
 	          { className: 'primary' },
 	          React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
+	          React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, onClick: this.orderSelect, markerID: 1 }),
 	          React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	          React.createElement(
 	            'div',
@@ -20100,6 +20144,8 @@
 	          React.createElement(ButtonColumn, {
 	            markerID: 1,
 	            tableToggle: this.onTableToggle,
+	            orderToggle: this.onOrderToggle,
+	            cashClick: this.onPayClick,
 	            splitClick: this.onSplitClick,
 	            payToggle: this.onPayToggle,
 	            logout: this.logout
@@ -20140,6 +20186,7 @@
 	              transitionLeaveTimeout: 500
 	            },
 	            React.createElement(Login, { onLogin: this.onLogin, display: this.state.secondaryLogin, markerID: 2, users: this.state.users, change: this.state.secondaryChange }),
+	            React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.secondaryOrderShow, onClick: this.orderSelect, markerID: 2 }),
 	            React.createElement(TableWindow, { markerID: 2, display: this.state.secondaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	            React.createElement(
 	              'div',
@@ -20166,6 +20213,8 @@
 	            React.createElement(ButtonColumn, {
 	              markerID: 2,
 	              tableToggle: this.onTableToggle,
+	              orderToggle: this.onOrderToggle,
+	              cashClick: this.onPayClick,
 	              splitClick: this.onSplitClick,
 	              payToggle: this.onPayToggle,
 	              logout: this.logout
@@ -20200,6 +20249,7 @@
 	        'div',
 	        { className: 'tyle-container' },
 	        React.createElement(Login, { onLogin: this.onLogin, display: this.state.primaryLogin, markerID: 1, users: this.state.users, change: this.state.primaryChange }),
+	        React.createElement(OrderSelector, { orders: this.state.orders, 'class': this.state.primaryOrderShow, onClick: this.orderSelect, markerID: 1 }),
 	        React.createElement(TableWindow, { markerID: 1, display: this.state.primaryTableShow, tables: this.state.tables, onClick: this.tableClick }),
 	        React.createElement(
 	          'div',
@@ -20223,6 +20273,8 @@
 	        ),
 	        React.createElement(ButtonColumn, {
 	          markerID: 1,
+	          orderToggle: this.onOrderToggle,
+	          cashClick: this.onPayClick,
 	          tableToggle: this.onTableToggle,
 	          splitClick: this.onSplitClick,
 	          payToggle: this.onPayToggle,
@@ -37134,7 +37186,7 @@
 	      // displays item window with CashDisplay if active
 	      return React.createElement(
 	        'div',
-	        { className: this.props.class },
+	        { className: 'holder' },
 	        React.createElement(CashDisplay, { markerID: this.props.markerID, onClick: this.props.onPayClick }),
 	        React.createElement(
 	          'ul',
@@ -37169,20 +37221,24 @@
 	var Item = React.createClass({
 	  displayName: 'Item',
 	  getInitialState: function getInitialState() {
-	    return { expanded: false, timer: null, linkItems: [] };
+	    return { expanded: false, timer: null, hidetimer: null, linkItems: [] };
 	  },
-	  checkSubItem: function checkSubItem() {},
 	  startTimer: function startTimer() {
-	    console.log("down");
+	    clearInterval(this.state.hidetimer);
 	    this.state.timer = setTimeout(this.toggleExpanded, 200);
+	    this.state.hidetimer = setTimeout(this.hideItem, 1500);
 	  },
 	  stopTimer: function stopTimer(event, arrayRef) {
-	    console.log("up");
 	    clearInterval(this.state.timer);
 	    if (this.state.expanded) {
 	      this.toggleExpanded();
 	    }
 	    this.onClick(event, arrayRef);
+	  },
+	  hideItem: function hideItem() {
+	    if (this.state.expanded) {
+	      this.setState({ expanded: false });
+	    }
 	  },
 	  toggleExpanded: function toggleExpanded() {
 	    if (this.state.expanded) {
@@ -37194,14 +37250,17 @@
 	  },
 	  getLinks: function getLinks() {
 	    var sizes = this.props.sizes;
-	    var itemArray = [{ name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: this.props.name, value: this.props.index, size: "0", sizeDescriptor: sizes[0] }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }];
-	    console.log(sizes);
+	    var itemArray = [{ name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: "", size: '', sizeDescriptor: "" }, { name: this.props.name, value: this.props.index, size: "0", sizeDescriptor: sizes[0] }, { name: "", size: '', sizeDescriptor: "" }];
 	    for (var size in sizes) {
 	      itemArray[size] = { name: this.props.name, sizeDescriptor: sizes[size], value: this.props.index, size: size };
 	    }
 	    return itemArray;
 	  },
 	  onClick: function onClick(event, arrayRef) {
+	    console.log("CLICK VALUE:", event.target.value);
+	    if (event.target.value === -1) {
+	      return;
+	    }
 	    this.props.onClick(event, this.props.markerID, arrayRef);
 	  },
 	  render: function render() {
@@ -37216,7 +37275,7 @@
 	        )
 	      );
 	    } else {
-	      return React.createElement(ExpandedItem, { value: this.props.index, onClick: this.checkSubItem, items: this.state.linkItems, name: this.props.name, markerID: this.props.markerID, onMouseUp: this.stopTimer });
+	      return React.createElement(ExpandedItem, { value: this.props.index, items: this.state.linkItems, name: this.props.name, markerID: this.props.markerID, onMouseUp: this.stopTimer });
 	    }
 	  }
 	});
@@ -37235,30 +37294,26 @@
 	var ExpandedItem = React.createClass({
 	    displayName: 'ExpandedItem',
 	    onMouseUp: function onMouseUp(event) {
-	        console.log(event.target);
+	        console.log("EXPANDED ITEM CLICK:", event.target);
 	        var arrayRef = this.props.items[event.target.id] || 0;
 	        if (arrayRef != 0) {
 	            arrayRef = arrayRef.size;
 	        }
-	        console.log("Array", arrayRef);
 	        this.props.onMouseUp(event, arrayRef);
 	    },
 	    render: function render() {
 	        var _this = this;
 	
-	        console.log(this.props.items[0].name);
-	
 	        var nodes = this.props.items.map(function (item, index) {
 	            return React.createElement(
 	                'li',
-	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp, onClick: _this.props.onClick },
+	                { className: 'subItem', key: "sub" + index, id: index, value: _this.props.value, markerID: _this.props.markerID, index: index, onMouseUp: _this.onMouseUp },
 	                React.createElement(
 	                    'p',
 	                    null,
 	                    item.name,
-	                    ' (',
-	                    item.sizeDescriptor,
-	                    ')'
+	                    '  ',
+	                    item.sizeDescriptor
 	                )
 	            );
 	        });
@@ -37269,7 +37324,16 @@
 	            React.createElement(
 	                'ul',
 	                { className: 'subItem-container' },
-	                nodes
+	                nodes,
+	                React.createElement(
+	                    'li',
+	                    { className: 'exit', value: '-1', markerID: this.props.markerID, onMouseUp: this.onMouseUp },
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'EXIT'
+	                    )
+	                )
 	            )
 	        );
 	    }
@@ -38197,7 +38261,7 @@
 	          'h2',
 	          null,
 	          'Order Complete, last change: ',
-	          (this.props.change * -1).toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	          this.props.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
 	        );
 	      } else {
 	        info = React.createElement(
@@ -38333,6 +38397,11 @@
 	            'div',
 	            null,
 	            React.createElement(
+	                'h5',
+	                null,
+	                'User:'
+	            ),
+	            React.createElement(
 	                'h6',
 	                null,
 	                props.user
@@ -38344,7 +38413,7 @@
 	            React.createElement(
 	                'h5',
 	                null,
-	                'Input'
+	                'Input:'
 	            ),
 	            React.createElement(
 	                'h5',
@@ -38358,7 +38427,7 @@
 	            React.createElement(
 	                'h5',
 	                null,
-	                'Last Change'
+	                'Change:'
 	            ),
 	            React.createElement(
 	                'h5',
@@ -38369,6 +38438,11 @@
 	        React.createElement(
 	            'div',
 	            null,
+	            React.createElement(
+	                'h5',
+	                null,
+	                'Date:'
+	            ),
 	            React.createElement(
 	                'h5',
 	                null,
@@ -38492,7 +38566,7 @@
 	        }
 	        return total;
 	    },
-	    getOrderInfo: function getOrderInfo(order) {
+	    getOrderInfo: function getOrderInfo(order, user) {
 	        var total = 0.00;
 	        var payments = 0.00;
 	        var items = 0;
@@ -38505,7 +38579,10 @@
 	            }
 	        }
 	        var change = total + payments;
-	        return { total: total, payments: payments, items: items, change: change, orderDetail: order };
+	        payments = payments * -1;
+	        change = change * -1;
+	        var time = new Date();
+	        return { user: user, time: time, total: total, payments: payments, items: items, change: change, orderDetail: order };
 	    },
 	    checkPayAmount: function checkPayAmount(selected, input, total) {
 	        var category = null;
@@ -38554,52 +38631,52 @@
 	var OrderManager = function OrderManager() {};
 	
 	OrderManager.prototype = {
-	    addItem: function addItem(orderItems, newItem, input, arrayRef) {
-	        var itemsObject = orderItems[0];
-	        var sizeRef = parseInt(arrayRef) || 0;
-	        var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
-	        var price = newItem.prices[sizeRef];
-	        var qty = parseInt(input) || 1;
-	        if (itemsObject[ref]) {
-	            qty = itemsObject[ref].qty + (parseInt(input) || 1);
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    removeItem: function removeItem(orderItems, key, input) {
-	        var itemsObject = orderItems[0];
-	        console.log(input);
-	        var currentTotal = parseFloat(itemsObject[key].total);
-	        var origQty = itemsObject[key].qty;
-	        var price = currentTotal / origQty;
-	        var qty = origQty - (parseInt(input) || 1);
-	        var id = itemsObject[key].id;
-	        if (qty < 1) {
-	            delete itemsObject[key];
-	            var _returnArray = [itemsObject];
-	            return _returnArray;
-	        }
-	        var total = parseFloat(price * qty);
-	        itemsObject[key] = { id: id, name: key, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
-	    },
-	    addPayment: function addPayment(orderItems, payment) {
-	        var itemsObject = orderItems[0];
-	        var ref = payment.name;
-	        var oldTotal = 0;
-	        var qty = parseInt(payment.qty);
-	        if (itemsObject[ref]) {
-	            qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
-	            oldTotal = itemsObject[ref].total;
-	        }
-	        var total = parseFloat(payment.total + oldTotal);
-	        itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
-	        var returnArray = [itemsObject];
-	        return returnArray;
+	  addItem: function addItem(orderItems, newItem, input, arrayRef) {
+	    var itemsObject = orderItems[0];
+	    var sizeRef = parseInt(arrayRef) || 0;
+	    var ref = newItem.name + "(" + newItem.sizes[sizeRef] + ")";
+	    var price = newItem.prices[sizeRef];
+	    var qty = parseInt(input) || 1;
+	    if (itemsObject[ref]) {
+	      qty = itemsObject[ref].qty + (parseInt(input) || 1);
 	    }
+	    var total = parseFloat(price * qty);
+	    itemsObject[ref] = { id: newItem.id, name: ref, qty: qty, total: total };
+	    var returnArray = [itemsObject];
+	    return returnArray;
+	  },
+	  removeItem: function removeItem(orderItems, key, input) {
+	    var itemsObject = orderItems[0];
+	    console.log(input);
+	    var currentTotal = parseFloat(itemsObject[key].total);
+	    var origQty = itemsObject[key].qty;
+	    var price = currentTotal / origQty;
+	    var qty = origQty - (parseInt(input) || 1);
+	    var id = itemsObject[key].id;
+	    if (qty < 1) {
+	      delete itemsObject[key];
+	      var _returnArray = [itemsObject];
+	      return _returnArray;
+	    }
+	    var total = parseFloat(price * qty);
+	    itemsObject[key] = { id: id, name: key, qty: qty, total: total };
+	    var returnArray = [itemsObject];
+	    return returnArray;
+	  },
+	  addPayment: function addPayment(orderItems, payment) {
+	    var itemsObject = orderItems[0];
+	    var ref = payment.name;
+	    var oldTotal = 0;
+	    var qty = parseInt(payment.qty);
+	    if (itemsObject[ref]) {
+	      qty = parseInt(itemsObject[ref].qty) + parseInt(payment.qty);
+	      oldTotal = itemsObject[ref].total;
+	    }
+	    var total = parseFloat(payment.total + oldTotal);
+	    itemsObject[ref] = { id: payment.id, name: ref, qty: qty, total: total };
+	    var returnArray = [itemsObject];
+	    return returnArray;
+	  }
 	};
 	
 	module.exports = OrderManager;
@@ -38616,10 +38693,6 @@
 	
 	TableManager.prototype = {
 	  manageTable: function manageTable(tables, table, order) {
-	    console.log("table", tables[table]);
-	    console.log("order", Object.keys(order[0]));
-	    console.log(tables[table] == !Object.keys(order[0]));
-	    console.log(tables[table].length);
 	
 	    if (!tables[table].length > 0 && Object.keys(order[0]).length > 0) {
 	      console.log("assign order to table");
@@ -38643,7 +38716,7 @@
 /* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	_ = __webpack_require__(161);
 	
@@ -38734,11 +38807,9 @@
 	        return returnArray;
 	    },
 	    getTypes: function getTypes(items) {
-	        console.log(this.getCategories(items).types);
 	        return this.getCategories(items).types;
 	    },
 	    getCategories: function getCategories(items) {
-	        console.log(items);
 	        var divisions = [];
 	        var types = [];
 	        var subtypes = [];
@@ -38751,9 +38822,7 @@
 	                }
 	            }
 	        }
-	
 	        var categories = { divisions: divisions, types: types, subtypes: subtypes };
-	        console.log("divisions", categories);
 	        return categories;
 	    }
 	};
@@ -38761,43 +38830,7 @@
 	module.exports = ItemManager;
 
 /***/ },
-/* 181 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var ButtonColumn = React.createClass({
-	  displayName: 'ButtonColumn',
-	  onPayClick: function onPayClick() {
-	    this.props.payToggle(this.props.markerID);
-	  },
-	  onSplitClick: function onSplitClick() {
-	    this.props.splitClick(this.props.markerID);
-	  },
-	  onTableClick: function onTableClick() {
-	    this.props.tableToggle(this.props.markerID);
-	  },
-	  onLogout: function onLogout() {
-	    this.props.logout(this.props.markerID);
-	  },
-	  render: function render() {
-	    return React.createElement(
-	      'div',
-	      { className: 'button-column' },
-	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/save.png' }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick })
-	    );
-	  }
-	});
-	
-	module.exports = ButtonColumn;
-
-/***/ },
+/* 181 */,
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38870,19 +38903,16 @@
 	var MenuTray = React.createClass({
 	  displayName: 'MenuTray',
 	  onClick: function onClick(event) {
-	    console.log(event.target.value);
 	    this.props.onClick(event.target.value, this.props.markerID);
 	  },
 	  getInitialState: function getInitialState() {
 	    return { target: '', timer: null };
 	  },
 	  startTimer: function startTimer(event) {
-	    console.log("down");
 	    this.setState({ target: event.target.value });
 	    this.state.timer = setTimeout(this.getSubItems, 200);
 	  },
 	  stopTimer: function stopTimer(event) {
-	    console.log("up");
 	    clearInterval(this.state.timer);
 	    this.onClick(event);
 	  },
@@ -38895,7 +38925,6 @@
 	
 	      var subButtons = [];
 	      var categories = this.props.subCategories;
-	      console.log("SUB MENU", categories);
 	      for (var item in categories) {
 	        var button = React.createElement(
 	          'button',
@@ -38918,7 +38947,6 @@
 	    } else {
 	      var buttons = [];
 	      var _categories = this.props.categories;
-	      console.log(_categories);
 	      if (_categories) {
 	        var _iteratorNormalCompletion = true;
 	        var _didIteratorError = false;
@@ -39038,6 +39066,119 @@
 	
 	module.exports = __webpack_require__(3);
 
+
+/***/ },
+/* 186 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var ButtonColumn = React.createClass({
+	  displayName: 'ButtonColumn',
+	  onPayClick: function onPayClick() {
+	    this.props.payToggle(this.props.markerID);
+	  },
+	  onSplitClick: function onSplitClick() {
+	    this.props.splitClick(this.props.markerID);
+	  },
+	  onTableClick: function onTableClick() {
+	    this.props.tableToggle(this.props.markerID);
+	  },
+	  onLogout: function onLogout() {
+	    this.props.logout(this.props.markerID);
+	  },
+	  onOrderToggle: function onOrderToggle() {
+	    this.props.orderToggle(this.props.markerID);
+	  },
+	  onCashClick: function onCashClick() {
+	    this.props.cashClick('cash', this.props.markerID);
+	  },
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'button-column' },
+	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/save.png', onClick: this.onOrderToggle }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick }),
+	      React.createElement(
+	        'button',
+	        { className: 'quick-cash', value: 'cash', onClick: this.onCashClick },
+	        'QUICK CASH'
+	      )
+	    );
+	  }
+	});
+	
+	module.exports = ButtonColumn;
+
+/***/ },
+/* 187 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var OrderSelector = React.createClass({
+	    displayName: 'OrderSelector',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event.target.value, this.props.markerID);
+	    },
+	    render: function render() {
+	        var _this = this;
+	
+	        return React.createElement(
+	            'ul',
+	            { className: this.props.class },
+	            this.props.orders.map(function (order, index) {
+	                return React.createElement(
+	                    'li',
+	                    { key: index, value: index, onClick: _this.onClick },
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-info' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            '(',
+	                            order.id + 1,
+	                            ')',
+	                            order.user,
+	                            ':  ',
+	                            order.time.toLocaleString('en-gb')
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-detail' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'items: ',
+	                            order.items,
+	                            ' total: ',
+	                            order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'payment:',
+	                            order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
+	                            ' change: ',
+	                            order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        )
+	                    )
+	                );
+	            })
+	        );
+	    }
+	});
+	
+	module.exports = OrderSelector;
 
 /***/ }
 /******/ ]);

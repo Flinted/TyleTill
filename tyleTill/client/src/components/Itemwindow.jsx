@@ -17,7 +17,7 @@ const Itemwindow= React.createClass({
    if(this.props.cashDisplay){
       // displays item window with CashDisplay if active
       return(
-        <div className={this.props.class}>
+        <div className="holder">
         <CashDisplay markerID={this.props.markerID} onClick={this.props.onPayClick}/>
        <ul className="item-window-cash-display">
        {nodes}

@@ -50,12 +50,10 @@ prepareSubtypes(items){
 
 
 getTypes(items){
-    console.log(this.getCategories(items).types)
     return this.getCategories(items).types
 },
 
 getCategories(items){
-    console.log(items)
     let divisions = []
     let types =[]
     let subtypes =[]
@@ -68,9 +66,7 @@ getCategories(items){
                 }
           }
     }
-
     const categories= {divisions: divisions, types: types, subtypes: subtypes}
-    console.log("divisions", categories)
     return categories  
 }
 

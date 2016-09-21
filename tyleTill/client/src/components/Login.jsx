@@ -35,7 +35,7 @@ const Login = React.createClass({
     }else{
         let info=''
       if(this.props.change){
-        info= <h2>Order Complete, last change: {(this.props.change * -1).toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</h2>
+        info= <h2>Order Complete, last change: {(this.props.change).toLocaleString('en-GB', {style:'currency', currency:'GBP'})}</h2>
       }else{
         info = <h2>Please enter your 4 digit pin</h2>
       }  

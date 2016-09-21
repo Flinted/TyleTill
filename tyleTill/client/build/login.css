@@ -7,17 +7,6 @@
   z-index: 10000;
 }
 
-/*.login-show h1{
-  margin: auto;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border: 3px solid black;
-  color: black;
-  height: 50px;
-  width: 310px;
-  background-color: rgba(255,255,255,0.8);
-}*/
-
 .primary .login-show:nth-child(1), .secondary .login-show:nth-child(1){
 width: 49% !important;
 margin-left: -20px;
