@@ -48,7 +48,7 @@
 	
 	var React = __webpack_require__(1);
 	var Tyle = __webpack_require__(158);
-	var ReactDOM = __webpack_require__(185);
+	var ReactDOM = __webpack_require__(186);
 	
 	window.onload = function () {
 	  ReactDOM.render(React.createElement(Tyle, null), document.getElementById('app'));
@@ -19755,12 +19755,12 @@
 	var OrderManager = __webpack_require__(178);
 	var TableManager = __webpack_require__(179);
 	var ItemManager = __webpack_require__(180);
-	var ButtonColumn = __webpack_require__(186);
+	var ButtonColumn = __webpack_require__(181);
 	var TableWindow = __webpack_require__(182);
-	var OrderSelector = __webpack_require__(187);
+	var OrderSelector = __webpack_require__(183);
 	var ReactCSSTransitionGroup = __webpack_require__(167);
-	var MenuTray = __webpack_require__(183);
-	var APIRunner = __webpack_require__(184);
+	var MenuTray = __webpack_require__(184);
+	var APIRunner = __webpack_require__(185);
 	_ = __webpack_require__(161);
 	
 	var Tyle = React.createClass({
@@ -38806,7 +38806,54 @@
 	module.exports = ItemManager;
 
 /***/ },
-/* 181 */,
+/* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var ButtonColumn = React.createClass({
+	  displayName: 'ButtonColumn',
+	  onPayClick: function onPayClick() {
+	    this.props.payToggle(this.props.markerID);
+	  },
+	  onSplitClick: function onSplitClick() {
+	    this.props.splitClick(this.props.markerID);
+	  },
+	  onTableClick: function onTableClick() {
+	    this.props.tableToggle(this.props.markerID);
+	  },
+	  onLogout: function onLogout() {
+	    this.props.logout(this.props.markerID);
+	  },
+	  onOrderToggle: function onOrderToggle() {
+	    this.props.orderToggle(this.props.markerID);
+	  },
+	  onCashClick: function onCashClick() {
+	    this.props.cashClick('cash', this.props.markerID);
+	  },
+	  render: function render() {
+	    return React.createElement(
+	      'div',
+	      { className: 'button-column' },
+	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/save.png', onClick: this.onOrderToggle }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
+	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick }),
+	      React.createElement(
+	        'button',
+	        { className: 'quick-cash', value: 'cash', onClick: this.onCashClick },
+	        'QUICK CASH'
+	      )
+	    );
+	  }
+	});
+	
+	module.exports = ButtonColumn;
+
+/***/ },
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -38869,6 +38916,71 @@
 
 /***/ },
 /* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var OrderSelector = React.createClass({
+	    displayName: 'OrderSelector',
+	    onClick: function onClick(event) {
+	        this.props.onClick(event.target.value, this.props.markerID);
+	    },
+	    render: function render() {
+	        var _this = this;
+	
+	        return React.createElement(
+	            'ul',
+	            { className: this.props.class },
+	            this.props.orders.map(function (order, index) {
+	                return React.createElement(
+	                    'li',
+	                    { key: index, value: index, onClick: _this.onClick },
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-info' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            '(',
+	                            order.id + 1,
+	                            ')',
+	                            order.user,
+	                            ':  ',
+	                            order.time.toLocaleString('en-gb')
+	                        )
+	                    ),
+	                    React.createElement(
+	                        'div',
+	                        { className: 'order-detail' },
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'items: ',
+	                            order.items,
+	                            ' total: ',
+	                            order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        ),
+	                        React.createElement(
+	                            'p',
+	                            null,
+	                            'payment:',
+	                            order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
+	                            ' change: ',
+	                            order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+	                        )
+	                    )
+	                );
+	            })
+	        );
+	    }
+	});
+	
+	module.exports = OrderSelector;
+
+/***/ },
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38970,7 +39082,7 @@
 	module.exports = MenuTray;
 
 /***/ },
-/* 184 */
+/* 185 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -39035,126 +39147,13 @@
 	module.exports = APIRunner;
 
 /***/ },
-/* 185 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	module.exports = __webpack_require__(3);
 
-
-/***/ },
-/* 186 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var ButtonColumn = React.createClass({
-	  displayName: 'ButtonColumn',
-	  onPayClick: function onPayClick() {
-	    this.props.payToggle(this.props.markerID);
-	  },
-	  onSplitClick: function onSplitClick() {
-	    this.props.splitClick(this.props.markerID);
-	  },
-	  onTableClick: function onTableClick() {
-	    this.props.tableToggle(this.props.markerID);
-	  },
-	  onLogout: function onLogout() {
-	    this.props.logout(this.props.markerID);
-	  },
-	  onOrderToggle: function onOrderToggle() {
-	    this.props.orderToggle(this.props.markerID);
-	  },
-	  onCashClick: function onCashClick() {
-	    this.props.cashClick('cash', this.props.markerID);
-	  },
-	  render: function render() {
-	    return React.createElement(
-	      'div',
-	      { className: 'button-column' },
-	      React.createElement('image', { className: 'menu-button', src: '/images/split.png', onClick: this.onSplitClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/table.png', onClick: this.onTableClick }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/save.png', onClick: this.onOrderToggle }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/logout.png', onClick: this.onLogout }),
-	      React.createElement('image', { className: 'menu-button', src: '/images/pay.png', onClick: this.onPayClick }),
-	      React.createElement(
-	        'button',
-	        { className: 'quick-cash', value: 'cash', onClick: this.onCashClick },
-	        'QUICK CASH'
-	      )
-	    );
-	  }
-	});
-	
-	module.exports = ButtonColumn;
-
-/***/ },
-/* 187 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var React = __webpack_require__(1);
-	
-	var OrderSelector = React.createClass({
-	    displayName: 'OrderSelector',
-	    onClick: function onClick(event) {
-	        this.props.onClick(event.target.value, this.props.markerID);
-	    },
-	    render: function render() {
-	        var _this = this;
-	
-	        return React.createElement(
-	            'ul',
-	            { className: this.props.class },
-	            this.props.orders.map(function (order, index) {
-	                return React.createElement(
-	                    'li',
-	                    { key: index, value: index, onClick: _this.onClick },
-	                    React.createElement(
-	                        'div',
-	                        { className: 'order-info' },
-	                        React.createElement(
-	                            'p',
-	                            null,
-	                            '(',
-	                            order.id + 1,
-	                            ')',
-	                            order.user,
-	                            ':  ',
-	                            order.time.toLocaleString('en-gb')
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'div',
-	                        { className: 'order-detail' },
-	                        React.createElement(
-	                            'p',
-	                            null,
-	                            'items: ',
-	                            order.items,
-	                            ' total: ',
-	                            order.total.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	                        ),
-	                        React.createElement(
-	                            'p',
-	                            null,
-	                            'payment:',
-	                            order.payments.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' }),
-	                            ' change: ',
-	                            order.change.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
-	                        )
-	                    )
-	                );
-	            })
-	        );
-	    }
-	});
-	
-	module.exports = OrderSelector;
 
 /***/ }
 /******/ ]);
