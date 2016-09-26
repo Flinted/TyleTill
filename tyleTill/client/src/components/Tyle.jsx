@@ -14,7 +14,7 @@ const OrderSelector =require('./OrderSelector')
 const ReactCSSTransitionGroup=require('react-addons-css-transition-group') 
 const MenuTray = require('./MenuTray')
 const APIRunner = require('../models/APIRunner')
-_=require('lodash')
+// _=require('lodash')
 
 const Tyle = React.createClass({
 
@@ -27,363 +27,429 @@ const Tyle = React.createClass({
       tillTotal:[],
       time:'',
       date:'',
-      tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[]},
-      primaryDisplayItems:[],
-      primarySubCategories:{},
-      primaryOrderShow:'hidden',
-      primaryLogin: true,
-      primaryChange:'',
-      primaryUser: "",
-      primaryOrderItems:[{}],
-      primaryOrderTotal:0.00,
-      primaryInput:'',
-      primaryCashDisplay: false,
-      primaryTableShow:false,
-      primarySubMenuShow: "hide-sub",
-      secondaryUser: "",
-      secondaryLogin: true,
-      secondaryChange:'',
-      secondaryOrderItems:[{}],
-      secondaryDisplayItems:[],
-      secondarySubCategories:{},
-      secondaryOrderShow:'hidden',
-      secondaryOrderTotal:0.00,
-      secondaryInput:'',
-      secondaryCashDisplay: false,
-      secondaryTableShow:false,
-      secondarySubMenuShow: "hide-sub",
+      tables:{one: [], two:[], three:[], four:[], five:[], six:[], seven:[], eight:[], nine:[], ten:[], eleven:[], twelve:[], thirteen:[], fourteen:[], fifteen:[]},
+      displayItems:[[],[]],
+      subCategories:[{},{}],
+      orderShow:['hidden','hidden'],
+      login: [true,true],
+      change:['',''],
+      user: ['',''],
+      orderItems:[[{}],[{}]],
+      orderTotal:[0.00,0.00],
+      input:['',''],
+      cashDisplay: [false, false],
+      tableShow: [false, false],
+      subMenuShow:['hide-sub', 'hide-sub'],
       split: false
-
     }
   },
 
   componentWillMount(){
     console.log("attempting api call")
     let users= null
+    this.clock()
     const runner = new APIRunner
-
     runner.run("GET","http://localhost:5000/api/users").then(function(result){
       users= result
     })
     const APIpromise = runner.run("GET", "http://localhost:5000/api/divisions")
     APIpromise.then(function(result){
-      // const itemManager = new ItemManager
-      const categories = ItemManager.getTypes(result)
-      this.clock()
-      setInterval(this.clock,60000)
-      const displayItems = ItemManager.prepareItems(result[0].types[0].subtypes[0].items)
-      this.setState({users: users, categories: categories, items: result, primaryDisplayItems: displayItems, secondaryDisplayItems: displayItems})
+        let state = this.state
+        const categories = ItemManager.getTypes(result)
+        setInterval(this.clock,60000)
+        const displayItems = ItemManager.prepareItems(result[0].types[0].subtypes[0].items)
+        state.users = users
+        state.categories = categories
+        state.items = result
+        state.displayItems[0] = displayItems
+        state.displayItems[1] = displayItems
+        this.setState(state)
     }.bind(this), function(err){
       console.log(err)
     })
   },
 
   clock(){    
-      const newTime = new Date();
-      const month = newTime.getUTCMonth()+1
-      const day = newTime.getUTCDate()
-      const hour = newTime.getHours()
-      let minutes = newTime.getMinutes()
-      if(minutes.toString().length === 1){ minutes = "0" + minutes.toString()}
-      const displayTime = hour + ":" + minutes
-      const displayDate = day+"/"+month
-      this.setState({time: displayTime, date:displayDate})
+    console.log( "clock" )
+    const newTime = new Date();
+    const month = newTime.getUTCMonth()+1
+    const day = newTime.getUTCDate()
+    const hour = newTime.getHours()
+    let minutes = newTime.getMinutes()
+    
+    if(minutes.toString().length === 1){ minutes = "0" + minutes.toString()}
+    
+    const displayTime = hour + ":" + minutes
+    const displayDate = day+"/"+month
+    this.setState({time: displayTime, date:displayDate})
   },
 
   onItemClick(event, markerID, arrayRef){
-    let currentOrder = this.state.primaryOrderItems
-    let input = this.state.primaryInput
-    if(markerID === 2){
-      currentOrder = this.state.secondaryOrderItems
-      input = this.state.secondaryInput
-    }
-    let item = this.state.primaryDisplayItems[event.target.value]
-    if(markerID === 2){item = this.state.secondaryDisplayItems[event.target.value]}
+    let state = this.state
+    let currentOrder = this.state.orderItems[markerID]
+    let input = this.state.input[markerID]
+    let item = this.state.displayItems[markerID][event.target.value]
     let newOrderArray = OrderManager.addItem(currentOrder, item, input, arrayRef)
     const total = CashManager.total(newOrderArray)
-    if(markerID === 2){
-      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
-    }else{
-      this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
-    }
+    state.orderItems[markerID] = newOrderArray
+    state.orderTotal[markerID] = total
+    state.input[markerID]= ''
+
+    this.setState(state)
   },
 
   onOrderRowClick(key, markerID){
+    let state = this.state
     let items = null
-    let currentOrder = this.state.primaryOrderItems
-    let input = this.state.primaryInput
-    if(markerID === 2){
-      currentOrder = this.state.secondaryOrderItems
-      input = this.state.secondaryInput
-    }
+    let currentOrder = this.state.orderItems[markerID]
+    let input = this.state.input[markerID]
     let newOrderArray = OrderManager.removeItem(currentOrder, key, input)
     const total = CashManager.total(newOrderArray)
-    if(markerID === 2){
-      this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput: ''})
-    }else{
-      this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
-    }
+    state.orderItems[markerID] = newOrderArray
+    state.orderTotal[markerID] = total
+    state.input[markerID] = ''
+    this.setState(state)
   },
 
   menuOptionClick(selected, markerID){
-      const runner = new APIRunner
-      let url = "http://localhost:5000/api/types/find/"+selected
-      console.log(url)
-      const promise = runner.run("GET",url)
-      promise.then(function(result){
+    const runner = new APIRunner
+    let url = "http://localhost:5000/api/types/find/"+selected
+    console.log(url)
+    const promise = runner.run("GET",url)
+    promise.then(function(result){
+        let state = this.state
         const finalItems = ItemManager.getItems(result)
-        if(markerID===2){
-          this.setState({secondaryDisplayItems: finalItems})
-        }else{
-          this.setState({primaryDisplayItems: finalItems})
-        }
-      }.bind(this))
+        state.displayItems[markerID] = finalItems
+        this.setState(state)
+    }.bind(this))
   },
 
   subMenuOptionClick(selected, markerID){
-          let url = "http://localhost:5000/api/subtypes/find/"+selected
-
-          const runner = new APIRunner
-          const promise = runner.run("GET",url)
-          promise.then(function(result){
-            const finalItems = ItemManager.getItems(result)
-            if(markerID===2){
-              this.setState({secondaryDisplayItems: finalItems, secondarySubMenuShow: "hide-sub"})
-            }else{
-              this.setState({primaryDisplayItems: finalItems, primarySubMenuShow: "hide-sub"})
-            }
-          }.bind(this))
+    let url = "http://localhost:5000/api/subtypes/find/"+selected
+    const runner = new APIRunner
+    const promise = runner.run("GET",url)
+    promise.then(function(result){
+        let state = this.state
+        const finalItems = ItemManager.getItems(result)
+        state.displayItems[markerID] = finalItems
+        state.subMenuShow[markerID] = 'hide-sub'
+        this.setState(state)
+    }.bind(this))
   },
 
   getSubItems(selected, markerID){
-      this.setState({primarySubMenuShow: "sub"})
-      let url = "http://localhost:5000/api/types/find/"+ selected
-      const apiRunner = new APIRunner
-      apiRunner.run("GET", url).then(function(result){
-        console.log(result[0].subtypes)
+    let state = this.state
+    let url = "http://localhost:5000/api/types/find/"+ selected
+    const apiRunner = new APIRunner
+    apiRunner.run("GET", url).then(function(result){
         const subtypes = ItemManager.prepareSubtypes(result)
-
-        if(markerID === 2){
-        this.setState({secondarySubCategories: subtypes, secondarySubMenuShow: "sub"})
-        }else{
-        this.setState({primarySubCategories: subtypes, primarySubMenuShow: "sub"})
-      }
-      }.bind(this))
+        state.subCategories[markerID] = subtypes
+        state.subMenuShow[markerID] = 'sub'
+        this.setState(state)
+    }.bind(this))
   },
 
   cashButtonClick(input, markerID){
-            let newInput = this.state.primaryInput
-            if(markerID===2){newInput = this.state.secondaryInput}
+    let state = this.state
+    let newInput = this.state.input[markerID]
     switch(input){
-        case '.':
-            newInput+= "."
-            break;
-        case 'C':
-            newInput=''
-            break;
-        default:
-            if(newInput.length < 3 || newInput.indexOf(".") > -1 ){
-                    newInput += input
-            }
-          }
-          if(markerID===2){
-              this.setState({secondaryInput:newInput})
-          }else{
-              this.setState({primaryInput:newInput})
+      case '.':
+      newInput+= "."
+      break;
+      case 'C':
+      newInput=''
+      break;
+      default:
+        if(newInput.length < 3 || newInput.indexOf(".") > -1 ){
+            newInput += input
         }
-      },
+    }
+    state.input[markerID] = newInput
+    this.setState(state)
+  },
 
-      onSplitClick( markerID){
-        if(!this.state.split){
+  onSplitClick( markerID){
+    let state = this.state
+    
+    if(!this.state.split){
           this.setState({split: true})
-        }else{
-          if(markerID=== 2){
-            this.setState({split: false, 
-              primaryOrderItems: this.state.secondaryOrderItems, 
-              primaryOrderTotal: this.state.secondaryOrderTotal, 
-              primaryUser: this.state.secondaryUser,
-              primaryCashDisplay: this.state.secondaryCashDisplay,
-              primaryDisplayItems: this.state.secondaryDisplayItems,
-              secondaryOrderItems:[{}],
-              secondaryOrderTotal: 0,
-              secondaryUser: '',
-              secondaryCashDisplay: false,
-              secondaryLogin: true,
-              secondaryOrderShow:'hidden'
-            })
-          }else{
-            this.setState({split:false, secondaryLogin: true, secondaryOrderShow:'hidden'})
-          }
-        }
-      },
+    }else{
+      if(markerID=== 1){
+          state.split= false
+          state.orderItems[0] = state.orderItems[1]
+          state.orderTotal[0] = state.orderTotal[1]
+          state.user[0]= this.state.user[1]
+          state.cashDisplay[0] = state.cashDisplay[1]
+          state.displayItems[0] = state.displayItems[1]
+          state.orderItems[1] =[{}]
+          state.orderTotal[1] = 0
+          state.user[1] = ''
+          state.cashDisplay[1] = false
+          state.login[1] = true
+          state.login[0] = false
+          state.orderShow[1] = 'hidden'
+      }else{
+          state.split =false
+          state.login[1]=true
+          state.orderShow[1]='hidden'
+          state.orderItems[1] =[{}]
+          state.orderTotal[1] = 0
+          state.user[1] = ''
+      }
+      this.setState(state)
+    }
+  },
 
-      onOrderToggle(markerID){
-          console.log("orderToggle")
+  onOrderToggle(markerID){
+    let state = this.state
+    if(this.state.orderShow[markerID] === 'hidden'){
+        state.orderShow[markerID] = 'order-selector'
+        state.tableShow[markerID] = false
+    }else{
+        state.orderShow[markerID] = 'hidden'
+    }
+    this.setState(state)
+  },
 
-        if(markerID === 2){
-          if(this.state.secondaryOrderShow === 'hidden'){
-          this.setState({secondaryOrderShow: 'order-selector'})
-          }else{
-          this.setState({secondaryOrderShow: 'hidden'})
-          }
-        }else{
-          if(this.state.primaryOrderShow === 'hidden'){
-          this.setState({primaryOrderShow: 'order-selector'})
-          }else{
-          this.setState({primaryOrderShow: 'hidden'})
-          }
-           
-        }
-      },
+  orderSelect(order, markerID){
+    let state = this.state
+    let currentOrder = this.state.orderItems[markerID]
+    const archivedOrder = this.state.orders[order]
+    
+    if(!Object.keys(currentOrder[0]).length>0){
+        state.orderItems[markerID]=archivedOrder.orderDetail
+        state.orderShow[markerID]='hidden'
+        this.setState(state)
+    }else{
+        console.log("ITEMS IN ORDER, CANCELLED")
+    }
+  },
 
-      orderSelect(order, markerID){
-          console.log("Order Selected:", order)
-          let currentOrder = this.state.primaryOrderItems
-          if(markerID ===2){currentOrder =this.state.secondaryOrderItems}
-          const archivedOrder = this.state.orders[order]
+  onPayClick(selected, markerID){
+    let state = this.state
+    const input = this.state.input[markerID]
+    const oldTotal = this.state.orderTotal[markerID]
+    const items = this.state.orderItems[markerID]
+    const newPayment = CashManager.checkPayAmount(selected, input, oldTotal)
+    const newOrderArray = OrderManager.addPayment(items, newPayment)
+    const total = CashManager.total(newOrderArray)
+    
+    if(total <= 0.00){
+        this.cashOff(newOrderArray, markerID)
+        return
+    }
 
-          if(!Object.keys(currentOrder[0]).length>0){
-              if(markerID === 2){
-                this.setState({secondaryOrderItems: archivedOrder.orderDetail, secondaryOrderShow: 'hidden'})
-              }else{
-                this.setState({primaryOrderItems: archivedOrder.orderDetail, primaryOrderShow: 'hidden'})
-              } 
-          }else{
-              console.log("ITEMS IN ORDER, CANCELLED")
-          }
-      },
+    state.orderItems[markerID] = newOrderArray
+    state.orderTotal[markerID] = total
+    state.input[markerID]= ''
+    this.setState(state)
+  },
 
-      onPayClick(selected, markerID){
-          let input = this.state.primaryInput
-          let oldTotal = this.state.primaryOrderTotal
-          let items = this.state.primaryOrderItems
-          if(markerID ===2){
-            input = this.state.secondaryInput
-            oldTotal = this.state.secondaryOrderTotal
-            items = this.state.secondaryOrderItems
-          }
-          const newPayment = CashManager.checkPayAmount(selected, input, oldTotal)
-          const newOrderArray = OrderManager.addPayment(items, newPayment)
-          const total = CashManager.total(newOrderArray)
-          if(total <= 0.00){
-            this.cashOff(newOrderArray, markerID)
-            return
-          }
-          if(markerID === 2){
-            this.setState({secondaryOrderItems: newOrderArray, secondaryOrderTotal: total, secondaryInput:''})
-          }else{
-            this.setState({primaryOrderItems: newOrderArray, primaryOrderTotal: total, primaryInput:''})
-          }
-      },
-
-
-      cashOff(newOrderArray, markerID){
-          console.log("CASH OFF")
-          let newOrders = this.state.orders
-          let user = this.state.primaryUser
-          if(markerID===2){user = this.state.secondaryUser}
-          const entry = CashManager.getOrderInfo(newOrderArray,user)
-          entry["id"]= newOrders.length
-          newOrders.push(entry)
-          console.log(newOrders)
-          if(markerID=== 2){
-              this.setState({secondaryCashDisplay: false, secondaryTableShow: false, secondaryOrderShow: 'hidden', secondaryOrderItems: [{}], secondaryOrderTotal: 0.00, secondaryInput:'', secondaryChange: entry.change, secondaryLogin:true})
-          }else{
-              this.setState({primaryCashDisplay: false, primaryTableShow: false, primaryOrderShow: 'hidden', primaryOrderItems:[{}], primaryOrderTotal: 0.00, primaryInput:'', primaryChange: entry.change, primaryLogin:true})
-          }
-      },  
+  cashOff(newOrderArray, markerID){
+    let state = this.state
+    console.log("CASH OFF")
+    let newOrders = this.state.orders
+    let user = this.state.user[markerID]
+    const entry = CashManager.getOrderInfo(newOrderArray,user)
+    entry["id"]= newOrders.length
+    newOrders.push(entry)
+    state.orders = newOrders
+    state.cashDisplay[markerID] = false
+    state.tableShow[markerID] = false
+    state.orderShow[markerID] = 'hidden'
+    state.orderItems[markerID] = [{}]
+    state.orderTotal[markerID] = 0.00
+    state.input[markerID] = ''
+    state.change[markerID] = entry.change
+    state.login[markerID] = true
+    this.setState(state) 
+  },  
 
 
-      onPayToggle(markerID){
-          if(markerID === 2){
-              if(this.state.secondaryCashDisplay){
-                  this.setState({secondaryCashDisplay:false})
-              }else{
-                  this.setState({secondaryCashDisplay:true})            
-              }
-          }else{
-              if(this.state.primaryCashDisplay){
-                  this.setState({primaryCashDisplay:false})
-              }else{
-                  this.setState({primaryCashDisplay:true})            
-              }
-          }
-      },
+  onPayToggle(markerID){
+    let state = this.state
+    
+    if(this.state.cashDisplay[markerID]){
+        state.cashDisplay[markerID] = false
+    }else{
+        state.cashDisplay[markerID] = true
+    }
 
-      onTableToggle(markerID){
-        if(markerID===2){
-            if(this.state.secondaryTableShow){
-                this.setState({secondaryTableShow:false})
-            }else{
-                this.setState({secondaryTableShow:true}) 
-            } 
-        }else{
-          if(this.state.primaryTableShow){
-              this.setState({primaryTableShow:false})
-          }else{
-              this.setState({primaryTableShow:true}) 
-          } 
-        }
-      },
+    this.setState(state)
+  },
 
-      tableClick(table, markerID){
-        let order = this.state.primaryOrderItems  
-        if(markerID===2){order = this.state.secondaryOrderItems }
-        const result = TableManager.manageTable(this.state.tables, table, order)
-        if(!result){
-          console.log("CANNOT DO THIS!")
-        }else if(result[0] === "tables"){
-          if(markerID === 2){
-            this.setState({secondaryOrderItems: [{}],secondaryOrderTotal:0.00,tables: result[1]})
-          }else{
-            this.setState({primaryOrderItems: [{}], primaryOrderTotal:0.00 ,tables: result[1]})
-          }
-        }else{
-          if(markerID === 2){
-            this.setState({secondaryOrderItems: result[1], tables:result[2]})
-          }else{
-            this.setState({primaryOrderItems: result[1], tables:result[2]})
-          }
-        }
+  onTableToggle(markerID){
+    let state = this.state
 
-      },
+    if(this.state.tableShow[markerID]){
+        state.tableShow[markerID] = false
+    }else{
+        state.tableShow[markerID] = true
+        state.orderShow[markerID] = 'hidden'
+    } 
 
-      onLogin(user, markerID){
-          if(markerID === 2){
-              this.setState({secondaryUser: user.name, secondaryLogin: false})
-          }else{
-              this.setState({primaryUser: user.name, primaryLogin: false})
-          }
-      },
+    this.setState(state)
+  },
 
-      logout(markerID){
-        if(markerID === 2){
-          this.setState({secondaryCashDisplay: false,secondaryTableShow: false, secondaryOrderShow:'hidden', secondaryUser: "", secondaryLogin:true, secondaryOrderItems:[{}], secondaryOrderTotal:0.00})
-        }else{
-          this.setState({primaryCashDisplay: false,primaryTableShow: false, primaryOrderShow:'hidden', primaryUser:"", primaryLogin:true, primaryOrderItems:[{}], primaryOrderTotal:0.00})
-        }
-      },
+  tableClick(table, markerID){
+    let state = this.state
+    let order = this.state.orderItems[markerID]  
+    const result = TableManager.manageTable(this.state.tables, table, order)
+
+    if(!result){
+        console.log("CANNOT DO THIS!")
+    }else if(result[0] === "tables"){
+        state.orderItems[markerID] = [{}]
+        state.orderTotal[markerID] = 0.00
+        state.tables = result[1]
+    }else{
+        state.orderItems[markerID] = result[1]
+        state.tables= result[2]
+    }
+
+    this.setState(state)
+  },
+
+  onLogin(user, markerID){
+    let state = this.state
+    state.user[markerID]=user.name
+    state.login[markerID]=false
+    this.setState(state)
+  },
+
+  logout(markerID){
+    let state = this.state
+    state.cashDisplay[markerID] = false
+    state.tableShow[markerID] = false
+    state.orderShow[markerID] = 'hidden'
+    state.user[markerID] = ''
+    state.login[markerID] = true
+    state.orderItems[markerID] = [{}]
+    state.orderTotal[markerID] = 0.00
+    this.setState(state)
+  },
+
+
+
+
+// HERE BE RENDER
 
       render(){
         if(this.state.split){
           return(
             <div className='tyle-container'>
             <div className="primary">
-            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users} change={this.state.primaryChange}/>
-            <OrderSelector orders={this.state.orders} class={this.state.primaryOrderShow} onClick={this.orderSelect}markerID={1}/>
-            <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
+            <Login 
+                onLogin={this.onLogin} 
+                display={this.state.login[0]} 
+                markerID={0} 
+                users={this.state.users} 
+                change={this.state.change[0]}
+            />
+            <OrderSelector 
+                orders={this.state.orders} 
+                class={this.state.orderShow[0]} 
+                onClick={this.orderSelect}
+                markerID={0}
+            />
+            <TableWindow 
+                markerID={0} 
+                display={this.state.tableShow[0]} 
+                tables={this.state.tables} 
+                onClick={this.tableClick} 
+            />
                   <div id='sidebar'>
                         <Infowindow 
                               time={this.state.time}
                               date={this.state.date} 
-                              input={this.state.primaryInput} 
-                              total={this.state.primaryOrderTotal} 
-                              user={this.state.primaryUser}
-                              change={this.state.primaryChange}
+                              input={this.state.input[0]} 
+                              total={this.state.orderTotal[0]} 
+                              user={this.state.user[0]}
+                              change={this.state.change[0]}
+                        />
+                        <Orderwindow 
+                              markerID={0} 
+                              items={this.state.orderItems[0]} 
+                              onClick={this.onOrderRowClick}
+                        />
+                        <Cashwindow 
+                              markerID={0} 
+                              onClick={this.cashButtonClick} 
+                        />
+                  </div>
+                  <ButtonColumn 
+                        markerID={0}
+                        tableToggle={this.onTableToggle}
+                        orderToggle= {this.onOrderToggle}
+                        cashClick={this.onPayClick}
+                        splitClick= {this.onSplitClick}                    
+                        payToggle={this.onPayToggle} 
+                        logout={this.logout}
+                  />
+                  <Itemwindow 
+                        markerID={0} 
+                        class='item-window-split' 
+                        onPayClick={this.onPayClick}
+                        cashDisplay={this.state.cashDisplay[0]}
+                        items={this.state.displayItems[0]} 
+                        onClick={this.onItemClick} 
+                        onLongClick={this.onLongClick}
+                    />
+                    <MenuTray 
+                        subCategories={this.state.subCategories[0]} 
+                        show={this.state.subMenuShow[0]}
+                        onClick={this.subMenuOptionClick} 
+                        markerID={0}
+                    />
+                    <MenuTray 
+                        categories={this.state.categories} 
+                        onClick={this.menuOptionClick}
+                        onLongClick={this.getSubItems}
+                        markerID={0}
+                    />
+            </div>
+
+            <div id="divider"/>
+
+            <div className="secondary">
+            <ReactCSSTransitionGroup
+                     transitionName="background"
+                     transitionAppear={true} 
+                      transitionAppearTimeout={500}
+                      transitionEnterTimeout={500}
+                      transitionLeaveTimeout={500}
+            >
+            <Login 
+                  onLogin={this.onLogin} 
+                  display={this.state.login[1]} 
+                  markerID={1} 
+                  users={this.state.users} 
+                  change={this.state.change[1]}
+            />
+            <OrderSelector 
+                  orders={this.state.orders} 
+                  class={this.state.orderShow[1]} 
+                  onClick={this.orderSelect}
+                  markerID={1}
+            />
+            <TableWindow 
+                  markerID={1} 
+                  display={this.state.tableShow[1]} 
+                  tables={this.state.tables} 
+                  onClick={this.tableClick} 
+            />
+                  <div id='sidebar'>
+                        <Infowindow 
+                              time={this.state.time}
+                              date={this.state.date} 
+                              input={this.state.input[1]} 
+                              total={this.state.orderTotal[1]} 
+                              user={this.state.user[1]}
+                              change={this.state.change[1]}
                         />
                         <Orderwindow 
                               markerID={1} 
-                              items={this.state.primaryOrderItems} 
+                              items={this.state.orderItems[1]} 
                               onClick={this.onOrderRowClick}
                         />
                         <Cashwindow 
@@ -404,14 +470,14 @@ const Tyle = React.createClass({
                         markerID={1} 
                         class='item-window-split' 
                         onPayClick={this.onPayClick}
-                        cashDisplay={this.state.primaryCashDisplay}
-                        items={this.state.primaryDisplayItems} 
+                        cashDisplay={this.state.cashDisplay[1]}
+                        items={this.state.displayItems[1]} 
                         onClick={this.onItemClick} 
                         onLongClick={this.onLongClick}
                     />
                     <MenuTray 
-                        subCategories={this.state.primarySubCategories} 
-                        show={this.state.primarySubMenuShow}
+                        subCategories={this.state.subCategories[1]} 
+                        show={this.state.subMenuShow[1]}
                         onClick={this.subMenuOptionClick} 
                         markerID={1}
                     />
@@ -421,71 +487,6 @@ const Tyle = React.createClass({
                         onLongClick={this.getSubItems}
                         markerID={1}
                     />
-            </div>
-
-            <div id="divider"/>
-
-            <div className="secondary">
-            <ReactCSSTransitionGroup
-                     transitionName="background"
-                     transitionAppear={true} 
-                      transitionAppearTimeout={500}
-                      transitionEnterTimeout={500}
-                      transitionLeaveTimeout={500}
-                   >
-            <Login onLogin={this.onLogin} display={this.state.secondaryLogin} markerID={2} users={this.state.users} change={this.state.secondaryChange}/>
-            <OrderSelector orders={this.state.orders} class={this.state.secondaryOrderShow} onClick={this.orderSelect}markerID={2}/>
-            <TableWindow markerID={2} display={this.state.secondaryTableShow} tables={this.state.tables} onClick={this.tableClick} />
-            <div id='sidebar'>
-                <Infowindow 
-                    time={this.state.time}
-                    date={this.state.date} 
-                    input={this.state.secondaryInput} 
-                    total={this.state.secondaryOrderTotal} 
-                    user={this.state.secondaryUser}
-                    change={this.state.secondaryChange}
-
-                />
-                <Orderwindow 
-                    markerID={2} 
-                    items={this.state.secondaryOrderItems} 
-                    onClick={this.onOrderRowClick}
-                />
-                <Cashwindow 
-                    markerID={2} 
-                    onClick={this.cashButtonClick}
-                />
-            </div>
-            <ButtonColumn 
-                markerID={2}
-                tableToggle={this.onTableToggle}
-                orderToggle= {this.onOrderToggle}
-                cashClick={this.onPayClick}
-                splitClick= {this.onSplitClick}
-                payToggle={this.onPayToggle} 
-                logout={this.logout}
-            />
-            <Itemwindow 
-                markerID={2} 
-                onPayClick={this.onPayClick}
-                cashDisplay={this.state.secondaryCashDisplay}
-                class='item-window-split' 
-                items={this.state.secondaryDisplayItems} 
-                onClick={this.onItemClick} 
-                onLongClick={this.onLongClick}
-            />
-         <MenuTray 
-             subCategories={this.state.secondarySubCategories} 
-             show={this.state.secondarySubMenuShow}
-             onClick={this.subMenuOptionClick} 
-             markerID={2}
-         />
-         <MenuTray 
-             categories={this.state.categories} 
-             onClick={this.menuOptionClick} 
-             onLongClick={this.getSubItems}
-             markerID={2}
-         />
            </ReactCSSTransitionGroup>
             </div>
                    
@@ -495,58 +496,73 @@ const Tyle = React.createClass({
 
           return(
             <div className='tyle-container'>
-            <Login onLogin={this.onLogin} display={this.state.primaryLogin} markerID={1} users={this.state.users} change={this.state.primaryChange}/>
-            <OrderSelector orders={this.state.orders} class={this.state.primaryOrderShow} onClick={this.orderSelect}markerID={1}/>
-            <TableWindow markerID={1} display={this.state.primaryTableShow} tables={this.state.tables} onClick={this.tableClick}/>
-            <div id='sidebar'>
-                <Infowindow
-                    time={this.state.time}
-                    date={this.state.date} 
-                    input={this.state.primaryInput} 
-                    total={this.state.primaryOrderTotal} 
-                    user={this.state.primaryUser}
-                    change={this.state.primaryChange}
-                />
-                <Orderwindow 
-                    markerID={1} 
-                    items={this.state.primaryOrderItems} 
-                    onClick={this.onOrderRowClick}
-                />
-                <Cashwindow 
-                    markerID={1} 
-                    onClick={this.cashButtonClick}/>
-            </div>
-            <ButtonColumn
-                markerID={1}
-                orderToggle= {this.onOrderToggle}
-                cashClick={this.onPayClick}
-                tableToggle={this.onTableToggle}
-                splitClick= {this.onSplitClick}
-                payToggle={this.onPayToggle}
-                logout={this.logout}
+           <Login 
+                  onLogin={this.onLogin} 
+                  display={this.state.login[0]} 
+                  markerID={0} users={this.state.users} 
+                  change={this.state.change[0]}
             />
-            <Itemwindow 
-                markerID={1} 
-                onPayClick={this.onPayClick}
-                cashDisplay={this.state.primaryCashDisplay}
-                class= 'item-window' 
-                items={this.state.primaryDisplayItems} 
-                onClick={this.onItemClick} 
-                onLongClick={this.onLongClick}
+           <OrderSelector 
+                  orders={this.state.orders} 
+                  class={this.state.orderShow[0]} 
+                  onClick={this.orderSelect}
+                  markerID={0}
             />
-            <MenuTray 
-                subCategories={this.state.primarySubCategories} 
-                show={this.state.primarySubMenuShow}
-                onClick={this.subMenuOptionClick} 
-                markerID={1}
+           <TableWindow 
+                  markerID={0} 
+                  display={this.state.tableShow[0]} 
+                  tables={this.state.tables} 
+                  onClick={this.tableClick} 
             />
-            <MenuTray 
-                categories={this.state.categories} 
-                onClick={this.menuOptionClick}
-                onLongClick={this.getSubItems}
-                markerID={1}
-            />
-            </div>
+                 <div id='sidebar'>
+                       <Infowindow 
+                             time={this.state.time}
+                             date={this.state.date} 
+                             input={this.state.input[0]} 
+                             total={this.state.orderTotal[0]} 
+                             user={this.state.user[0]}
+                             change={this.state.change[0]}
+                       />
+                       <Orderwindow 
+                             markerID={0} 
+                             items={this.state.orderItems[0]} 
+                             onClick={this.onOrderRowClick}
+                       />
+                       <Cashwindow 
+                             markerID={0} 
+                             onClick={this.cashButtonClick} 
+                       />
+                 </div>
+                 <ButtonColumn 
+                       markerID={0}
+                       tableToggle={this.onTableToggle}
+                       orderToggle= {this.onOrderToggle}
+                       cashClick={this.onPayClick}
+                       splitClick= {this.onSplitClick}                    
+                       payToggle={this.onPayToggle} 
+                       logout={this.logout}
+                 />
+                 <Itemwindow 
+                       markerID={0} 
+                       class='item-window' 
+                       onPayClick={this.onPayClick}
+                       cashDisplay={this.state.cashDisplay[0]}
+                       items={this.state.displayItems[0]} 
+                       onClick={this.onItemClick} 
+                       onLongClick={this.onLongClick}
+                   />
+                   <MenuTray 
+                       subCategories={this.state.subCategories[0]} 
+                       show={this.state.subMenuShow[0]}
+                       onClick={this.subMenuOptionClick} 
+                       markerID={0}
+                   />
+                   <MenuTray 
+                       categories={this.state.categories} 
+                       onClick={this.menuOptionClick}
+                       onLongClick={this.getSubItems}
+                       markerID={0}
+                   />            </div>
             )
 
         }
