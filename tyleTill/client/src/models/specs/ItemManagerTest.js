@@ -9,7 +9,6 @@ describe("ItemTest", function(){
   
   it("Should return all items", function(){
         const returnItems = ItemManager.getItems(items)
-        console.log(returnItems)
         assert.deepEqual(returnItems.length, 14)
   })
 

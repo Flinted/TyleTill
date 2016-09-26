@@ -18,7 +18,7 @@ const TableWindow = React.createClass({
        for(let key in data){
               if(data[key].length > 0 ){
                 className = "table-taken"
-                }else{
+              }else{
                 className = "table-free"            
               }
                 tables.push(<div className={className} id={key} key={key} onClick={this.tableClick}>{key}</div>)
